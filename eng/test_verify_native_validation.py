@@ -58,6 +58,8 @@ class NativeGateTests(unittest.TestCase):
                              ("App.cs", '#pragma warning disable IL2026'),
                              ("App.cs", '#pragma warning disable 2026'),
                              ("App.csproj", '<Project><PropertyGroup><RunAnalyzers>false</RunAnalyzers></PropertyGroup></Project>'),
+                             ("App.csproj", '<Project><PropertyGroup><SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings></PropertyGroup></Project>'),
+                             ("App.csproj", '<Project><PropertyGroup><SuppressAotAnalysisWarnings>true</SuppressAotAnalysisWarnings></PropertyGroup></Project>'),
                              ("App.csproj", '<Project><PropertyGroup><EnableAotAnalyzer>false</EnableAotAnalyzer></PropertyGroup></Project>'),
                              ("App.cs", '[DynamicDependency("Setter")]'),
                              (".editorconfig", 'dotnet_diagnostic.IL2026.severity = warning')):

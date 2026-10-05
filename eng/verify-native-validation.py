@@ -98,6 +98,8 @@ def guard_consumer_sources(folder):
                             "TreatWarningsAsErrors", "ILLinkTreatWarningsAsErrors", "IlcTreatWarningsAsErrors"}
                 if node.tag in enforced and (node.text or "").strip().lower() != "true":
                     raise ValueError(f"Analysis or strict warning policy disabled: {path}: {node.tag}")
+                if node.tag in {"SuppressTrimAnalysisWarnings", "SuppressAotAnalysisWarnings"} and (node.text or "").strip().lower() != "false":
+                    raise ValueError(f"Native/trim diagnostic suppression forbidden: {path}: {node.tag}")
                 if node.tag == "Import":
                     raise ValueError(f"Consumer must not import external build definitions: {path}")
         if path.suffix == ".cs":
@@ -201,14 +203,19 @@ def main():
     # production ProjectReference and restore Validation in a fresh local cache.
     with tempfile.TemporaryDirectory(prefix="work-", dir=output) as temporary:
         work = Path(temporary)
+        if report["dirty"]:
+            raise ValueError("Strict candidate verification requires a clean current source checkout")
         if args.package_feed:
-            if report["dirty"]:
-                raise ValueError("Prepacked candidate artifacts require a clean current source checkout")
             feed = args.package_feed.resolve()
         else:
             feed = work / "candidate-feed"
             run(["dotnet", "pack", "ReactiveUI.Validation.slnx", "-c", "Release", "-m:2", "-warnaserror", "-o", feed],
                 output / "candidate-pack.log", ROOT / "src")
+            retained = output / "candidate-packages" / report["source"]
+            retained.mkdir(parents=True, exist_ok=True)
+            for package in feed.glob("*.nupkg"):
+                shutil.copyfile(package, retained / package.name)
+            feed = retained
         release_feed = ROOT / "artifacts/verification/released-validation"
         run([sys.executable, ROOT / "investigations/NativeAot/restore-validation-feed.py", release_feed],
             output / "baseline-feed.log", ROOT)
@@ -236,7 +243,8 @@ def main():
                 flags = ["-c", "Release", "-m:2", "-warnaserror", "--configfile", config,
                          f"-p:ValidationVersion={version}", f"-p:RestorePackagesPath={cache}",
                          "-p:EnableTrimAnalyzer=true", "-p:EnableAotAnalyzer=true", "-p:TreatWarningsAsErrors=true",
-                         "-p:TrimmerSingleWarn=false", "-p:ILLinkTreatWarningsAsErrors=true"]
+                         "-p:TrimmerSingleWarn=false", "-p:ILLinkTreatWarningsAsErrors=true",
+                         "-p:SuppressTrimAnalysisWarnings=false", "-p:SuppressAotAnalysisWarnings=false"]
                 package_hash = digest(package_path)
                 report["packages"][f"{kind}-{flavor}"] = {"id": package_id, "version": version, "sha256": package_hash}
                 stages = ["baseline"] if kind == "baseline" else (["managed", "trimmed", "native"] if args.mode == "all" else [args.mode])
