@@ -4,6 +4,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 #if REACTIVE_SHIM
 namespace ReactiveUI.Validation.Reactive.Extensions;
@@ -22,26 +23,19 @@ public static class ValidatableViewModelExtensions
         /// Registers an <see cref="IValidationComponent"/> into the <see cref="ValidationContext"/>
         /// of the specified <see cref="IValidatableViewModel"/>. Disposes and removes the
         /// <see cref="IValidationComponent"/> from the <see cref="ValidationContext"/> when the
-        /// <see cref="ValidationHelper"/> is disposed.
+        /// <see cref="ValidationHelper"/> is disposed. The context is captured during registration, even
+        /// if the view model later replaces its default context.
         /// </summary>
         /// <typeparam name="TValidationComponent">The disposable validation component type.</typeparam>
         /// <param name="validation">The disposable validation component to register into the context.</param>
         /// <returns>The bindable validation helper holding the disposable.</returns>
         [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
         [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal ValidationHelper RegisterValidation<TValidationComponent>(
             TValidationComponent validation)
-            where TValidationComponent : IValidationComponent, IDisposable
-        {
-            viewModel.ValidationContext.Add(validation);
-            return new(validation, Disposable.Create(
-                (viewModel, validation),
-                static state =>
-                {
-                    state.viewModel.ValidationContext?.Remove(state.validation);
-                    state.validation.Dispose();
-                }));
-        }
+            where TValidationComponent : IValidationComponent, IDisposable =>
+            ValidationRuleContextExtensions.RegisterValidation(viewModel.ValidationContext, validation);
     }
 
     /// <summary>Provides validation rule extension members for <paramref name="viewModel"/>.</summary>
