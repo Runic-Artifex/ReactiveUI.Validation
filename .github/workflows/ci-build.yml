@@ -23,6 +23,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.x'
+      - name: Test package dependency guards
+        run: python -B -m unittest discover -s eng -p test_verify_packages.py -v
       - name: Restore pinned Runic DynamicData packages
         run: python eng/restore-fork-dependencies.py
       - name: Build .NET 10
