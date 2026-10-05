@@ -209,3 +209,12 @@ artifacts; release hashes must be read from the actual published assets.
 The redundant queued main-push Build was cancelled after the exact same source
 passed cross-platform CI. This final documentation-only update reuses that
 unchanged-source evidence and does not alter the published source/tag/assets.
+
+The canonical ignored `artifacts/packages` feed now contains exactly the two
+published `.790.17` assets with the verified release hashes above. The local
+`.804` verification pair moved to
+`artifacts/retained-packages/8.1.0-runic.0.804`; its integration summary preserves
+both historical pack-time paths and current retained paths. The previous `.790`
+pair remains retained. `artifacts/verification/canonical-published-feed.json`
+records the canonical copy. The release description was updated from the reviewed
+notes without changing the tag or assets.
