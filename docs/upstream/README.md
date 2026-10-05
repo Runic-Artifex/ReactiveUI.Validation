@@ -9,6 +9,11 @@ For subsequent implementation status, use the [live October ledger](implementati
 and [implementation review](reviews/2026-10-implementation.md). The recommendations
 and diagnostic results below describe the original reviewed baseline.
 
+The separate [NativeAOT and generator investigation](../aot-and-generators.md),
+dated 2026-10-05 against the released cohort, follows up on the generator/AOT
+questions below. It records native consumer results and proposed support work;
+it does not change this historical review or declare production AOT support.
+
 This review inventories upstream issues and pull requests and identifies useful work for our .NET 10 fork. The immediate recommendation is to fix binding lifetime behavior, then add explicit validation-context selection and a Runic collection-validation example. Typed state bindings and benchmarks are useful follow-ups. Most historical dependency upgrades and bug fixes are already inherited and should not be replayed.
 
 The inventory contains **53 issues and 936 pull requests**, covering open, closed and merged records as of **2026-10-05**. Five issues are open; no pull requests are open. The assessment below separates upstream reports, observations in our fork, and proposed implementation work. No product fixes were applied during this review.

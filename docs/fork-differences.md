@@ -74,3 +74,9 @@ collection examples and source-level SDK adapter probes. The
 [ledger](upstream/implementation-2026-10.md#implemented-behavior-and-scheduling-correction)
 records the shipping pin, API parity approval and completed verification. No broad
 Native AOT support or ReactiveUI 25 compatibility follows from this release.
+
+The separate [NativeAOT and generator investigation](aot-and-generators.md)
+dated **2026-10-05** records the released cohort's native consumer evidence and
+additive migration options. It leaves the released API annotations and support
+scope unchanged; proposed native APIs and broader compatibility remain future
+work rather than adopted differences in this register.
