@@ -78,9 +78,11 @@ both view model and selected-context property replacement, and detaches previous
 subscriptions. A null model or selected context clears text, delivers an empty property-rule
 list and delivers a valid aggregate state. String targets display aggregate text or the first nonempty property-rule
 message. They support an optional text formatter; property bindings also support
-`strict: false` for nonexclusive property matching. Callbacks receive validation
-states directly, so native controls or browser projections can map validity and
-text without deriving validity from an empty message. Callbacks run on the
+`strict: false` to include rules that validate additional properties. Both modes
+match the exact property path; `strict: true` includes only rules that validate
+that property exclusively. Callbacks receive validation states directly, so
+native controls or browser projections can map validity and text without deriving
+validity from an empty message. Callbacks run on the
 source notification thread; marshal UI assignment explicitly when necessary.
 
 Property callbacks receive the actual matching rule states. No matching rules
