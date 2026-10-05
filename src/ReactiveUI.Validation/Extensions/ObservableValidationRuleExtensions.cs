@@ -9,7 +9,13 @@ namespace ReactiveUI.Validation.Extensions;
 #endif
 
 /// <summary>Registers caller-created observables without discovering or observing properties.</summary>
-/// <remarks>Supply initial states and serialize mutations and notifications on the model owner. Dispose helpers before their captured context.</remarks>
+/// <remarks>
+/// Supply initial states and serialize mutations and notifications on the model owner.
+/// Helpers unregister and dispose their rule's subscription, without disposing the caller's observable or context.
+/// Failed registration removes any partly admitted rule and disposes its subscription before propagating the original failure.
+/// If rollback also fails, an <see cref="AggregateException"/> retains the registration failure as its first inner exception.
+/// Dispose helpers before their captured context.
+/// </remarks>
 public static class ObservableValidationRuleExtensions
 {
     /// <summary>Provides explicit-observable rules for a view model's default context.</summary>

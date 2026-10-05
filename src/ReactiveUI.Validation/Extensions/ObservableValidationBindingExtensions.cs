@@ -9,6 +9,11 @@ namespace ReactiveUI.Validation.Extensions;
 #endif
 
 /// <summary>Projects validation through caller-created source streams and ordinary typed callbacks.</summary>
+/// <remarks>
+/// Bindings own subscriptions only; they do not dispose caller-owned sources, helpers, models, or contexts.
+/// Observable, selector, converter, and callback failures follow ordinary observable subscription behavior;
+/// this adapter does not recover errors or schedule notifications.
+/// </remarks>
 public static class ObservableValidationBindingExtensions
 {
     /// <summary>Provides validation binding for explicit model, helper, or context selections.</summary>

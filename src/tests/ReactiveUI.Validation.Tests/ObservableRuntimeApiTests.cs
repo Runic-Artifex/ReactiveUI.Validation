@@ -96,7 +96,7 @@ public class ObservableRuntimeApiTests
         await Assert.That(identities).IsEquivalentTo(new IValidationState[] { first, second, second });
         await Assert.That(snapshots[^1][0]).IsSameReferenceAs(second);
         await Assert.That(((SeverityValidationState)snapshots[^1][1]).Severity).IsEqualTo(UpdatedSeverity);
-        await Assert.That(snapshots[^1].All(static value => !value.IsValid && value.Text.Count == 0)).IsTrue();
+        await Assert.That(snapshots[^1].All(static value => !value.IsValid && value.Text.ToSingleLine().Length == 0)).IsTrue();
     }
 
     /// <summary>Verifies initial empty membership, addition/removal, replaced contexts, null selections, and disposal.</summary>
@@ -256,10 +256,144 @@ public class ObservableRuntimeApiTests
         await Assert.That(() => selected.BindObservablePropertyValidationState(static value => value, "Name", static values => values.Count, (Action<int>)null!, true)).Throws<ArgumentNullException>();
     }
 
+    /// <summary>Verifies admission rollback removes a partly added rule and releases its activated upstream connection.</summary>
+    /// <returns>The asynchronous test.</returns>
+    [Test]
+    public async Task RejectedRegistrationRollsBackMembershipAndSubscription()
+    {
+        using var context = new RejectingContext();
+        using var states = new BehaviorSubject<IValidationState>(ValidationState.Valid);
+        var failure = await Assert.That(() => ((IValidationContext)context).AddObservableRule(states, ["Name"])).Throws<InvalidOperationException>();
+        await Assert.That(failure).IsSameReferenceAs(context.AdmissionError);
+        await Assert.That(context.Activated).IsTrue();
+        await Assert.That(context.Validations.Count).IsEqualTo(0);
+        await Assert.That(states.HasObservers).IsFalse();
+        states.OnNext(new ValidationState(false, "still usable"));
+    }
+
+    /// <summary>Verifies rollback failure retains the admission error and still disposes the active source.</summary>
+    /// <returns>The asynchronous test.</returns>
+    [Test]
+    public async Task RollbackFailureRetainsOriginalAdmissionError()
+    {
+        using var context = new RejectingContext { FailRollback = true };
+        using var states = new BehaviorSubject<IValidationState>(ValidationState.Valid);
+        var failure = await Assert.That(() => ((IValidationContext)context).AddObservableRule(states, ["Name"])).Throws<AggregateException>();
+        await Assert.That(failure!.InnerExceptions[0]).IsSameReferenceAs(context.AdmissionError);
+        await Assert.That(failure.InnerExceptions[1]).IsSameReferenceAs(context.RollbackError);
+        await Assert.That(context.Validations.Count).IsEqualTo(0);
+        await Assert.That(states.HasObservers).IsFalse();
+    }
+
+    /// <summary>Verifies failure while the helper activates a supplied stream rolls back already added membership.</summary>
+    /// <returns>The asynchronous test.</returns>
+    [Test]
+    public async Task SourceActivationFailureRollsBackRegistration()
+    {
+        using var context = new ValidationContext();
+        var source = new FailingSource();
+        var failure = await Assert.That(() => context.AddObservableRule(source, ["Name"])).Throws<InvalidOperationException>();
+        await Assert.That(failure).IsSameReferenceAs(source.SubscriptionError);
+        await Assert.That(context.Validations.Count).IsEqualTo(0);
+    }
+
+    /// <summary>Verifies first-seed callbacks can replace membership and reselect the same context without missed changes.</summary>
+    /// <returns>The asynchronous test.</returns>
+    [Test]
+    public async Task InitialSeedReentrancyRecoversLatestMembershipAndSelection()
+    {
+        using var context = new ValidationContext();
+        using var oldStates = new BehaviorSubject<IValidationState>(new ValidationState(false, "old"));
+        using var newStates = new BehaviorSubject<IValidationState>(ValidationState.Valid);
+        using var oldRule = context.AddObservableRule(oldStates, ["Name"]);
+        using var sources = new BehaviorSubject<IValidationContext?>(context);
+        var values = new List<bool>();
+        ValidationHelper? replacement = null;
+        var changed = false;
+        using var binding = sources.BindObservablePropertyValidationState(
+            static selected => selected,
+            "Name",
+            static states => states.All(static state => state.IsValid),
+            value =>
+            {
+                values.Add(value);
+                if (!changed)
+                {
+                    changed = true;
+                    context.Remove(context.Validations.Items[0]);
+                    replacement = context.AddObservableRule(newStates, ["Name"]);
+                    sources.OnNext(null);
+                    sources.OnNext(context);
+                }
+            },
+            true);
+        try
+        {
+            await Assert.That(values[0]).IsFalse();
+            await Assert.That(values[^1]).IsTrue();
+            var count = values.Count;
+            oldStates.OnNext(ValidationState.Valid);
+            await Assert.That(values.Count).IsEqualTo(count);
+            newStates.OnNext(new ValidationState(false, "latest"));
+            await Assert.That(values[^1]).IsFalse();
+        }
+        finally
+        {
+            replacement?.Dispose();
+        }
+    }
+
     /// <summary>A non-reactive owner proves registration and selection use only supplied inputs.</summary>
     private sealed class PlainModel : IValidatableViewModel
     {
         /// <inheritdoc/>
         public IValidationContext ValidationContext { get; set; } = null!;
+    }
+
+    /// <summary>A supplied observable whose subscription cannot be established.</summary>
+    private sealed class FailingSource : IObservable<IValidationState>
+    {
+        /// <summary>Gets the original activation failure.</summary>
+        internal InvalidOperationException SubscriptionError { get; } = new("Supplied source activation failed.");
+
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException">The source cannot establish a subscription.</exception>
+        public IDisposable Subscribe(IObserver<IValidationState> observer) => throw SubscriptionError;
+    }
+
+    /// <summary>A custom context that accepts and activates a component before rejecting admission.</summary>
+    private sealed class RejectingContext : ValidationContext, IValidationContext
+    {
+        /// <summary>Gets the original admission failure.</summary>
+        internal InvalidOperationException AdmissionError { get; } = new("Admission rejected after activation.");
+
+        /// <summary>Gets the rollback failure.</summary>
+        internal InvalidOperationException RollbackError { get; } = new("Rollback rejected after removal.");
+
+        /// <summary>Gets a value indicating whether rollback rejects removal.</summary>
+        internal bool FailRollback { get; init; }
+
+        /// <summary>Gets a value indicating whether admission connected the state source.</summary>
+        internal bool Activated { get; private set; }
+
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException">Admission fails after adding and activating the supplied rule.</exception>
+        public new void Add(IValidationComponent validation)
+        {
+            base.Add(validation);
+            Activated = validation.IsValid;
+            throw AdmissionError;
+        }
+
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException">Rollback fails after removing the supplied rule.</exception>
+        public new void Remove(IValidationComponent validation)
+        {
+            base.Remove(validation);
+            if (FailRollback)
+            {
+                throw RollbackError;
+            }
+        }
     }
 }
