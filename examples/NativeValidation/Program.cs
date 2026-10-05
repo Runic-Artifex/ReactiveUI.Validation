@@ -26,16 +26,22 @@ internal static class Program
             catch (Exception error)
             {
                 failed++;
-                Console.WriteLine($"{{\"case\":\"{name}\",\"passed\":false,\"exception\":\"{error.GetType().Name}\"}}");
+                var failureId = error.Data["failureId"] is string assertion ? assertion : "unexpected-exception";
+                Console.WriteLine($"{{\"case\":\"{name}\",\"passed\":false,\"exception\":\"{error.GetType().Name}\",\"failureId\":\"{failureId}\"}}");
                 Console.Error.WriteLine($"{name}: {error}");
             }
         }
         return failed == 0 ? 0 : 1;
     }
 
-    private static void Check(bool condition, string message)
+    private static void Check(bool condition, string message, string failureId = "assertion")
     {
-        if (!condition) throw new InvalidOperationException(message);
+        if (!condition)
+        {
+            var error = new InvalidOperationException(message);
+            error.Data["failureId"] = failureId;
+            throw error;
+        }
     }
 
     private static void GenericField()
@@ -114,16 +120,27 @@ internal static class Program
         Check(editor.Writes == writes, "replaced helper source detached");
         remoteState.Set(ValidationState.Valid);
         Check(editor.Status is null, "replacement helper valid projection");
+        remoteState.Set(new UniquenessState(false, "before-null-helper", 8));
+        Check(editor.Status?.Revision == 8, "live helper invalid before null");
         second.AddressRule = null;
         Check(editor.Status is null, "null helper clears typed nullable target");
-        editor.ViewModel = null;
         writes = editor.Writes;
-        second.Address!.Postcode = "12345";
+        remoteState.Set(ValidationState.Valid);
+        Check(editor.Writes == writes, "null helper detaches still-live source");
+        second.AddressRule = replacementRule;
+        remoteState.Set(new UniquenessState(false, "before-null-editor", 9));
+        Check(editor.Status?.Revision == 9, "live editor invalid before null model");
+        editor.ViewModel = null;
+        Check(editor.Status is null, "null editor clears invalid live helper");
+        writes = editor.Writes;
+        remoteState.Set(ValidationState.Valid);
+        second.Address!.Postcode = "changed-after-null";
+        second.AddressRule = firstRule;
         Check(editor.Writes == writes, "null editor detaches");
         binding.Dispose();
         editor.ViewModel = first;
         Check(editor.Writes == writes, "owner binding cleanup");
-        Check(nullAddressInvalid, "required-address policy violated: legacy observation retains the previous value");
+        Check(nullAddressInvalid, "required-address policy violated: legacy observation retains the previous value", "required-address-policy");
     }
 
     private static Presentation? Project(IValidationState state) => state.IsValid ? null : new Presentation(Severity.Blocking, state.Text.ToSingleLine(), state is UniquenessState rich ? rich.Revision : 1);
@@ -186,8 +203,9 @@ internal static class Program
         Check(customer.HasErrors && customer.ValidationContext.Validations.Count == 2, "new rows block while uniqueness is pending");
         IValidationState? lastState = null;
         using var stateSubscription = rows[1].Rule.ValidationChanged.Subscribe(new Observer<IValidationState>(state => lastState = state));
-        rows[1].Source.Set(new UniquenessState(false, "duplicate", 1));
-        Check(!rows[1].Rule.IsValid && lastState is UniquenessState { Code: "duplicate", Revision: 1 }, "async result retains rich struct state");
+        IValidationState deliveredState = new UniquenessState(false, "duplicate", 1);
+        rows[1].Source.Set(deliveredState);
+        Check(!rows[1].Rule.IsValid && ReferenceEquals(lastState, deliveredState) && lastState is UniquenessState { Code: "duplicate", Revision: 1 }, "async result retains original boxed rich struct state");
         stateSubscription.Dispose();
         var removed = rows[1];
         removed.Rule.Dispose();
