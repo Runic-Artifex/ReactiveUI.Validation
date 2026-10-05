@@ -196,5 +196,18 @@
     ],
     "accepted_rids_are_not_execution_proof": true,
     "final_integrated_results_recorded": false
+  },
+  "runtime_api": {
+    "topic_source": "67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195",
+    "independently_reviewed": true,
+    "merged_into_integration_owner_candidate": true,
+    "new_methods_per_flavor": 6,
+    "new_baseline_lines_per_flavor": 21,
+    "focused_tests_per_flavor": 12,
+    "focused_tests_failed_per_flavor": 0,
+    "release_producer_build_warnings": 0,
+    "release_producer_build_errors": 0,
+    "regressions": "src/tests/ReactiveUI.Validation.Tests/ObservableRuntimeApiTests.cs",
+    "final_integrated_package_native_gate_recorded": false
   }
 }

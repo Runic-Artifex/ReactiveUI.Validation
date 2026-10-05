@@ -37,7 +37,11 @@ The view-model form captures the current default context once. The explicit
 context form captures the supplied context. Replacing the model's context later
 does not move the rule or redirect helper cleanup. Dispose the helper before its
 captured context: it unregisters its own component and disposes the connection
-owned by that component. It does not dispose the caller's observable or context.
+owned by that component. It does not dispose the caller's observable or context. If registration or
+initial helper activation fails, rollback removes that exact component from the
+captured context and disposes its owned connection. The original exception is
+preserved; a cleanup failure produces an `AggregateException` with the original
+exception first.
 
 ## Follow selections and assign typed results
 
@@ -82,6 +86,8 @@ The callback performs a statically compiled assignment, for example
 custom presentation value without deriving validity from text. Dispatch to the
 UI scheduler in the application adapter when required. Validation does not
 change the source notification scheduler or global ReactiveUI defaults.
+Selector, stream, converter and callback errors propagate through the ordinary
+observable subscription; these APIs add no recovery or scheduling policy.
 
 Disposing a binding detaches subscriptions, including after replacement or null
 selection. Repeated and reentrant disposal are supported. Bindings do not dispose

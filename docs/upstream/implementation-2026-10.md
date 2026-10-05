@@ -213,7 +213,12 @@ define the contract and keep topic, integration and publication evidence separat
 Audit `4cdf89ab1d2de08dc3b85c48db2aee7418aa85c1` removes false RDC requirements,
 narrows blanket RUC on generated OAPH and supplied-observable paths, and preserves
 RUC on legacy reflection. Both producers pass warnings-as-errors analysis and
-48 focused tests per flavor; that topic evidence does not substitute for final
+48 focused tests per flavor. API `67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195`
+adds six methods and 21 baseline lines per flavor, with 12 new runtime regressions
+per flavor passing and a clean producer-analysis build. Registration rollback,
+original exception preservation and reentrant initial membership/source selection
+have focused coverage. These topics are independently reviewed and merged into
+the integration owner's candidate; their evidence does not substitute for final
 integrated core/native gates. The [structured follow-up evidence](evidence/native-runtime-implementation.json)
 records exact audit counts and historical probe identities.
 
