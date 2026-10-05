@@ -166,8 +166,9 @@ var presentation = new HelperSelections(editor).BindObservableValidationState(
 
 `PropertyValues`, `NestedPostcodes`, `HelperSelections` and `Project` here are
 application-owned corpus code, not assumed library APIs. A future observation
-generator emits their typed notification/subscription operations or accepts those
-streams unchanged. The snippet never asks another generator to transform its
+generator emits equivalent typed notification/subscription operations with the
+handoff safeguards below, or accepts caller streams under their declared
+observation contract. The snippet never asks another generator to transform its
 emitted code. The model owner retains and disposes `emailRule`/`postcodeRule`;
 the editor owner retains and disposes `presentation`.
 
@@ -188,6 +189,44 @@ it does not meet this corpus's policy that a missing address becomes invalid.
 The Validation observation declaration must specify the null policy explicitly,
 or the caller must supply a null-aware observable. This is a distinct choice
 from null *binding source*, whose documented projection is valid/empty.
+
+### Synchronous subscription handoff and initial failure
+
+The example adapters demonstrate the tested ordinary replacement/null/disposal
+flows. They do not establish behavior when an initial `OnNext` reenters parent
+replacement/disposal or throws. A future generator must handle those cases before
+its notification adapter is treated as reusable runtime infrastructure.
+
+In `NestedPostcodes` and `HelperSelections`, a naive `inner = Subscribe(observer)`
+assignment occurs after synchronous initial delivery. If that delivery replaces
+the parent, a reentered subscription can become current, then be overwritten by
+the older subscription's returned handle. Reentry to a null parent can similarly
+leave the old subscription attached. The generated adapter must install an owned
+pending assignment slot before subscribing. Replacements dispose that slot via a
+serial owner; when an obsolete `Subscribe` finally returns, assigning its handle
+to its already-disposed slot disposes it immediately instead of overwriting the
+current slot. A generation token/disposed guard rejects notifications from a
+superseded or disposed generation. This is a subscription ownership requirement
+within the serialized owner model, not a promise of concurrent mutation support.
+
+Initial failure requires source-side cleanup too: a subscription that attaches an
+event handler and then throws during its getter/initial `OnNext` returns no handle
+for its caller to dispose. Generated notification sources must construct cleanup
+before initial delivery and detach their handlers if that delivery fails, then
+propagate the original error. Generated nested sources must also dispose all
+already-installed outer/inner pending slots on construction/subscription failure.
+A pending slot alone cannot recover a leaked handler inside an arbitrary supplied
+source whose `Subscribe` throws before returning; caller-created sources keep
+their own exception-cleanup contract.
+
+Deferred generated-adapter acceptance cases must exercise the handoff itself:
+
+| Trigger during synchronous initial delivery | Required evidence |
+| --- | --- |
+| Initial postcode callback replaces Address; initial helper callback replaces editor ViewModel | Latest source remains owned; subsequent old-source changes emit nothing; disposal detaches both old and latest handlers. |
+| Initial callback changes the parent to null | Explicit null policy is delivered; the returning old subscription is disposed; old-source changes emit nothing. |
+| Initial callback disposes an owner whose pending subscription slot is already installed | Returned handles are disposed immediately; no handler or later callback survives disposal. |
+| Initial getter or callback throws after event attachment, including a nested subscription | Original error propagates; all task-owned outer/inner handlers are detached despite no returned subscription handle. |
 
 A target generator is optional: a caller-written `value => editor.Status = value`
 already has typed reachability and supports nullable/custom targets. Generating
