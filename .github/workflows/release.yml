@@ -23,4 +23,4 @@ jobs:
         run: |
           package=$(find artifacts/packages -maxdepth 1 -name 'Runic.ReactiveUI.Validation.*.nupkg' ! -name 'Runic.ReactiveUI.Validation.Reactive.*')
           version=$(basename "$package" | sed -E 's/^Runic.ReactiveUI.Validation\.(.*)\.nupkg$/\1/')
-          gh release create "runic-v$version" artifacts/packages/*.nupkg --target "$GITHUB_SHA" --title "Runic ReactiveUI.Validation $version" --prerelease --generate-notes
+          gh release create "runic-v$version" artifacts/packages/*.nupkg --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Runic ReactiveUI.Validation $version" --prerelease --generate-notes
