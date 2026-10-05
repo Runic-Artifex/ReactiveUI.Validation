@@ -25,6 +25,13 @@ Unless noted otherwise, the adoption source for these entries is Runic commit `5
 | RUV-008 / retained | [Upstream #990](https://github.com/reactiveui/ReactiveUI.Validation/pull/990), `e68c8a6`: split validation flavors, custom-resolver formatter fallback and PublicApiSharp baselines; TUnit/Microsoft.Testing.Platform already exists upstream. | Preserve [formatter resolver tests](../src/tests/ReactiveUI.Validation.Tests/ValidationTextFormatterResolverTests.cs), awaited TUnit assertions and explicit review of both .NET 10 API baselines. Replacement needs equivalent consumer/DI/API evidence, not another test runner by incidental merge. |
 | RUV-009 / retained | [Upstream #660](https://github.com/reactiveui/ReactiveUI.Validation/pull/660), `3834d5e`: disposable collection ownership for context observations; [#879](https://github.com/reactiveui/ReactiveUI.Validation/pull/879), `406c372`: disposal-order and `WhenAnyValue` error-state regressions. | Preserve [context](../src/tests/ReactiveUI.Validation.Tests/ValidationContextTests.cs), [internal collection](../src/tests/ReactiveUI.Validation.Tests/InternalCollectionTests.cs), [helper](../src/tests/ReactiveUI.Validation.Tests/ValidationHelperTests.cs) and [error notification](../src/tests/ReactiveUI.Validation.Tests/NotifyDataErrorInfoTests.cs) coverage in both flavors. Retire an adaptation only after equivalent ownership/order behavior is reproduced. These tests do not prove all ViewModel replacement or side-effect ordering cases. |
 
+## Live implementation status
+
+The [October implementation ledger](upstream/implementation-2026-10.md) and
+[implementation review](upstream/reviews/2026-10-implementation.md) track the
+authorized follow-up work. Adoption and final verification are pending; the
+historical findings below retain their reviewed baseline.
+
 ## Known gaps and proposed work
 
 The [2026-10-05 investigation](upstream/README.md#binding-lifetime) reproduced old-model updates after ViewModel replacement and an exception on a second binding Dispose call, in both flavors. Its [diagnostic source/results](upstream/evidence/README.md) are evidence of current bugs, not adopted fixes or proof of which upstream release introduced them. When fixed, add active entries with adopting commits and permanent regressions; then update the live status here without rewriting the historical evidence.
