@@ -15,6 +15,11 @@ namespace ReactiveUI.Validation.ValidationBindings;
 #endif
 
 /// <inheritdoc />
+/// <remarks>
+/// Bindings follow the view's current model and detach subscriptions when models or helpers are replaced.
+/// A null model produces empty property state collections, or a valid whole-model/helper state, which is
+/// passed through the selected formatter. Disposing a binding stops updates and preserves its last rendered value.
+/// </remarks>
 [System.Diagnostics.DebuggerDisplay("ValidationBinding: {_disposable}")]
 public sealed class ValidationBinding : IValidationBinding
 {
@@ -24,11 +29,15 @@ public sealed class ValidationBinding : IValidationBinding
         + "Removing it changes the arity of a public method and breaks every existing caller.";
 
     /// <summary>The subscription to the binding observable that keeps the validation binding active.</summary>
-    private IDisposable _disposable;
+    [SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Dispose atomically exchanges the field to null and disposes the returned subscription.")]
+    private IDisposable? _disposable;
 
     /// <summary>Initializes a new instance of the <see cref="ValidationBinding"/> class.</summary>
     /// <param name="bindingObservable">The observable that drives the validation binding updates.</param>
     internal ValidationBinding(IObservable<Unit> bindingObservable) => _disposable = SubscribeExtensions.Subscribe(bindingObservable);
+
+    /// <summary>Gets the empty property projection used while a model is missing or has not emitted its rules.</summary>
+    private static IValidationState[] EmptyPropertyStates { get; } = [];
 
     /// <summary>Creates a binding between a ViewModel property and a view property, using the default formatter.</summary>
     /// <typeparam name="TView">ViewFor of ViewModel type.</typeparam>
@@ -115,8 +124,10 @@ public sealed class ValidationBinding : IValidationBinding
 
         var messages = ((IViewFor<TViewModel>)view)
             .WhenAnyValueUnsafe(v => v.ViewModel)
-            .Where(static vm => vm is not null)
-            .SelectMany(vm => vm!.ValidationContext.ObserveFor(viewModelProperty, strict))
+            .Select(vm => vm is null
+                ? Observable.Return<IList<IValidationState>>(EmptyPropertyStates)
+                : vm.ValidationContext.ObserveFor(viewModelProperty, strict).StartWith(EmptyPropertyStates))
+            .SwitchTo()
             .Select(states => FirstNonEmptyMessage(states, formatter));
 
         var updates = BindToView(messages, (IViewFor<TViewModel>)view, viewProperty);
@@ -187,8 +198,10 @@ public sealed class ValidationBinding : IValidationBinding
 
         var updates = ((IViewFor<TViewModel>)view)
             .WhenAnyValueUnsafe(v => v.ViewModel)
-            .Where(static vm => vm is not null)
-            .SelectMany(vm => vm!.ValidationContext.ObserveFor(viewModelProperty, strict))
+            .Select(vm => vm is null
+                ? Observable.Return<IList<IValidationState>>(EmptyPropertyStates)
+                : vm.ValidationContext.ObserveFor(viewModelProperty, strict).StartWith(EmptyPropertyStates))
+            .SwitchTo()
             .Do(states => action(states, FormatAll(states, formatter)))
             .Select(static _ => Unit.Default);
 
@@ -324,8 +337,10 @@ public sealed class ValidationBinding : IValidationBinding
 
         var updates = ((IViewFor<TViewModel>)view)
             .WhenAnyValueUnsafe(v => v.ViewModel)
-            .Where(static vm => vm is not null)
-            .SelectMany(static vm => vm!.ValidationContext.ValidationStatusChange)
+            .Select(static vm => vm is null
+                ? Observable.Return(ValidationState.Valid)
+                : vm.ValidationContext.ValidationStatusChange)
+            .SwitchTo()
             .Do(state => action(formatter.Format(state.Text)))
             .Select(static _ => Unit.Default);
 
@@ -382,8 +397,10 @@ public sealed class ValidationBinding : IValidationBinding
 
         var messages = ((IViewFor<TViewModel>)view)
             .WhenAnyValueUnsafe(v => v.ViewModel)
-            .Where(static vm => vm is not null)
-            .SelectMany(static vm => vm!.ValidationContext.ValidationStatusChange)
+            .Select(static vm => vm is null
+                ? Observable.Return(ValidationState.Valid)
+                : vm.ValidationContext.ValidationStatusChange)
+            .SwitchTo()
             .Select(state => formatter.Format(state.Text));
 
         var updates = BindToView(messages, (IViewFor<TViewModel>)view, viewProperty);
@@ -446,8 +463,7 @@ public sealed class ValidationBinding : IValidationBinding
             return;
         }
 
-        _disposable.Dispose();
-        _disposable = null!;
+        Interlocked.Exchange(ref _disposable, null)?.Dispose();
     }
 
     /// <summary>Formats each state and returns the first message that is not empty.</summary>
@@ -499,12 +515,14 @@ public sealed class ValidationBinding : IValidationBinding
         where TViewModel : class, IReactiveObject, IValidatableViewModel =>
         ((IViewFor<TViewModel>)view)
             .WhenAnyValueUnsafe(v => v.ViewModel)
-            .Where(static vm => vm is not null)
             .Select(
-                viewModel => viewModel!
-                    .WhenAnyValueUnsafe<TViewModel, ValidationHelper?>(viewModelHelperProperty!)
-                    .SelectMany(static helper => helper is not null
-                        ? helper.ValidationChanged
-                        : Observable.Return(ValidationState.Valid)))
+                viewModel => viewModel is null
+                    ? Observable.Return(ValidationState.Valid)
+                    : viewModel
+                        .WhenAnyValueUnsafe<TViewModel, ValidationHelper?>(viewModelHelperProperty!)
+                        .Select(static helper => helper is not null
+                            ? helper.ValidationChanged
+                            : Observable.Return(ValidationState.Valid))
+                        .SwitchTo())
             .SwitchTo();
 }
