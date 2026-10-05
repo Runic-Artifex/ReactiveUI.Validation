@@ -708,7 +708,7 @@
     "release_producer_build_warnings": 0,
     "release_producer_build_errors": 0,
     "regressions": "src/tests/ReactiveUI.Validation.Tests/ObservableRuntimeApiTests.cs",
-    "final_integrated_package_native_gate_recorded": false
+    "final_integrated_package_native_gate_recorded": true
   },
   "local_core": {
     "source": "eae498422aaf55ef9fea765eaff5027fb9d1a289",
@@ -726,7 +726,7 @@
       "Primitives",
       "Reactive"
     ],
-    "source_role": "unchanged library/test tree at preliminary eae; final remote full verification pending"
+    "source_role": "Local 618-test result at eae4984 reused for byte-identical library/test trees; final f22d2bb CI 37375282317 and release 37375833531 each reran and passed the full 618 tests per OS."
   },
   "retained_local_artifacts": {
     "artifacts/verification/native-gates/baseline-Primitives-baseline.build.log": "e99a45d620d639c8d89ef8c80e6801002509c0fe1c4be50fa8930ad105967a1d",
