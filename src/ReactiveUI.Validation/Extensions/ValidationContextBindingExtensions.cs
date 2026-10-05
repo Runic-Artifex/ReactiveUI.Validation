@@ -20,7 +20,7 @@ namespace ReactiveUI.Validation.Extensions;
 [SuppressMessage(
     "Design",
     "SST2309:Do not use optional parameters",
-    Justification = "Fixed null formatter and strict path defaults keep this new selected-context surface compact; callers may override either.")]
+    Justification = "Fixed null formatter and exclusive-property defaults keep this new selected-context surface compact; callers may override either.")]
 [SuppressMessage("Design", "SST1703:Use extension block", Justification = "TViewModel is inferred from a method argument and also constrains the receiver TView.")]
 public static class ValidationContextBindingExtensions
 {
@@ -61,7 +61,7 @@ public static class ValidationContextBindingExtensions
     /// <param name="viewModelProperty">The property whose validation text is displayed.</param>
     /// <param name="viewProperty">The string view property to update.</param>
     /// <param name="formatter">The text formatter, or null for the registered default.</param>
-    /// <param name="strict">Whether rules must match the property's complete path.</param>
+    /// <param name="strict">Whether to include only rules validating this property exclusively.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view or an expression is null.</exception>
     [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
@@ -117,7 +117,7 @@ public static class ValidationContextBindingExtensions
     /// <param name="contextProperty">The observable context property to select.</param>
     /// <param name="viewModelProperty">The property whose rules are observed.</param>
     /// <param name="action">Receives actual matching rule states; a null context or no matching rules emits an empty list.</param>
-    /// <param name="strict">Whether rules must match the property's complete path.</param>
+    /// <param name="strict">Whether to include only rules validating this property exclusively.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view, an expression or action is null.</exception>
     [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
@@ -185,7 +185,7 @@ public static class ValidationContextBindingExtensions
     /// <param name="view">The current view.</param>
     /// <param name="contextProperty">The context property expression.</param>
     /// <param name="viewModelProperty">The validated property expression.</param>
-    /// <param name="strict">Whether complete property paths must match.</param>
+    /// <param name="strict">Whether to include only rules validating this property exclusively.</param>
     /// <returns>The selected property states.</returns>
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -207,7 +207,7 @@ public static class ValidationContextBindingExtensions
     /// <typeparam name="TProperty">The property type.</typeparam>
     /// <param name="context">The selected context.</param>
     /// <param name="property">The validated property expression.</param>
-    /// <param name="strict">Whether complete property paths must match.</param>
+    /// <param name="strict">Whether to include only rules validating this property exclusively.</param>
     /// <returns>Actual current states, or an empty list when there are no matching rules.</returns>
     private static IObservable<IList<IValidationState>> ObserveRules<TViewModel, TProperty>(
         IValidationContext context,
