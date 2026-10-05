@@ -14,8 +14,8 @@ execution: **30 scenario executions**, with zero positive-path warnings/errors.
 passes at this source: **618 core tests per OS** and **20 actual native case
 checks** across Linux x64/Windows x64, both flavors. Candidate publish paths have
 zero warnings/errors. The [release workflow 37375833531](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37375833531)
-repeats the complete matrix and publishes the exact Ubuntu artifact verified by
-both native RID jobs. The tag, nuspec source and both downloaded asset hashes
+repeats the complete matrix and publishes its own exact Ubuntu artifact verified
+by that run's two native RID jobs. The tag, nuspec source and both downloaded asset hashes
 are independently verified.
 The preliminary `eae4984` candidate also passed its four-job CI, including
 Windows native; those earlier package bytes are retained as historical evidence.

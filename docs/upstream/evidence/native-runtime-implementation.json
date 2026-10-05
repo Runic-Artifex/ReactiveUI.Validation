@@ -1070,7 +1070,9 @@
       "runic-v8.1.0-runic.0.790.17": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a"
     },
     "canonical_feed": "artifacts/packages",
-    "retained_local_final_pair": "artifacts/retained-packages/8.1.0-runic.0.790.17.15/local-f22d2bb"
+    "retained_local_final_pair": "artifacts/retained-packages/8.1.0-runic.0.790.17.15/local-f22d2bb",
+    "same_bytes_as_final_ci_verification": false,
+    "same_bytes_as_local_verification": false
   },
   "documentation_review_stamp": {
     "scope": "Documentation and evidence metadata only; no source, workflow, dependency or fixture assertion changes",

@@ -85,9 +85,11 @@ These changes are **released in [8.1.0-runic.0.790.17.15](https://github.com/Run
 `f22d2bb42c30d66df19a59333ed4fa633b241940`, based on `e653e52`. Strict local
 actual-package consumers pass all five safe cases, including application-adapter
 handoff/failure cleanup checks, in both flavors across managed, fully trimmed
-and Linux native execution with zero positive warnings/errors. Final four-job CI passes both OS core gates and actual Linux/Windows native
-consumers using the same verified Ubuntu package artifact. The release matrix repeats those gates and publishes the same verified
-artifact pair; tag, source and downloaded assets are independently verified.
+and Linux native execution with zero positive warnings/errors. Final four-job CI
+passes both OS core gates and actual Linux/Windows native consumers using its
+own Ubuntu package pair. The release matrix independently repeats those gates
+and publishes its own pair verified by both native RID jobs; tag, source and
+downloaded assets are independently verified.
 They are not part of published `8.1.0-runic.0.790.17`. The
 [follow-up review](upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
 and [structured evidence](upstream/evidence/native-runtime-implementation.json)

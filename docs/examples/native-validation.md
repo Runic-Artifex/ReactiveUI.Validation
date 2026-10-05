@@ -2,13 +2,14 @@
 
 Use caller-created streams and ordinary delegates to register rules and present
 validation without discovering model properties or target setters at runtime.
-The released [8.1.0-runic.0.790.17.15](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15) at exact
-`f22d2bb42c30d66df19a59333ed4fa633b241940` passes the five safe cases in both
-flavors under managed, fully trimmed and Linux x64 NativeAOT execution with zero
-positive-path warnings/errors. The preliminary `eae4984` CI is historical;
-final cross-platform CI and the release matrix pass actual Linux x64 and Windows
-x64 native cases using the verified published package pair, recorded
-in the [implementation review](../upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up).
+These APIs ship in [8.1.0-runic.0.790.17.15](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15)
+from exact source `f22d2bb42c30d66df19a59333ed4fa633b241940`. The local
+source-pinned pair passes five cases per flavor in managed, standalone full-trim
+and Linux x64 NativeAOT modes. Final CI passes actual Linux x64/Windows x64 native
+cases using its own Ubuntu package pair. The release matrix independently
+verifies both native RIDs against the pair it publishes, with zero positive-path
+warnings/errors. The [implementation review](../upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
+records those distinct package hashes and the historical preliminary CI.
 The immutable `8.1.0-runic.0.790.17` release does not contain these new APIs.
 
 ## Register rules and retain property metadata

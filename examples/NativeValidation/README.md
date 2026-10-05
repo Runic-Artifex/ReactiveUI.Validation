@@ -67,9 +67,10 @@ method provenance. It rejects unrelated compile failures. Logs remain under
 at released source `f22d2bb42c30d66df19a59333ed4fa633b241940`, version
 [`8.1.0-runic.0.790.17.15`](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15).
 Local Linux execution passes all five cases in both flavors across managed,
-standalone full-trim and NativeAOT modes; final CI and the release matrix pass
-actual Linux x64 and Windows x64 NativeAOT against the exact published package
-pair, with zero positive warnings/errors. The handoff/initial-failure adapter
+standalone full-trim and NativeAOT modes. Final CI passes actual Linux x64 and
+Windows x64 NativeAOT using its own Ubuntu package pair; the release matrix
+independently verifies both native RIDs against the exact pair it publishes.
+Both runs have zero positive warnings/errors. The handoff/initial-failure adapter
 checks execute within `generic-field`. The [implementation review](../../docs/upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
 records distinct local/CI/published hashes and the strict baseline failures.
 The baseline report in `evidence/baseline-results.json` records actual focused
