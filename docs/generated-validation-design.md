@@ -143,6 +143,33 @@ private partial ValidationHelper AttachMatching(
 }
 ```
 
+For example, the following is the concrete generated-operation target for the
+corpus, using its existing application adapters and the actual runtime APIs:
+
+```csharp
+var emailValues = new PropertyValues<string>(
+    customer, nameof(Customer.Email), () => customer.Email);
+var emailRule = customer.AddObservableRule(
+    emailValues,
+    static email => new ValidationState(email.Contains('@'), "email-required"),
+    new[] { "Email" });
+var postcodeRule = customer.AddObservableRule(
+    new NestedPostcodes(customer),
+    static postcode => new ValidationState(postcode?.Length == 5, "postcode-required"),
+    new[] { "Address.Postcode" });
+var presentation = new HelperSelections(editor).BindObservableValidationState(
+    static helper => helper.ValidationChanged,
+    Project,
+    value => editor.Status = value);
+```
+
+`PropertyValues`, `NestedPostcodes`, `HelperSelections` and `Project` here are
+application-owned corpus code, not assumed library APIs. A future observation
+generator emits their typed notification/subscription operations or accepts those
+streams unchanged. The snippet never asks another generator to transform its
+emitted code. The model owner retains and disposes `emailRule`/`postcodeRule`;
+the editor owner retains and disposes `presentation`.
+
 For an observation declaration, the initial supported input should be real
 user-declared readable properties and `INotifyPropertyChanged` on each observed
 node. The generated method can use the same contract as the corpus's
