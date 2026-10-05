@@ -304,6 +304,46 @@ public class MultipleValidationContextTests
         await Assert.That(received[received.Count - 1].Count).IsEqualTo(0);
     }
 
+    /// <summary>Default rule helpers remove their rule from the original context after a model replaces it.</summary>
+    /// <returns>The asynchronous test task.</returns>
+    [Test]
+    public async Task DefaultHelperCleanupCapturesOriginalContext()
+    {
+        using var original = new ValidationContext(ImmediateContextScheduler.Instance);
+        using var replacement = new ValidationContext(ImmediateContextScheduler.Instance);
+        using var values = new BehaviorSubject<bool>(false);
+        var model = new ReplaceableContextModel { ValidationContext = original };
+        var helper = model.ValidationRule(values, FirstMessage);
+        using var retained = model.ValidationRule(replacement, values, SecondMessage);
+        model.ValidationContext = replacement;
+        helper.Dispose();
+        await Assert.That(original.Validations.Count).IsEqualTo(0);
+        await Assert.That(replacement.Validations.Count).IsEqualTo(1);
+        await Assert.That(original.IsDisposed).IsFalse();
+        await Assert.That(replacement.IsDisposed).IsFalse();
+    }
+
+    /// <summary>Default rule helpers release their rule even after their original context has been disposed.</summary>
+    /// <returns>The asynchronous test task.</returns>
+    [Test]
+    public async Task DefaultHelperCleanupSurvivesOriginalContextDisposal()
+    {
+        var original = new ValidationContext(ImmediateContextScheduler.Instance);
+        using var values = new BehaviorSubject<bool>(false);
+        var model = new ReplaceableContextModel { ValidationContext = original };
+        var helper = model.ValidationRule(values, FirstMessage);
+        original.Dispose();
+        helper.Dispose();
+        await Assert.That(values.HasObservers).IsFalse();
+    }
+
+    /// <summary>A custom model whose owner may replace its default context.</summary>
+    private sealed class ReplaceableContextModel : ReactiveObject, IValidatableViewModel
+    {
+        /// <inheritdoc/>
+        public IValidationContext ValidationContext { get; set; } = null!;
+    }
+
     /// <summary>A view model with independently owned contexts and a replaceable advice selection.</summary>
     private sealed class ContextModel : ReactiveObject, IValidatableViewModel, IDisposable
     {

@@ -239,7 +239,7 @@ public static class ValidationRuleContextExtensions
     /// <param name="validation">The rule to add.</param>
     /// <returns>A helper that removes and disposes this rule, without disposing the context.</returns>
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
-    private static ValidationHelper RegisterValidation<TValidationComponent>(
+    internal static ValidationHelper RegisterValidation<TValidationComponent>(
         IValidationContext context,
         TValidationComponent validation)
         where TValidationComponent : IValidationComponent, IDisposable
