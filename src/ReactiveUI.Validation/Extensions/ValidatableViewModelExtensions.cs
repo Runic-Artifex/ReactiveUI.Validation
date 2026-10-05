@@ -29,8 +29,6 @@ public static class ValidatableViewModelExtensions
         /// <typeparam name="TValidationComponent">The disposable validation component type.</typeparam>
         /// <param name="validation">The disposable validation component to register into the context.</param>
         /// <returns>The bindable validation helper holding the disposable.</returns>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal ValidationHelper RegisterValidation<TValidationComponent>(
             TValidationComponent validation)
@@ -52,7 +50,6 @@ public static class ValidatableViewModelExtensions
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="message"/> is empty.</exception>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
         [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp>(
             Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
@@ -84,7 +81,6 @@ public static class ValidatableViewModelExtensions
         /// <param name="message">Func to define the validation error message based on the viewModelProperty value.</param>
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
         [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp>(
             Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
@@ -116,8 +112,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule(
             IObservable<bool> validationObservable,
             string message)
@@ -150,8 +144,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TValue>(
             IObservable<TValue> validationObservable,
             Func<TValue, bool> isValidFunc,
@@ -181,8 +173,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule(
             IObservable<IValidationState> validationObservable)
         {
@@ -204,8 +194,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TValue>(
             IObservable<TValue> validationObservable)
             where TValue : IValidationState
@@ -233,8 +221,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp>(
             Expression<Func<TViewModel, TViewModelProp>> viewModelProperty,
             IObservable<bool> viewModelObservable,
@@ -273,8 +259,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp, TValue>(
             Expression<Func<TViewModel, TViewModelProp>> viewModelProperty,
             IObservable<TValue> viewModelObservable,
@@ -310,8 +294,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp>(
             Expression<Func<TViewModel, TViewModelProp>> viewModelProperty,
             IObservable<IValidationState> validationObservable)
@@ -339,8 +321,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp, TValue>(
             Expression<Func<TViewModel, TViewModelProp>> viewModelProperty,
             IObservable<TValue> validationObservable)

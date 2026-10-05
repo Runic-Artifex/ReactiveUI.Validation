@@ -29,7 +29,6 @@ public static class ValidationStateBindingExtensions
     /// <remarks>
     /// A null model or helper produces <see cref="ValidationState.Valid"/>. Assignments run on the source notification thread.
     /// </remarks>
-    [RequiresDynamicCode("Expression-based observation and property assignment may require dynamic code generation.")]
     [RequiresUnreferencedCode("Expression-based observation and property assignment may reference trimmed members.")]
     public static IValidationBinding BindValidationState<TView, TViewModel, TOut>(
         this TView view,
@@ -59,7 +58,6 @@ public static class ValidationStateBindingExtensions
     /// <remarks>
     /// A null model or helper produces <see cref="ValidationState.Valid"/>. Callbacks run on the source notification thread.
     /// </remarks>
-    [RequiresDynamicCode("Expression-based observation may require dynamic code generation.")]
     [RequiresUnreferencedCode("Expression-based observation may reference trimmed members.")]
     public static IValidationBinding BindValidationState<TView, TViewModel, TOut>(
         this TView view,
@@ -91,7 +89,6 @@ public static class ValidationStateBindingExtensions
     /// <remarks>
     /// A null model or no matching rules produces an empty list. Active rules must each emit an initial state; no synthetic valid state is inserted. Assignments run on the source notification thread.
     /// </remarks>
-    [RequiresDynamicCode("Expression-based observation and property assignment may require dynamic code generation.")]
     [RequiresUnreferencedCode("Expression-based observation and property assignment may reference trimmed members.")]
     public static IValidationBinding BindValidationState<TView, TViewModel, TProperty, TOut>(
         this TView view,
@@ -124,7 +121,6 @@ public static class ValidationStateBindingExtensions
     /// <remarks>
     /// A null model or no matching rules produces an empty list. Active rules must each emit an initial state; no synthetic valid state is inserted. Callbacks run on the source notification thread.
     /// </remarks>
-    [RequiresDynamicCode("Expression-based observation may require dynamic code generation.")]
     [RequiresUnreferencedCode("Expression-based observation may reference trimmed members.")]
     public static IValidationBinding BindValidationState<TView, TViewModel, TProperty, TOut>(
         this TView view,

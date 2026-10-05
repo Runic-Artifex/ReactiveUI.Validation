@@ -45,6 +45,13 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!-- Audit the two shipped shared-source libraries; legacy reflection APIs
+       retain their trimming annotations at the caller boundary. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'ReactiveUI.Validation' or '$(MSBuildProjectName)' == 'ReactiveUI.Validation.Reactive'">
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+  </PropertyGroup>
+
   <PropertyGroup>
     <!-- Match Runic.DynamicData's .NET 10-only support policy. -->
     <LibraryTargetFrameworks>net10.0</LibraryTargetFrameworks>

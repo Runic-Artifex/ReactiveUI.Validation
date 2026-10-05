@@ -35,7 +35,6 @@ internal sealed class ValidationStateBinding : IValidationBinding
     /// <param name="target">Target view.</param>
     /// <param name="viewProperty">Target property.</param>
     /// <returns>The assignment subscription.</returns>
-    [RequiresDynamicCode("Expression-based property assignment may require dynamic code generation.")]
     [RequiresUnreferencedCode("Expression-based property assignment may reference trimmed members.")]
     internal static IValidationBinding BindToView<TView, TOut, TTarget>(IObservable<TOut> values, TTarget target, Expression<Func<TView, TOut>> viewProperty)
         where TTarget : class

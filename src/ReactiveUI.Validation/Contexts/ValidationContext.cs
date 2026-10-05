@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for full license information.
 
 using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 #if REACTIVE_SHIM
@@ -48,7 +47,6 @@ public class ValidationContext : ReactiveObject, IValidationContext
     private int _isActive;
 
     /// <summary>Initializes a new instance of the <see cref="ValidationContext"/> class that uses the current thread scheduler.</summary>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public ValidationContext()
         : this(null)
     {
@@ -61,7 +59,6 @@ public class ValidationContext : ReactiveObject, IValidationContext
     /// The scheduler controls presentation updates to <see cref="IsValid"/> and <see cref="Text"/>.
     /// The caller must serialize rule mutations and rule notifications with its model owner.
     /// </remarks>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public ValidationContext(IScheduler? scheduler)
     {
         scheduler ??= CurrentThreadSequencer.Instance;
