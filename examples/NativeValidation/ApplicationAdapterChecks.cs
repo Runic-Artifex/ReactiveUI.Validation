@@ -54,6 +54,24 @@ internal static class ApplicationAdapterChecks
         Check(current.Subscribers == 0, "initial current-value callback failure removes registration");
         current.Set(1);
         Check(callbacks == 2, "failed current-value callback remains detached");
+        IDisposable? laterCurrent = null;
+        using var earlierCurrent = current.Subscribe(new Observer<int>(value => { if (value == 2) laterCurrent?.Dispose(); }));
+        int laterCurrentCalls = 0;
+        laterCurrent = current.Subscribe(new Observer<int>(_ => laterCurrentCalls++));
+        current.Set(2);
+        Check(laterCurrentCalls == 1 && current.Subscribers == 1, "current snapshot skips a registration disposed before its turn");
+        earlierCurrent.Dispose();
+        Check(current.Subscribers == 0, "current snapshot registrations detached");
+
+        IDisposable? laterProperty = null;
+        PropertyChangedEventHandler removeLater = (_, _) => laterProperty?.Dispose();
+        owner.PropertyChanged += removeLater;
+        int laterPropertyCalls = 0;
+        laterProperty = properties.Subscribe(new Observer<int>(_ => laterPropertyCalls++));
+        owner.Update(2);
+        Check(laterPropertyCalls == 1 && owner.Handlers == 1, "event snapshot skips a handler disposed before its turn");
+        owner.PropertyChanged -= removeLater;
+        Check(owner.Handlers == 0, "event snapshot handlers detached");
         using var pendingOwner = new PendingSubscription();
         pendingOwner.Assign(properties.Subscribe(new Observer<int>(_ => pendingOwner.Dispose())));
         Check(owner.Handlers == 0, "owner disposed during initial notification rejects the returned token");

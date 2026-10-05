@@ -13,7 +13,7 @@
   },
   "afterSources": {
     "ApplicationModels.cs": "232bae4d8241593284d2835f46d6ad67b8179b6ef79a79e859613c1317ce9cfb",
-    "ApplicationAdapterChecks.cs": "10f68cb82f72c2b656a4a262a095399ffb8617e770ccb700a7136e156375af99",
+    "ApplicationAdapterChecks.cs": "e57f3cd1606df29fabb6bf12ad488ea35cda05b2dfa24513f4b6a3036ffe7bca",
     "Program.cs": "26ce4144c44abe093b62cb6d0484c55ee68f4ad267d6e129b4e28e33a5beaf1a",
     "Imports.cs": "7fb57c5468cd5415c9e7f3b6ace4217b4dd9bd78a0a9640f93f5a6fb409ec832"
   },
