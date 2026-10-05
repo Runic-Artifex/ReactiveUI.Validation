@@ -50,7 +50,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding ForProperty<TView, TViewModel, TViewModelProperty, TViewProperty>(
         TView view,
@@ -76,7 +75,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="view"/>, <paramref name="viewModelProperty"/>, or <paramref name="viewProperty"/> is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding ForProperty<TView, TViewModel, TViewModelProperty, TViewProperty>(
         TView view,
@@ -103,7 +101,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// <param name="strict">Indicates if the ViewModel property to find is unique.</param>
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="view"/>, <paramref name="viewModelProperty"/>, or <paramref name="viewProperty"/> is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding ForProperty<TView, TViewModel, TViewModelProperty, TViewProperty>(
         TView view,
@@ -150,7 +147,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding ForProperty<TView, TViewModel, TViewModelProperty, TOut>(
         TView view,
@@ -177,7 +173,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// <param name="strict">Indicates if the ViewModel property to find is unique.</param>
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding ForProperty<TView, TViewModel, TViewModelProperty, TOut>(
         TView view,
@@ -218,7 +213,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding ForValidationHelperProperty<TView, TViewModel, TViewProperty>(
         TView view,
@@ -242,7 +236,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// </param>
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="view"/>, <paramref name="viewModelHelperProperty"/>, or <paramref name="viewProperty"/> is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding ForValidationHelperProperty<TView, TViewModel, TViewProperty>(
         TView view,
@@ -281,7 +274,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// <param name="formatter">Validation formatter.</param>
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding ForValidationHelperProperty<TView, TViewModel, TOut>(
         TView view,
@@ -319,7 +311,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// <param name="formatter">Validation formatter.</param>
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="view"/>, <paramref name="action"/>, or <paramref name="formatter"/> is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     [SuppressMessage("Design", "SST2307:Type parameter is not inferable", Justification = ViewModelTypeNotInferable)]
     public static IValidationBinding ForViewModel<TView, TViewModel, TOut>(
@@ -356,7 +347,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="view"/> or <paramref name="viewProperty"/> is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     [SuppressMessage("Design", "SST2307:Type parameter is not inferable", Justification = ViewModelTypeNotInferable)]
     public static IValidationBinding ForViewModel<TView, TViewModel, TViewProperty>(
@@ -379,7 +369,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// </param>
     /// <returns>Returns a validation component.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="view"/> or <paramref name="viewProperty"/> is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     [SuppressMessage("Design", "SST2307:Type parameter is not inferable", Justification = ViewModelTypeNotInferable)]
     public static IValidationBinding ForViewModel<TView, TViewModel, TViewProperty>(
@@ -420,7 +409,6 @@ public sealed class ValidationBinding : IValidationBinding
     /// <param name="target">Target instance.</param>
     /// <param name="viewProperty">View property.</param>
     /// <returns>Returns a validation component.</returns>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     internal static IObservable<Unit> BindToView<TView, TViewProperty, TTarget>(
         IObservable<string> valueChange,

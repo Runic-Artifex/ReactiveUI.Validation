@@ -32,7 +32,6 @@ public static class ViewForExtensions
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelProperty"/> or <paramref name="viewProperty"/> is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IDisposable BindValidation<TView, TViewModel, TViewModelProperty, TViewProperty>(
         this TView view,
@@ -59,7 +58,6 @@ public static class ViewForExtensions
     /// </param>
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelProperty"/> or <paramref name="viewProperty"/> is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IDisposable BindValidation<TView, TViewModel, TViewModelProperty, TViewProperty>(
         this TView view,
@@ -87,7 +85,6 @@ public static class ViewForExtensions
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewProperty"/> is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
         this TView view,
@@ -111,7 +108,6 @@ public static class ViewForExtensions
     /// </param>
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewProperty"/> is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
         this TView view,
@@ -137,7 +133,6 @@ public static class ViewForExtensions
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelHelperProperty"/> or <paramref name="viewProperty"/> is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
         this TView view,
@@ -163,7 +158,6 @@ public static class ViewForExtensions
     /// </param>
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelHelperProperty"/> or <paramref name="viewProperty"/> is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
         this TView view,
