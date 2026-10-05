@@ -7,6 +7,11 @@ retiring an adaptation. The [upstream investigation](docs/upstream/README.md) is
 dated research; the [implementation ledger](docs/upstream/implementation-2026-10.md),
 review records and the register track actual adoption.
 
+The [NativeAOT and generator investigation](docs/aot-and-generators.md) records
+the separately scoped native consumer evidence and proposed migration path.
+Its opt-in investigations do not expand core CI, platform support or the
+production package's NativeAOT contract.
+
 Use .NET SDK 10.0.401, pinned in the root `global.json`, and Python 3 for the
 dependency bootstrap. On the Runic desktop, reuse the locked development shell
 with `direnv exec ../runic-sdk <command>` from this repository root (or

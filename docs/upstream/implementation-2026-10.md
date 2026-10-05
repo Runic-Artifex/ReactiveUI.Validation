@@ -107,6 +107,12 @@ regression preservation, rather than a second historical patch import. The
 
 ## Explicit deferrals and superseded proposals
 
+NativeAOT/generator follow-up dated **2026-10-05** is recorded in the
+[separate investigation](../aot-and-generators.md). It establishes specific
+released-package native executions and generated consumer output while retaining
+the public warnings. It does not adopt native APIs, change annotations or expand
+the supported platform/cohort scope; those remain future support work.
+
 | Source | Decision / reason | Reconsider when |
 | --- | --- | --- |
 | #356 virtual `RaiseErrorsChanged` hook | Deferred: no concrete Runic SDK adapter requires overriding event delivery. Existing `ErrorsChanged` subscription covers the stated bridge use. | A concrete adapter needs the hook and defines base-call/ownership semantics. |
