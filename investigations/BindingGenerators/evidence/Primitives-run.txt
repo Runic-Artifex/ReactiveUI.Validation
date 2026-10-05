@@ -1,0 +1,3 @@
+RUNTIME dynamicCodeSupported=True
+SHAPES private-chain=[one,two] generic=42 anonymous=excluded: RXUIBIND015
+PASS generated properties; observed rule; generated BindTo; typed callback replacement/null; nested/private/generic/property selectors

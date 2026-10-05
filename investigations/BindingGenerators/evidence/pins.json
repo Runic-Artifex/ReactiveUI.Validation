@@ -1,0 +1,9 @@
+{
+  "sdk": "10.0.401",
+  "source": "2ba57c537172d841cdc545ef9cd255f1e41a4af8",
+  "releasedSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+  "packages": {
+    "Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.nupkg": "5d3c5261324181b7d8b995cc7b242977adba21a0ad81c361a4d4bd8a163d14df",
+    "Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.nupkg": "e3ba50fa1ad991912bd2d243a923c25055e9d434fb6d7c2eb840cf1ebbd5cb4b"
+  }
+}

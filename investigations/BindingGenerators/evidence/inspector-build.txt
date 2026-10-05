@@ -1,0 +1,9 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  InspectShipping -> <repo>/investigations/BindingGenerators/InspectShipping/bin/Release/net10.0/InspectShipping.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.62

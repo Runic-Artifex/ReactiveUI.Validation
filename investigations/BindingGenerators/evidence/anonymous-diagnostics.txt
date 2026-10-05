@@ -1,0 +1,11 @@
+<repo>/investigations/BindingGenerators/Program.cs(84,42): warning RXUIBIND002: Type '' has no observable properties and does not implement any observable notification mechanism [<repo>/investigations/BindingGenerators/Primitives/BindingGenerators.Primitives.csproj]
+<repo>/investigations/BindingGenerators/Program.cs(84,42): error RXUIBIND015: '<anonymous type: string Value>' is anonymous, file-local, private or protected, so no generated code claims this call; use an internal or public type, make the calling class partial, or call the Unsafe overload [<repo>/investigations/BindingGenerators/Primitives/BindingGenerators.Primitives.csproj]
+
+Build FAILED.
+
+<repo>/investigations/BindingGenerators/Program.cs(84,42): warning RXUIBIND002: Type '' has no observable properties and does not implement any observable notification mechanism [<repo>/investigations/BindingGenerators/Primitives/BindingGenerators.Primitives.csproj]
+<repo>/investigations/BindingGenerators/Program.cs(84,42): error RXUIBIND015: '<anonymous type: string Value>' is anonymous, file-local, private or protected, so no generated code claims this call; use an internal or public type, make the calling class partial, or call the Unsafe overload [<repo>/investigations/BindingGenerators/Primitives/BindingGenerators.Primitives.csproj]
+    1 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.41

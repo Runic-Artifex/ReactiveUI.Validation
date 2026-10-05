@@ -1,0 +1,7 @@
+  BindingGenerators.Primitives -> <repo>/investigations/BindingGenerators/Primitives/bin/Release/net10.0/BindingGenerators.Primitives.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.48

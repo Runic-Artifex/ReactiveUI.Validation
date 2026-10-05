@@ -1,0 +1,34 @@
+{
+  "primitives": {
+    "rid": "linux-x64",
+    "publishExit": 0,
+    "runtimeExit": 0,
+    "requireAot": true,
+    "warningLines": 10,
+    "warnings": {
+      "IL2026": 6,
+      "IL3050": 4
+    },
+    "sourceOwner": "/root/aot_publish_probes",
+    "publishedProgramSha256": "e57baecd853253dea9edc39d0e8a55cde84235f367258bb761ca3c7bed5bd474",
+    "publish.logSha256": "117cfc4158d3bed01c650bcb64f912bb5c0127c463a02a84f6223ede91c0408b",
+    "runtime.logSha256": "241692fa0a383010d3de1d6514b3dfe2f49d5eeb017375189a81e61c58f280ab",
+    "binarySha256": "0be56ef49882caeadd14a0a777b52edc2f340cfa7828521d773b7ffd2c870ddf"
+  },
+  "reactive": {
+    "rid": "linux-x64",
+    "publishExit": 0,
+    "runtimeExit": 0,
+    "requireAot": true,
+    "warningLines": 10,
+    "warnings": {
+      "IL2026": 6,
+      "IL3050": 4
+    },
+    "sourceOwner": "/root/aot_publish_probes",
+    "publishedProgramSha256": "e57baecd853253dea9edc39d0e8a55cde84235f367258bb761ca3c7bed5bd474",
+    "publish.logSha256": "70b96646b29a0bfbee35acf45df1e576ff5c5a46586a8b796bd031efe03905c6",
+    "runtime.logSha256": "241692fa0a383010d3de1d6514b3dfe2f49d5eeb017375189a81e61c58f280ab",
+    "binarySha256": "af94f833ed9e07a476c573ebefe62fc3e78a3e11a2dcd3eff125f7c52d68daf8"
+  }
+}
