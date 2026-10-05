@@ -46,7 +46,7 @@ internal static class Program
         Check(!rule.IsValid && customer.HasErrors && editor.Message == "email-required" && editor.Messages.Count > 0 && editor.Messages.All(static value => value == "email-required"), "initial invalid field is immediately presented without empty prelude");
         Check(customer.GetErrors(nameof(Customer.Email)).Cast<string>().Single() == "email-required", "property metadata survives packaging");
         customer.Email = "owner@example.test";
-        Check(rule.IsValid && !customer.HasErrors && editor.Message == "", "notifying field clears errors");
+        Check(rule.IsValid && !customer.HasErrors && editor.Message.Length == 0, "notifying field clears errors");
         using var dynamicRule = customer.ValidationRule(model => model.Confirmation, static value => !string.IsNullOrEmpty(value), static value => $"confirmation:{value}");
         Check(!dynamicRule.IsValid && customer.GetErrors(nameof(Customer.Confirmation)).Cast<string>().Single() == "confirmation:", "dynamic message overload");
         rule.Dispose();
@@ -59,7 +59,7 @@ internal static class Program
         using var helper = editor.BindValidation(customer, model => model!.AddressRule, view => view.Message);
         using var helperFormatter = editor.BindValidation(customer, model => model!.AddressRule, view => view.Message, null);
         customer.Confirmation = "confirmed";
-        Check(editor.Message == "", "all generated text overloads execute");
+        Check(editor.Message.Length == 0, "all generated text overloads execute");
         var supplied = new Current<bool>(false);
         using var metadata = customer.ValidationRule(model => model.Metadata.Value, supplied, "external-value");
         Check(customer.GetErrors("Metadata.Value").Cast<string>().Single() == "external-value", "metadata-only expression does not require notifying property owners");
@@ -142,7 +142,7 @@ internal static class Program
         editor.Panel = replacement;
         Check(replacement.Message == "required" && replacement.Status?.Code == "required", "equal-overriding replacement target immediately replays latest output");
         customer.Email = "valid";
-        Check(replacement.Message == "" && replacement.Status is null && original.Message == "required", "old target detached");
+        Check(replacement.Message.Length == 0 && replacement.Status is null && original.Message == "required", "old target detached");
         editor.Panel = null;
         customer.Email = "";
         var reattached = new Panel();
@@ -153,7 +153,12 @@ internal static class Program
         editor.Panel = new Panel { Message = "sentinel", Status = new Presentation(Severity.Advisory, "sentinel", 99) };
         customer.Email = "valid";
         customer.Email = "";
-        Check(editor.Panel.Message == "sentinel" && editor.Panel.Status is { Revision: 99 }, "disposed nested target binding stays detached");
+        CheckPanel(editor.Panel, "sentinel", new Presentation(Severity.Advisory, "sentinel", 99));
+    }
+
+    private static void CheckPanel(Panel? panel, string message, Presentation? status)
+    {
+        Check(panel is not null && panel.Message == message && panel.Status == status, "disposed nested target binding stays detached");
     }
 
     private static void ContextReplacement()
@@ -181,11 +186,11 @@ internal static class Program
         rule.Dispose();
         Check(selected.Count == count, "old selected context membership detached");
         first.SelectedContext = null;
-        Check(editor.Message == "" && aggregates[^1].IsValid && selected[^1].Count == 0, "null context clears all projections");
+        Check(editor.Message.Length == 0 && aggregates[^1].IsValid && selected[^1].Count == 0, "null context clears all projections");
         editor.ViewModel = second;
         Check(editor.Message == "advisory:", "new view model selects its context");
         first.Email = "owner@company.test";
-        Check(editor.Message == "" && advisory.GetIsValid(), "captured explicit rule still observes original owner");
+        Check(editor.Message.Length == 0 && advisory.GetIsValid(), "captured explicit rule still observes original owner");
         editor.ViewModel = null;
         Check(selected[^1].Count == 0 && aggregates[^1].IsValid, "null selected model clears");
     }
