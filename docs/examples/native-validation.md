@@ -2,8 +2,14 @@
 
 Use caller-created streams and ordinary delegates to register rules and present
 validation without discovering model properties or target setters at runtime.
-The runtime implementation is a candidate until its exact integrated source and
-strict actual-package evidence appear in the [implementation review](../upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up).
+These APIs ship in [8.1.0-runic.0.790.17.15](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15)
+from exact source `f22d2bb42c30d66df19a59333ed4fa633b241940`. The local
+source-pinned pair passes five cases per flavor in managed, standalone full-trim
+and Linux x64 NativeAOT modes. Final CI passes actual Linux x64/Windows x64 native
+cases using its own Ubuntu package pair. The release matrix independently
+verifies both native RIDs against the pair it publishes, with zero positive-path
+warnings/errors. The [implementation review](../upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
+records those distinct package hashes and the historical preliminary CI.
 The immutable `8.1.0-runic.0.790.17` release does not contain these new APIs.
 
 ## Register rules and retain property metadata
@@ -116,6 +122,16 @@ failure. The safe counterpart explicitly emits null and intentionally replaces
 two single-property registrations with one multi-property rule; the metadata
 and membership change is visible. Row results use deterministic delivery, not a
 network or timing test.
+
+The bounded [application adapter checks](../../examples/NativeValidation/ApplicationAdapterChecks.cs)
+run inside `generic-field`. They assert synchronous initial parent replacement
+and null, old/latest/outer subscription detachment, owner disposal rejecting a
+returned handle, disposed listeners skipped in notification snapshots, and
+initial getter/callback failure propagating the original exception with handlers
+detached. The application adapters install pending ownership before subscribing,
+so an obsolete returning handle cannot replace the latest selection. A supplied
+source that throws before returning its handle must clean up its own handlers.
+Equivalent generated-observer tests remain deferred with the future generator.
 
 ## Package and support boundary
 

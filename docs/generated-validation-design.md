@@ -232,7 +232,7 @@ Deferred generated-adapter acceptance must reproduce the corpus handoff checks:
 | --- | --- |
 | Initial postcode callback replaces Address; initial helper callback replaces editor ViewModel | Latest source remains owned; subsequent old-source changes emit nothing; disposal detaches both old and latest handlers. |
 | Initial callback changes the parent to null | Explicit null policy is delivered; the returning old subscription is disposed; old-source changes emit nothing. |
-| Initial callback disposes an owner whose pending subscription slot is already installed | Returned handles are disposed immediately; no handler or later callback survives disposal. |
+| Initial callback disposes an owner whose pending subscription slot is already installed | Returned handles are disposed immediately; after `Subscribe` returns, no handler or later callback survives disposal. |
 | Initial getter or callback throws after event attachment, including a nested subscription | Original error propagates; all task-owned outer/inner handlers are detached despite no returned subscription handle. |
 
 A target generator is optional: a caller-written `value => editor.Status = value`

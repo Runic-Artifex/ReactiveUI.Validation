@@ -1,6 +1,6 @@
 {
   "date": "2026-10-05",
-  "status": "candidate",
+  "status": "released; tag and both published assets independently verified",
   "base": "e653e52eb6abba95d3a5787771df01c4e570e309",
   "scope": "Runtime and examples first; no Validation generator package or MVP",
   "published_baseline": {
@@ -158,12 +158,416 @@
     }
   },
   "integration_and_release": {
-    "candidate_final_gate_recorded": false,
-    "new_release_verified": false
+    "candidate_source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+    "candidate_final_local_gate_recorded": true,
+    "cross_platform_ci": {
+      "run_id": 37375282317,
+      "url": "https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37375282317",
+      "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+      "attempt": 1,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 111982276634,
+          "name": "build (windows-latest)",
+          "head_sha": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "conclusion": "success"
+        },
+        {
+          "id": 111982276962,
+          "name": "build (ubuntu-latest)",
+          "head_sha": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "conclusion": "success"
+        },
+        {
+          "id": 111983048759,
+          "name": "native-consumers / native (ubuntu-latest, linux-x64)",
+          "head_sha": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "conclusion": "success"
+        },
+        {
+          "id": 111983048764,
+          "name": "native-consumers / native (windows-latest, win-x64)",
+          "head_sha": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "conclusion": "success"
+        }
+      ],
+      "core_tests_per_os": 618,
+      "core_tests_per_flavor_per_os": 309,
+      "core_test_executions": 1236,
+      "native_case_checks": 20,
+      "failed": 0,
+      "skipped": 0,
+      "windows_native_execution_verified": true,
+      "same_ubuntu_pair_both_native_rids": true,
+      "native_results": {
+        "linux-x64": {
+          "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "dirty": false,
+          "sdk": "10.0.401",
+          "rid": "linux-x64",
+          "mode": "native",
+          "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+          "dynamicDataSha256": {
+            "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+            "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+          },
+          "packages": {
+            "candidate-Primitives": {
+              "id": "Runic.ReactiveUI.Validation",
+              "version": "8.1.0-runic.0.790.17.15",
+              "sha256": "f0c0a60577c3636d07946a5c69fb00092e553275fc9b026e2fd2a8c6c1b7847a"
+            },
+            "candidate-Reactive": {
+              "id": "Runic.ReactiveUI.Validation.Reactive",
+              "version": "8.1.0-runic.0.790.17.15",
+              "sha256": "ce1ff84059e7167a1e786f323efc9329ff4bbab307a63afb1bfa4ded409d3462"
+            },
+            "baseline-Primitives": {
+              "id": "Runic.ReactiveUI.Validation",
+              "version": "8.1.0-runic.0.790.17",
+              "sha256": "5d3c5261324181b7d8b995cc7b242977adba21a0ad81c361a4d4bd8a163d14df"
+            },
+            "baseline-Reactive": {
+              "id": "Runic.ReactiveUI.Validation.Reactive",
+              "version": "8.1.0-runic.0.790.17",
+              "sha256": "e3ba50fa1ad991912bd2d243a923c25055e9d434fb6d7c2eb840cf1ebbd5cb4b"
+            }
+          },
+          "checks": [
+            {
+              "name": "candidate-Primitives-native",
+              "passed": true
+            },
+            {
+              "name": "candidate-Reactive-native",
+              "passed": true
+            },
+            {
+              "name": "baseline-Primitives-baseline",
+              "passed": true
+            },
+            {
+              "name": "baseline-Reactive-baseline",
+              "passed": true
+            }
+          ]
+        },
+        "win-x64": {
+          "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "dirty": false,
+          "sdk": "10.0.401",
+          "rid": "win-x64",
+          "mode": "native",
+          "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+          "dynamicDataSha256": {
+            "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+            "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+          },
+          "packages": {
+            "candidate-Primitives": {
+              "id": "Runic.ReactiveUI.Validation",
+              "version": "8.1.0-runic.0.790.17.15",
+              "sha256": "f0c0a60577c3636d07946a5c69fb00092e553275fc9b026e2fd2a8c6c1b7847a"
+            },
+            "candidate-Reactive": {
+              "id": "Runic.ReactiveUI.Validation.Reactive",
+              "version": "8.1.0-runic.0.790.17.15",
+              "sha256": "ce1ff84059e7167a1e786f323efc9329ff4bbab307a63afb1bfa4ded409d3462"
+            },
+            "baseline-Primitives": {
+              "id": "Runic.ReactiveUI.Validation",
+              "version": "8.1.0-runic.0.790.17",
+              "sha256": "5d3c5261324181b7d8b995cc7b242977adba21a0ad81c361a4d4bd8a163d14df"
+            },
+            "baseline-Reactive": {
+              "id": "Runic.ReactiveUI.Validation.Reactive",
+              "version": "8.1.0-runic.0.790.17",
+              "sha256": "e3ba50fa1ad991912bd2d243a923c25055e9d434fb6d7c2eb840cf1ebbd5cb4b"
+            }
+          },
+          "checks": [
+            {
+              "name": "candidate-Primitives-native",
+              "passed": true
+            },
+            {
+              "name": "candidate-Reactive-native",
+              "passed": true
+            },
+            {
+              "name": "baseline-Primitives-baseline",
+              "passed": true
+            },
+            {
+              "name": "baseline-Reactive-baseline",
+              "passed": true
+            }
+          ]
+        }
+      },
+      "ubuntu_packages": [
+        {
+          "id": "Runic.ReactiveUI.Validation",
+          "version": "8.1.0-runic.0.790.17.15",
+          "sha256": "f0c0a60577c3636d07946a5c69fb00092e553275fc9b026e2fd2a8c6c1b7847a",
+          "repository_commit": "f22d2bb42c30d66df19a59333ed4fa633b241940"
+        },
+        {
+          "id": "Runic.ReactiveUI.Validation.Reactive",
+          "version": "8.1.0-runic.0.790.17.15",
+          "sha256": "ce1ff84059e7167a1e786f323efc9329ff4bbab307a63afb1bfa4ded409d3462",
+          "repository_commit": "f22d2bb42c30d66df19a59333ed4fa633b241940"
+        }
+      ],
+      "windows_packages": [
+        {
+          "id": "Runic.ReactiveUI.Validation",
+          "version": "8.1.0-runic.0.790.17.15",
+          "sha256": "c1473ced0335078ea07db359ce922d55b91f62fca56d2d4c18b0565ce2b85c95",
+          "repository_commit": "f22d2bb42c30d66df19a59333ed4fa633b241940"
+        },
+        {
+          "id": "Runic.ReactiveUI.Validation.Reactive",
+          "version": "8.1.0-runic.0.790.17.15",
+          "sha256": "701f08e7b2c3da2d4e01f3f0ce06e67399e6f43142ebba0d25c7ba953a780392",
+          "repository_commit": "f22d2bb42c30d66df19a59333ed4fa633b241940"
+        }
+      ],
+      "artifact_inventory": [
+        {
+          "id": 11371511133,
+          "name": "validation-windows-latest",
+          "bytes": 670832,
+          "digest": "sha256:132025aa479487098109e7d5b6dcaca2743f4048aca57f0233d5e7add501d212"
+        },
+        {
+          "id": 11371511099,
+          "name": "packages-ubuntu-latest",
+          "bytes": 369426,
+          "digest": "sha256:7a768166b7a5f794f6cf9010f12543cbbba9da6b1939612a29f592047b7b2b85"
+        },
+        {
+          "id": 11371496174,
+          "name": "packages-windows-latest",
+          "bytes": 369628,
+          "digest": "sha256:e89736b8837cae2394fe9dbb5ad12a45bd2555b50ad4a792c89fa5f1b7aeb78e"
+        },
+        {
+          "id": 11371476145,
+          "name": "validation-ubuntu-latest",
+          "bytes": 670356,
+          "digest": "sha256:2fa0f3d3b825c9aae855ed037de18f2107ddfd94d4b3ca2a618cdae062fc6ed2"
+        },
+        {
+          "id": 11371406580,
+          "name": "native-validation-win-x64",
+          "bytes": 32488,
+          "digest": "sha256:820a7ca90bb05e23ab69f64d031c6c98368a8dc3bd428d2dcb46818dead2e636"
+        },
+        {
+          "id": 11371406272,
+          "name": "native-validation-linux-x64",
+          "bytes": 34334,
+          "digest": "sha256:923199ad64fac019f6614a57ca8b36abb549d518892f7ed251e6af8ee7646bfd"
+        }
+      ]
+    },
+    "new_release_verified": true,
+    "release_workflow": {
+      "run_id": 37375833531,
+      "url": "https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37375833531",
+      "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+      "attempt": 1,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 111984252819,
+          "name": "verification / build (ubuntu-latest)",
+          "head_sha": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "conclusion": "success"
+        },
+        {
+          "id": 111984252997,
+          "name": "verification / build (windows-latest)",
+          "head_sha": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "conclusion": "success"
+        },
+        {
+          "id": 111985305049,
+          "name": "verification / native-consumers / native (ubuntu-latest, linux-x64)",
+          "head_sha": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "conclusion": "success"
+        },
+        {
+          "id": 111985305109,
+          "name": "verification / native-consumers / native (windows-latest, win-x64)",
+          "head_sha": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "conclusion": "success"
+        },
+        {
+          "id": 111986576714,
+          "name": "release",
+          "head_sha": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "conclusion": "success"
+        }
+      ],
+      "core_tests_per_os": 618,
+      "core_tests_per_flavor_per_os": 309,
+      "core_test_executions": 1236,
+      "native_case_checks": 20,
+      "failed": 0,
+      "skipped": 0,
+      "same_published_ubuntu_pair_both_native_rids": true,
+      "native_results": {
+        "linux-x64": {
+          "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "dirty": false,
+          "sdk": "10.0.401",
+          "rid": "linux-x64",
+          "mode": "native",
+          "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+          "dynamicDataSha256": {
+            "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+            "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+          },
+          "packages": {
+            "candidate-Primitives": {
+              "id": "Runic.ReactiveUI.Validation",
+              "version": "8.1.0-runic.0.790.17.15",
+              "sha256": "17be4c3b5f46e9ff237b5f89bf97c4ff1f47b5dfef9abd250516cc454c57e95f"
+            },
+            "candidate-Reactive": {
+              "id": "Runic.ReactiveUI.Validation.Reactive",
+              "version": "8.1.0-runic.0.790.17.15",
+              "sha256": "08d6087dbd86e0ae92f1230275351240d8b2e32b7765e5b6c2b31e8ae47b4fd2"
+            },
+            "baseline-Primitives": {
+              "id": "Runic.ReactiveUI.Validation",
+              "version": "8.1.0-runic.0.790.17",
+              "sha256": "5d3c5261324181b7d8b995cc7b242977adba21a0ad81c361a4d4bd8a163d14df"
+            },
+            "baseline-Reactive": {
+              "id": "Runic.ReactiveUI.Validation.Reactive",
+              "version": "8.1.0-runic.0.790.17",
+              "sha256": "e3ba50fa1ad991912bd2d243a923c25055e9d434fb6d7c2eb840cf1ebbd5cb4b"
+            }
+          },
+          "checks": [
+            {
+              "name": "candidate-Primitives-native",
+              "passed": true
+            },
+            {
+              "name": "candidate-Reactive-native",
+              "passed": true
+            },
+            {
+              "name": "baseline-Primitives-baseline",
+              "passed": true
+            },
+            {
+              "name": "baseline-Reactive-baseline",
+              "passed": true
+            }
+          ]
+        },
+        "win-x64": {
+          "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+          "dirty": false,
+          "sdk": "10.0.401",
+          "rid": "win-x64",
+          "mode": "native",
+          "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+          "dynamicDataSha256": {
+            "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+            "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+          },
+          "packages": {
+            "candidate-Primitives": {
+              "id": "Runic.ReactiveUI.Validation",
+              "version": "8.1.0-runic.0.790.17.15",
+              "sha256": "17be4c3b5f46e9ff237b5f89bf97c4ff1f47b5dfef9abd250516cc454c57e95f"
+            },
+            "candidate-Reactive": {
+              "id": "Runic.ReactiveUI.Validation.Reactive",
+              "version": "8.1.0-runic.0.790.17.15",
+              "sha256": "08d6087dbd86e0ae92f1230275351240d8b2e32b7765e5b6c2b31e8ae47b4fd2"
+            },
+            "baseline-Primitives": {
+              "id": "Runic.ReactiveUI.Validation",
+              "version": "8.1.0-runic.0.790.17",
+              "sha256": "5d3c5261324181b7d8b995cc7b242977adba21a0ad81c361a4d4bd8a163d14df"
+            },
+            "baseline-Reactive": {
+              "id": "Runic.ReactiveUI.Validation.Reactive",
+              "version": "8.1.0-runic.0.790.17",
+              "sha256": "e3ba50fa1ad991912bd2d243a923c25055e9d434fb6d7c2eb840cf1ebbd5cb4b"
+            }
+          },
+          "checks": [
+            {
+              "name": "candidate-Primitives-native",
+              "passed": true
+            },
+            {
+              "name": "candidate-Reactive-native",
+              "passed": true
+            },
+            {
+              "name": "baseline-Primitives-baseline",
+              "passed": true
+            },
+            {
+              "name": "baseline-Reactive-baseline",
+              "passed": true
+            }
+          ]
+        }
+      },
+      "artifact_inventory": [
+        {
+          "id": 11372190901,
+          "name": "packages-windows-latest",
+          "bytes": 369628,
+          "digest": "sha256:d6b3a21e1855d1f52ffc7aecef0372cae0fca21de4efec09eb1aa6de742d1d17"
+        },
+        {
+          "id": 11371951019,
+          "name": "validation-windows-latest",
+          "bytes": 670585,
+          "digest": "sha256:d11c29af5dfa70d1d7604470fcb95e0b2e8f192a5e26333804382efe2d54dee2"
+        },
+        {
+          "id": 11371796742,
+          "name": "packages-ubuntu-latest",
+          "bytes": 369426,
+          "digest": "sha256:198c8a70928f83144b51e70fec8ba6809f15728ace4693590dbcbd60c33206cf"
+        },
+        {
+          "id": 11371492520,
+          "name": "native-validation-linux-x64",
+          "bytes": 34342,
+          "digest": "sha256:59b8f74fb5459f2ba6d1a2e70572a3242fdb75aa890fc0862f3e96ea483d352a"
+        },
+        {
+          "id": 11371477890,
+          "name": "native-validation-win-x64",
+          "bytes": 32504,
+          "digest": "sha256:6ac29f1e801f79db4641528301084c8bbfb483568d0e61f6abf66647d6d120cd"
+        },
+        {
+          "id": 11371147114,
+          "name": "validation-ubuntu-latest",
+          "bytes": 670153,
+          "digest": "sha256:e6e2e19e4a2749e6c235f6fe14814aee284b87e27dc361f267bff98db480591a"
+        }
+      ]
+    }
   },
   "realistic_corpus": {
     "baseline_topic": "4c55026",
-    "safe_topic": "95ca295",
+    "safe_topic": "85c63a8",
     "results": "examples/NativeValidation/evidence/baseline-results.json",
     "baseline_version": "8.1.0-runic.0.790.17",
     "managed_case_results_per_flavor": [
@@ -177,7 +581,15 @@
       "IL2026",
       "IL3050"
     ],
-    "safe_counterpart_verified": false
+    "safe_counterpart_verified": true,
+    "safe_verification_source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+    "adapter_followup": {
+      "final_commit": "07ab9cad217a5ce75d807143be61ecfe93e51776",
+      "checks": "examples/NativeValidation/ApplicationAdapterChecks.cs",
+      "focused_evidence": "examples/NativeValidation/evidence/adapter-lifecycle-results.json",
+      "actual_final_managed_trimmed_native_execution": true,
+      "generator_equivalent_tests_deferred": true
+    }
   },
   "strict_gate": {
     "topic_sources": [
@@ -195,7 +607,95 @@
       "win-x64"
     ],
     "accepted_rids_are_not_execution_proof": true,
-    "final_integrated_results_recorded": false
+    "local_results": {
+      "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+      "dirty": false,
+      "sdk": "10.0.401",
+      "rid": "linux-x64",
+      "mode": "all",
+      "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+      "dynamicDataSha256": {
+        "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+        "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+      },
+      "packages": {
+        "candidate-Primitives": {
+          "id": "Runic.ReactiveUI.Validation",
+          "version": "8.1.0-runic.0.790.17.15",
+          "sha256": "78c7b65b9f60d5e316cad708f9ebc5545764ed0a3ea98f4917ac412d474c4f1f"
+        },
+        "candidate-Reactive": {
+          "id": "Runic.ReactiveUI.Validation.Reactive",
+          "version": "8.1.0-runic.0.790.17.15",
+          "sha256": "b6f2530fb5b56c256ff29568f7fe8374a5c6d0ce68d9d359c4394f79adbc5a58"
+        },
+        "baseline-Primitives": {
+          "id": "Runic.ReactiveUI.Validation",
+          "version": "8.1.0-runic.0.790.17",
+          "sha256": "5d3c5261324181b7d8b995cc7b242977adba21a0ad81c361a4d4bd8a163d14df"
+        },
+        "baseline-Reactive": {
+          "id": "Runic.ReactiveUI.Validation.Reactive",
+          "version": "8.1.0-runic.0.790.17",
+          "sha256": "e3ba50fa1ad991912bd2d243a923c25055e9d434fb6d7c2eb840cf1ebbd5cb4b"
+        }
+      },
+      "checks": [
+        {
+          "name": "candidate-Primitives-managed",
+          "passed": true
+        },
+        {
+          "name": "candidate-Primitives-trimmed",
+          "passed": true
+        },
+        {
+          "name": "candidate-Primitives-native",
+          "passed": true
+        },
+        {
+          "name": "candidate-Reactive-managed",
+          "passed": true
+        },
+        {
+          "name": "candidate-Reactive-trimmed",
+          "passed": true
+        },
+        {
+          "name": "candidate-Reactive-native",
+          "passed": true
+        },
+        {
+          "name": "baseline-Primitives-baseline",
+          "passed": true
+        },
+        {
+          "name": "baseline-Reactive-baseline",
+          "passed": true
+        }
+      ]
+    },
+    "local_summary": {
+      "cases_per_flavor": 5,
+      "flavors": 2,
+      "modes": [
+        "managed",
+        "trimmed",
+        "native"
+      ],
+      "scenario_executions_passed": 30,
+      "positive_warnings": 0,
+      "positive_errors": 0,
+      "actual_native_rid": "linux-x64",
+      "dynamic_code_supported_false_enforced": true,
+      "ilc_parallelism": 1,
+      "ilc_warnaserror": true,
+      "ilc_suppression": false,
+      "baseline_strict_diagnostic_failures_verified": true,
+      "baseline_new_native_execution": false,
+      "bounded_adapter_handoff_and_initial_exception_checks_execute_in_generic_field": true
+    },
+    "final_candidate_local_results_recorded": true
   },
   "runtime_api": {
     "topic_source": "67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195",
@@ -208,6 +708,375 @@
     "release_producer_build_warnings": 0,
     "release_producer_build_errors": 0,
     "regressions": "src/tests/ReactiveUI.Validation.Tests/ObservableRuntimeApiTests.cs",
-    "final_integrated_package_native_gate_recorded": false
+    "final_integrated_package_native_gate_recorded": true
+  },
+  "local_core": {
+    "source": "eae498422aaf55ef9fea765eaff5027fb9d1a289",
+    "clean": true,
+    "build_warnings": 0,
+    "build_errors": 0,
+    "tests_passed": 618,
+    "tests_failed": 0,
+    "tests_skipped": 0,
+    "tests_per_flavor": 309,
+    "python_guards_passed": 14,
+    "python_native_guards": 6,
+    "python_existing_package_guards": 8,
+    "ordinary_collection_examples_passed_flavors": [
+      "Primitives",
+      "Reactive"
+    ],
+    "source_role": "Local 618-test result at eae4984 reused for byte-identical library/test trees; final f22d2bb CI 37375282317 and release 37375833531 each reran and passed the full 618 tests per OS."
+  },
+  "retained_local_artifacts": {
+    "artifacts/verification/native-gates/baseline-Primitives-baseline.build.log": "e99a45d620d639c8d89ef8c80e6801002509c0fe1c4be50fa8930ad105967a1d",
+    "artifacts/verification/native-gates/baseline-Reactive-baseline.build.log": "8b588043f6d1c0c4e1fe7769f075ce69f5e35825833a1f20547d5e11260f23cf",
+    "artifacts/verification/native-gates/baseline-feed.log": "ae2a9c517d86fe2e9b85d9b12fb6992bc392185076dcc9e6d5ab8b7dd6ca197d",
+    "artifacts/verification/native-gates/candidate-Primitives-managed.build.log": "4e65b481747fabb2f4713171213ce80e75e07afe27dcb8080d0a0f49918f4651",
+    "artifacts/verification/native-gates/candidate-Primitives-managed.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+    "artifacts/verification/native-gates/candidate-Primitives-native.build.log": "ca29a1550ac187efb60eb9a7f7c6782b9275ccecbf08de97fc73257c73afaf4d",
+    "artifacts/verification/native-gates/candidate-Primitives-native.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+    "artifacts/verification/native-gates/candidate-Primitives-trimmed.build.log": "9443266c545d4b3b7f40412e2824e88c469b3f1af89fa4656f0a75a206085a86",
+    "artifacts/verification/native-gates/candidate-Primitives-trimmed.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+    "artifacts/verification/native-gates/candidate-Reactive-managed.build.log": "700c3bf1a28f4fd52e507f5589436e423def47349d7224890f1b7eeccfa393f9",
+    "artifacts/verification/native-gates/candidate-Reactive-managed.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+    "artifacts/verification/native-gates/candidate-Reactive-native.build.log": "23758b416f57525d22329a0e8ee05ef1a28a9000dc1348bebdda86ddcef017f8",
+    "artifacts/verification/native-gates/candidate-Reactive-native.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+    "artifacts/verification/native-gates/candidate-Reactive-trimmed.build.log": "9e472cdec02b6e32562e2c5a1d59abaf3fc2108db243faf2b3cb0cf4f9fd0804",
+    "artifacts/verification/native-gates/candidate-Reactive-trimmed.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+    "artifacts/verification/native-gates/candidate-pack.log": "e294925799b62a4e91ad59d76dbed12ee17db665cd3a8855bbf38410805dd9d1",
+    "artifacts/verification/native-gates/toolchain.log": "67e1c433e0c9b1da56f9ea8b527b9906131fbcf072ce9b31fa79db729f361fdb",
+    "artifacts/verification/native-gates/candidate-Primitives-native.ilc.rsp.txt": "f2c65b69e2d04487a44d758708128eaeabaa087bcb35c09a82df7a5f7e93633e",
+    "artifacts/verification/native-gates/candidate-Reactive-native.ilc.rsp.txt": "c6cc3b66e1fadf1f1b01d21dc0d97a19b56dbd8533ca5a6a4f4668aa60e5282c"
+  },
+  "preliminary_candidate_eae": {
+    "integration_and_release": {
+      "candidate_source": "eae498422aaf55ef9fea765eaff5027fb9d1a289",
+      "candidate_final_local_gate_recorded": true,
+      "cross_platform_ci": {
+        "run_id": 37373253674,
+        "source": "eae498422aaf55ef9fea765eaff5027fb9d1a289",
+        "status": "passed all four jobs",
+        "windows_native_execution_verified": true,
+        "native_results": {
+          "linux-x64": {
+            "source": "eae498422aaf55ef9fea765eaff5027fb9d1a289",
+            "dirty": false,
+            "sdk": "10.0.401",
+            "rid": "linux-x64",
+            "mode": "native",
+            "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+            "dynamicDataSha256": {
+              "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+              "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+            },
+            "packages": {
+              "candidate-Primitives": {
+                "id": "Runic.ReactiveUI.Validation",
+                "version": "8.1.0-runic.0.790.17.12",
+                "sha256": "9df627c8dc32f383789ccb9d7f17029170a7cdc09bbfb6e4612a5e8890c23a0e"
+              },
+              "candidate-Reactive": {
+                "id": "Runic.ReactiveUI.Validation.Reactive",
+                "version": "8.1.0-runic.0.790.17.12",
+                "sha256": "215dd3766805de7fc5086e3ad019a764d18902af5e464d6a4eaf2c4d37a32f35"
+              },
+              "baseline-Primitives": {
+                "id": "Runic.ReactiveUI.Validation",
+                "version": "8.1.0-runic.0.790.17",
+                "sha256": "5d3c5261324181b7d8b995cc7b242977adba21a0ad81c361a4d4bd8a163d14df"
+              },
+              "baseline-Reactive": {
+                "id": "Runic.ReactiveUI.Validation.Reactive",
+                "version": "8.1.0-runic.0.790.17",
+                "sha256": "e3ba50fa1ad991912bd2d243a923c25055e9d434fb6d7c2eb840cf1ebbd5cb4b"
+              }
+            },
+            "checks": [
+              {
+                "name": "candidate-Primitives-native",
+                "passed": true
+              },
+              {
+                "name": "candidate-Reactive-native",
+                "passed": true
+              },
+              {
+                "name": "baseline-Primitives-baseline",
+                "passed": true
+              },
+              {
+                "name": "baseline-Reactive-baseline",
+                "passed": true
+              }
+            ]
+          },
+          "win-x64": {
+            "source": "eae498422aaf55ef9fea765eaff5027fb9d1a289",
+            "dirty": false,
+            "sdk": "10.0.401",
+            "rid": "win-x64",
+            "mode": "native",
+            "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+            "dynamicDataSha256": {
+              "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+              "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+            },
+            "packages": {
+              "candidate-Primitives": {
+                "id": "Runic.ReactiveUI.Validation",
+                "version": "8.1.0-runic.0.790.17.12",
+                "sha256": "9df627c8dc32f383789ccb9d7f17029170a7cdc09bbfb6e4612a5e8890c23a0e"
+              },
+              "candidate-Reactive": {
+                "id": "Runic.ReactiveUI.Validation.Reactive",
+                "version": "8.1.0-runic.0.790.17.12",
+                "sha256": "215dd3766805de7fc5086e3ad019a764d18902af5e464d6a4eaf2c4d37a32f35"
+              },
+              "baseline-Primitives": {
+                "id": "Runic.ReactiveUI.Validation",
+                "version": "8.1.0-runic.0.790.17",
+                "sha256": "5d3c5261324181b7d8b995cc7b242977adba21a0ad81c361a4d4bd8a163d14df"
+              },
+              "baseline-Reactive": {
+                "id": "Runic.ReactiveUI.Validation.Reactive",
+                "version": "8.1.0-runic.0.790.17",
+                "sha256": "e3ba50fa1ad991912bd2d243a923c25055e9d434fb6d7c2eb840cf1ebbd5cb4b"
+              }
+            },
+            "checks": [
+              {
+                "name": "candidate-Primitives-native",
+                "passed": true
+              },
+              {
+                "name": "candidate-Reactive-native",
+                "passed": true
+              },
+              {
+                "name": "baseline-Primitives-baseline",
+                "passed": true
+              },
+              {
+                "name": "baseline-Reactive-baseline",
+                "passed": true
+              }
+            ]
+          }
+        },
+        "final_candidate_package_evidence": false
+      },
+      "new_release_verified": false,
+      "candidate_source_role": "preliminary; superseded by adapter/release workflow follow-up"
+    },
+    "strict_gate": {
+      "topic_sources": [
+        "ee7d0db",
+        "ba30d02"
+      ],
+      "runner": "eng/verify-native-validation.py",
+      "modes": [
+        "managed",
+        "trimmed",
+        "native"
+      ],
+      "accepted_rids": [
+        "linux-x64",
+        "win-x64"
+      ],
+      "accepted_rids_are_not_execution_proof": true,
+      "local_results": {
+        "source": "eae498422aaf55ef9fea765eaff5027fb9d1a289",
+        "dirty": false,
+        "sdk": "10.0.401",
+        "rid": "linux-x64",
+        "mode": "all",
+        "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+        "dynamicDataSha256": {
+          "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+          "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+        },
+        "packages": {
+          "candidate-Primitives": {
+            "id": "Runic.ReactiveUI.Validation",
+            "version": "8.1.0-runic.0.790.17.12",
+            "sha256": "b5dbbbd465ef73fe212668ed1a47487f91631ad3aecc6611527a7bf16f906a53"
+          },
+          "candidate-Reactive": {
+            "id": "Runic.ReactiveUI.Validation.Reactive",
+            "version": "8.1.0-runic.0.790.17.12",
+            "sha256": "5afe0c7ec174fa5a2bfefe688fcf1d2453263ee23d5566123c7b87a095b207f5"
+          },
+          "baseline-Primitives": {
+            "id": "Runic.ReactiveUI.Validation",
+            "version": "8.1.0-runic.0.790.17",
+            "sha256": "5d3c5261324181b7d8b995cc7b242977adba21a0ad81c361a4d4bd8a163d14df"
+          },
+          "baseline-Reactive": {
+            "id": "Runic.ReactiveUI.Validation.Reactive",
+            "version": "8.1.0-runic.0.790.17",
+            "sha256": "e3ba50fa1ad991912bd2d243a923c25055e9d434fb6d7c2eb840cf1ebbd5cb4b"
+          }
+        },
+        "checks": [
+          {
+            "name": "candidate-Primitives-managed",
+            "passed": true
+          },
+          {
+            "name": "candidate-Primitives-trimmed",
+            "passed": true
+          },
+          {
+            "name": "candidate-Primitives-native",
+            "passed": true
+          },
+          {
+            "name": "candidate-Reactive-managed",
+            "passed": true
+          },
+          {
+            "name": "candidate-Reactive-trimmed",
+            "passed": true
+          },
+          {
+            "name": "candidate-Reactive-native",
+            "passed": true
+          },
+          {
+            "name": "baseline-Primitives-baseline",
+            "passed": true
+          },
+          {
+            "name": "baseline-Reactive-baseline",
+            "passed": true
+          }
+        ]
+      },
+      "local_summary": {
+        "cases_per_flavor": 5,
+        "flavors": 2,
+        "modes": [
+          "managed",
+          "trimmed",
+          "native"
+        ],
+        "scenario_executions_passed": 30,
+        "positive_warnings": 0,
+        "positive_errors": 0,
+        "actual_native_rid": "linux-x64",
+        "dynamic_code_supported_false_enforced": true,
+        "ilc_parallelism": 1,
+        "ilc_warnaserror": true,
+        "ilc_suppression": false,
+        "baseline_strict_diagnostic_failures_verified": true,
+        "baseline_new_native_execution": false
+      },
+      "final_candidate_local_results_recorded": true
+    },
+    "local_core": {
+      "source": "eae498422aaf55ef9fea765eaff5027fb9d1a289",
+      "clean": true,
+      "build_warnings": 0,
+      "build_errors": 0,
+      "tests_passed": 618,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "tests_per_flavor": 309,
+      "python_guards_passed": 14,
+      "python_native_guards": 6,
+      "python_existing_package_guards": 8,
+      "ordinary_collection_examples_passed_flavors": [
+        "Primitives",
+        "Reactive"
+      ]
+    },
+    "retained_local_artifacts": {
+      "artifacts/verification/native-gates/baseline-Primitives-baseline.build.log": "c340358b5d0fd029309aa780426471deaeba4c5b5e22a32669f2a005db14c5c1",
+      "artifacts/verification/native-gates/baseline-Reactive-baseline.build.log": "77188d5e4c730be206e79e54eeb30227b6df6aad742c2322b82fa31817fdb1f0",
+      "artifacts/verification/native-gates/baseline-feed.log": "ae2a9c517d86fe2e9b85d9b12fb6992bc392185076dcc9e6d5ab8b7dd6ca197d",
+      "artifacts/verification/native-gates/candidate-Primitives-managed.build.log": "eade36a821e36379e6341437ed993bca34eb294b348f2af439ab613ffeb4367a",
+      "artifacts/verification/native-gates/candidate-Primitives-managed.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+      "artifacts/verification/native-gates/candidate-Primitives-native.build.log": "39a196fcafc578b8698d7a9ceee3a1ca358f7b8d556c4ba133d654d022bdb903",
+      "artifacts/verification/native-gates/candidate-Primitives-native.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+      "artifacts/verification/native-gates/candidate-Primitives-trimmed.build.log": "c80fb526bb0e2d86d6bc035e469c27ebfa963c7a2629938d0042d93a35c2ab5c",
+      "artifacts/verification/native-gates/candidate-Primitives-trimmed.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+      "artifacts/verification/native-gates/candidate-Reactive-managed.build.log": "02c45df1a2f3fd4f20fa0a8164098624f7276bbda1bed427a8ad010b7bc6e617",
+      "artifacts/verification/native-gates/candidate-Reactive-managed.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+      "artifacts/verification/native-gates/candidate-Reactive-native.build.log": "055a10dbfa4ee96a8a9aa6fb65216e15d2998ea07283fd85adf5b68c339a2b63",
+      "artifacts/verification/native-gates/candidate-Reactive-native.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+      "artifacts/verification/native-gates/candidate-Reactive-trimmed.build.log": "758a22964bba30b800a4a1af341c7e0c6f650a565ba9bad434b04427e6158d8f",
+      "artifacts/verification/native-gates/candidate-Reactive-trimmed.runtime.log": "23baf97b8e5bd7a4e68342c7444d113748245b50d66f66f53ee5f6697bc2187b",
+      "artifacts/verification/native-gates/candidate-pack.log": "f1a2d9788d4c6726882d3956a6754d06a42e41d327dde03a013d4ced15d63e69",
+      "artifacts/verification/native-gates/toolchain.log": "67e1c433e0c9b1da56f9ea8b527b9906131fbcf072ce9b31fa79db729f361fdb",
+      "artifacts/verification/native-gates/candidate-Primitives-native.ilc.rsp.txt": "8defbbc409fa4e19f4fd2a505d96fd03bff8cb68b509412227eec37605eae62c",
+      "artifacts/verification/native-gates/candidate-Reactive-native.ilc.rsp.txt": "8390673156cc8dda80b6f4ccf4772305415da6d73ab95a849bef1b5614097681",
+      "artifacts/verification/native-support/local/01-core-build.log": "73d6570282ddc3ac1fa5c40ab4a3ba84ddab98e0b5a494f0df4f921e58c5bd88",
+      "artifacts/verification/native-support/local/02-core-tests.log": "260222268133c21058e5134dc4a5c480dd523f42ca065470f474b68aea21c2b6",
+      "artifacts/verification/native-support/local/03-python-guards.log": "c64adf0ce686c694e77d2b3b180e34b5103d2762dc3b6de784080d885e7e7a39",
+      "artifacts/verification/native-support/local/04-collection-primitives.log": "f8183ff185679043b149c4e23bb5cb868cf494c90856d603954ba9856f64e592",
+      "artifacts/verification/native-support/local/05-collection-reactive.log": "f7cc08171c6606154e73c64678808fad043d322abe996035c87b48e4a5e9705b",
+      "artifacts/verification/native-support/local/06-independent-consumers.log": "56c35342c13efffc17bad8620731090490ad53f443fe4b1f0f753089e983bb69"
+    }
+  },
+  "supported_safe_console_scope": {
+    "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+    "native_rids": [
+      "linux-x64",
+      "win-x64"
+    ],
+    "flavors": [
+      "Primitives",
+      "Reactive"
+    ],
+    "cases_per_flavor": 5,
+    "positive_warnings": 0,
+    "positive_errors": 0,
+    "standalone_full_trim_execution_rids": [
+      "linux-x64"
+    ],
+    "native_publish_trimming_enabled_rids": [
+      "linux-x64",
+      "win-x64"
+    ],
+    "whole_library_compatibility_claim": false,
+    "generator_package_shipped": false,
+    "ui_platform_or_bridge_e2e_verified": false
+  },
+  "published_release": {
+    "version": "8.1.0-runic.0.790.17.15",
+    "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+    "tag": "runic-v8.1.0-runic.0.790.17.15",
+    "assets": {
+      "Runic.ReactiveUI.Validation": {
+        "sha256": "17be4c3b5f46e9ff237b5f89bf97c4ff1f47b5dfef9abd250516cc454c57e95f",
+        "bytes": 184532,
+        "nuspec_source": "f22d2bb42c30d66df19a59333ed4fa633b241940"
+      },
+      "Runic.ReactiveUI.Validation.Reactive": {
+        "sha256": "08d6087dbd86e0ae92f1230275351240d8b2e32b7765e5b6c2b31e8ae47b4fd2",
+        "bytes": 185104,
+        "nuspec_source": "f22d2bb42c30d66df19a59333ed4fa633b241940"
+      }
+    },
+    "url": "https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15",
+    "tag_resolves_exact_source": true,
+    "api_and_independent_download_hashes_match": true,
+    "nuspec_cohort_verified": true,
+    "fork_policy_versions_tags_assets_immutable": true,
+    "github_release_immutable_enforced": false,
+    "old_tags_unchanged": {
+      "runic-v8.1.0-runic.0.790": "509dd45b7f8458a22ae4cb758b1b68e72d874217",
+      "runic-v8.1.0-runic.0.790.17": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a"
+    },
+    "canonical_feed": "artifacts/packages",
+    "retained_local_final_pair": "artifacts/retained-packages/8.1.0-runic.0.790.17.15/local-f22d2bb",
+    "same_bytes_as_final_ci_verification": false,
+    "same_bytes_as_local_verification": false
+  },
+  "documentation_review_stamp": {
+    "scope": "Documentation and evidence metadata only; no source, workflow, dependency or fixture assertion changes",
+    "reuses_verified_shipping_source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+    "doc_commit_is_not_shipping_source": true
   }
 }
