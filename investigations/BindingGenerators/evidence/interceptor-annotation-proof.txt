@@ -1,0 +1,18 @@
+Managed interceptor annotation proof, 2026-10-05
+SDK 10.0.401; net10.0; C#14; Microsoft.NET.ILLink.Tasks 10.0.12.
+EnableTrimAnalyzer=true; EnableAotAnalyzer=true; no native or trim publish.
+Compiler namespace: Proof.Generated. Modern intercept location emitted by SDK Roslyn.
+Original API carries both RequiresUnreferencedCode and RequiresDynamicCode.
+Interceptor has neither annotation and returns a distinct sentinel.
+Isolated editorconfig records IL2026/IL3050 at warning severity; neither is suppressed.
+The repository ancestor editorconfig first made both diagnostics errors.
+No NoWarn, suppression attributes, linker roots or preservation attributes.
+
+Command: direnv exec "$RUNIC_SDK" dotnet run --project <PROOF_ROOT>/Consumer/Consumer.csproj
+
+direnv: loading ~/Development/RunicArtifex/runic-sdk/.envrc
+direnv: using flake
+direnv: nix-direnv: Using cached dev shell
+<PROOF_ROOT>/Consumer/Program.cs(3,19): warning IL2026: Using member 'UnsafeApi.Read()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. Original RUC sentinel. [<PROOF_ROOT>/Consumer/Consumer.csproj]
+<PROOF_ROOT>/Consumer/Program.cs(3,19): warning IL3050: Using member 'UnsafeApi.Read()' which has 'RequiresDynamicCodeAttribute' can break functionality when AOT compiling. Original RDC sentinel. [<PROOF_ROOT>/Consumer/Consumer.csproj]
+safe-interceptor
