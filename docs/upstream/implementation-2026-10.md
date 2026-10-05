@@ -7,8 +7,11 @@ records integrated inputs and verification. The [original October review](review
 and [diagnostic evidence](evidence/README.md) remain historical records.
 
 Status is **implemented candidate; final gates pending** at source candidate
-`e9ab48a3e7d46f9a20eb0c0f5e1777887599dbe8`. The integration owner supplied the
-logical adopting commits below. Collection/scheduling work remains in progress.
+`d6d634e43d109b848a06b960a29704aede2b100f`. Shipping code is pinned at
+`5d433128e0692af112f43a7e09409a43b7210edc`; workflow follow-up `667978c` adds
+negative-graph checks and ordinary collection example smoke. The integration
+owner supplied the logical adopting commits below. All shipping topics are
+implemented in this candidate; final gate results remain pending.
 This candidate has not completed final integration verification or release.
 Historical test counts do not verify the candidate. The [difference register](../fork-differences.md) remains
 the source of stable fork contracts.
@@ -20,13 +23,13 @@ the source of stable fork contracts.
 | Binding lifetime: #23, #152, #659/#660, #665/#879, reproduced diagnostics | Switch to the current ViewModel/helper/context; detach replaced and null sources; make binding disposal idempotent. Preserve property, aggregate, helper and callback behavior in both flavors. | Implemented candidate: `925e344e0ed1d8b26ff8f128167a2fa476b35067`; final gates pending. | Replacement/null/helper cases, stale-source detachment, double disposal and post-disposal updates; both flavor suites. |
 | Multiple contexts: #511; existing #35/#474 abstraction | Add explicit-context rule registration and context-selected binding while retaining the default context APIs. The selected registration context owns helper removal. Advice stays independent of blocking validity. | Implemented candidate: API `e116e8bf808ebbf37a7b4a5177729bf3d89b8193`, default ownership `64542c88e03951f0158de0e36874549a0be1b80f`; combined at `8dc90961e3b6e5dfd326004749e6b81447c5d093`. Final gates pending. | Blocking/advisory independence, clearing/disposal, context replacement/null, both API baselines and both flavors. |
 | Typed state binding: #463 | Add distinct `BindValidationState` projections for typed targets and actions. Define empty and multi-rule state explicitly; preserve text formatter overloads. | Implemented candidate: `acf8d7178b639d68ea3b5eaf474fdf5d521d4321`; final gates pending. | Bool/enum projection, mixed rules, empty state, replacement/null/disposal and both API baselines. |
-| Collection recipes: #173, #450, #433 | Compile fully imported examples for both flavors with an explicit initial empty snapshot, stable identity, child refresh and source replacement. Separate domain validity from touched/submitted presentation. | In progress; adoption pending. | Empty/add/edit/remove/clear/replacement scenarios, current validity and property/entity errors. |
-| Command and notification scheduling: #19, #31, #34, #70, #92/#95/#97, #515/#879 | Document and test serialized model mutation, validation and command admission using an explicit flavor scheduler. Preserve the distinction between synchronous current validity and deferred notifications. | In progress; adoption pending. | Same-turn invalidation, queued work, cross-field/membership changes, asynchronous completion and notification-order regressions. |
+| Collection recipes: #173, #450, #433 | Compile fully imported examples for both flavors with an explicit initial empty snapshot, stable identity, child refresh and same-key child replacement. Separate domain validity from touched/submitted presentation. | Implemented candidate: `004a17c84c264f50ece8f65400fe5373668bfa4f`; final compiled example/suite gates pending. | Empty/add/edit/remove/clear/replacement scenarios, current validity and property/entity errors. |
+| Command and notification scheduling: #19, #31, #34, #70, #92/#95/#97, #515/#879 | Document and test serialized model mutation, validation and command admission using an explicit flavor scheduler. Preserve the distinction between synchronous current validity and deferred notifications. | Implemented candidate: correction `0a94cea64958de8221059dbcef03d791d05544fc`, ordering example/regressions `004a17c84c264f50ece8f65400fe5373668bfa4f`; final gates pending. | Same-turn invalidation, queued work, cross-field/membership changes, asynchronous completion and notification-order regressions. |
 | Benchmarks: #117; inherited #878 baseline | Add an opt-in .NET 10 BenchmarkDotNet solution for both flavors outside shipping solution/release gates. Measure representative construction, change, collection and replacement/disposal workloads before optimizing. | Implemented candidate: initial `a23693e7990c9ba2539237db8ca5533ca8d54102`, binding workloads `587c1b0bf11c1b02b6adb0df34d85e7b8eeecd48`; candidate smoke/final gates pending. | Both projects compile; bounded smoke execution and workload coverage. Measurements are scenario evidence, not input-to-paint or blanket performance claims. |
 | Dependency and package boundaries: #500/#679/#696/#829/#874/#967/#979, #691/#933/#990 | Retain the released matching DynamicData pair and formatter fallback. Strengthen independent consumer checks for both upstream DynamicData IDs, opposite flavor, exact resolved versions and Primitives' System.Reactive exclusion. | Implemented candidate: `df7b48de7a2191171c7243484a785a36850e749c`; final packed-consumer gates pending. | Package verification plus deliberate negative graphs; independent packed consumers on the final integrated SHA. |
 | Catalog correction: #378 | The reported selector calls `view.FindControl<TextBlock>("UsernameError").Text`; move control lookup behind a property and bind `view.UsernameError.Text`. The reporter confirmed this fix. | Adopted documentation: `ac6e6ed`; included in candidate `e9ab48a`. | [Suggested property-only selector](https://github.com/reactiveui/ReactiveUI.Validation/issues/378#issuecomment-957330539) and [reporter confirmation](https://github.com/reactiveui/ReactiveUI.Validation/issues/378#issuecomment-960270058); issue table and JSON agree. |
 
-## Implemented behavior and remaining scheduling fix
+## Implemented behavior and scheduling correction
 
 The candidate includes permanent [binding lifetime regressions](../../src/tests/ReactiveUI.Validation.Tests/ValidationBindingLifetimeTests.cs),
 [typed state regressions](../../src/tests/ReactiveUI.Validation.Tests/ValidationStateBindingTests.cs)
@@ -45,13 +48,34 @@ do not invent valid states for existing invalid rules, and wait for each active
 rule to supply an initial state. Both surfaces are presentation observations;
 command admission requires its own current-validity/pending policy.
 
-The collection agent reproduced a separate **current scheduling bug**: adding an
-invalid rule during an explicit SDK model turn leaves `GetIsValid()`,
-`HasErrors` and command admission stale until queued membership publication.
-A correction is in progress to update raw context membership/status synchronously
-while preserving scheduled presentation OAPH updates. It is **not included** in
-candidate `e9ab48a`; its final source SHA and regression results remain pending.
-This adds evidence beyond the original passing property-notification probe.
+The explicit SDK model-turn probe reproduced a separate scheduling bug: adding
+an invalid rule left `GetIsValid()`, `HasErrors` and command admission stale
+until queued membership publication. Correction `0a94cea` now updates raw
+context membership, `Valid` and `ValidationStatusChange` synchronously on
+the owning model context; `IsValid` and `Text` OAPH presentation properties
+remain scheduled. **Public `Validations` observable delivery changes to the
+model owner**. Native/UI consumers must dispatch at the presentation boundary
+when they need another scheduler. This does not change global RxApp defaults or
+promise arbitrary concurrent mutation. Preserve the
+[scheduling regressions](../../src/tests/ReactiveUI.Validation.Tests/ValidationContextSchedulingTests.cs)
+and [ordering regressions](../../src/tests/ReactiveUI.Validation.Tests/ValidationOrderingTests.cs).
+
+The [collection recipe](../examples/collection-validation.md) compiles shared
+source for both flavors and covers initial empty/add/edit/remove/clear, same-key
+child replacement, old-child detachment and disposal. Its stable cache itself is
+not replaced; entire-source replacement requires a deliberate inner switch and
+ownership policy. Touched/submitted flags affect presentation, not validity.
+The [ordering recipe](../examples/validation-ordering.md) uses actual SDK model
+context/adapter source pinned at `e878a4f361a7c4b9326f54663defa7debe41adb9`
+through opt-in `RunicSdkRoot` projects. This is source-level SDK scheduling
+coverage, **not bridge/browser end-to-end verification**. CI runs Python negative
+graph checks and both ordinary collection examples; it does not run these
+SDK-source probes.
+
+The API parity review at shipping pin `5d433128e0692af112f43a7e09409a43b7210edc`
+confirmed preservation of all original public API lines, with **14 new methods**
+in each flavor and matching namespace/annotation contracts. Final build and
+consumer gates remain pending.
 
 The [benchmark report](../../benchmarks/results/2026-10-05.md) distinguishes the
 initial warmed baseline at `48a7bde` from the later binding workload smoke at
@@ -106,8 +130,8 @@ supported promise. Do not substitute unreleased sibling source for packages.
 
 ## Verification and release status
 
-Candidate/logical adopting SHAs are recorded above. Exact final integrated SHA,
-focused/full results, API review, packing, independent consumer graphs and
+Candidate/logical adopting SHAs and API parity review are recorded above. Exact final integrated SHA,
+focused/full results, API baseline build enforcement, packing, independent consumer graphs and
 Linux/Windows verification remain pending the integration owner.
 The historical **402 passing tests** at the earlier unchanged baseline are not
 verification of this implementation. Benchmarks, retained platforms, source
