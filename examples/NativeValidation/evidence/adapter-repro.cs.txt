@@ -1,0 +1,47 @@
+internal static class Repro
+{
+    private static void Main()
+    {
+        RxAppBuilder.CreateReactiveUIBuilder().WithCoreServices().BuildApp();
+        using var customer = new Customer();
+        var first = new Address { Postcode = "first" };
+        var second = new Address { Postcode = "second" };
+        customer.Address = first;
+        var records = new List<string?>();
+        var subscription = new NestedPostcodes(customer).Subscribe(new Observer<string?>(value => { records.Add(value); if (value == "first") customer.Address = second; }));
+        int count = records.Count;
+        first.Postcode = "old-after-replacement";
+        bool staleNested = records.Count != count;
+        subscription.Dispose();
+        count = records.Count;
+        second.Postcode = "new-after-disposal";
+        bool leakedNested = records.Count != count;
+        Console.WriteLine($"nested: staleAfterReplacement={staleNested}, newUpdatesAfterDispose={leakedNested}");
+        using var firstContext = new ValidationContext();
+        using var secondContext = new ValidationContext();
+        using var firstHelper = new ValidationHelper(firstContext);
+        using var secondHelper = new ValidationHelper(secondContext);
+        using var one = new Customer { AddressRule = firstHelper };
+        using var two = new Customer { AddressRule = secondHelper };
+        var editor = new Editor { ViewModel = one };
+        var helpers = new List<ValidationHelper?>();
+        var helperSubscription = new HelperSelections(editor).Subscribe(new Observer<ValidationHelper?>(value => { helpers.Add(value); if (ReferenceEquals(value, firstHelper)) editor.ViewModel = two; }));
+        count = helpers.Count;
+        one.AddressRule = null;
+        bool staleHelper = helpers.Count != count;
+        helperSubscription.Dispose();
+        count = helpers.Count;
+        two.AddressRule = null;
+        bool leakedHelper = helpers.Count != count;
+        Console.WriteLine($"helper: staleAfterReplacement={staleHelper}, newUpdatesAfterDispose={leakedHelper}");
+        int callbacks = 0;
+        try { _ = new PropertyValues<string>(customer, nameof(Customer.Email), () => customer.Email).Subscribe(new Observer<string>(_ => { if (++callbacks == 1) throw new InvalidOperationException("initial callback"); })); }
+        catch (InvalidOperationException) { }
+        customer.Email = "after-failed-subscribe";
+        Console.WriteLine($"property: callbacksAfterFailedSubscribe={callbacks - 1}");
+        var current = new Current<int>(0);
+        try { _ = current.Subscribe(new Observer<int>(_ => throw new InvalidOperationException("initial callback"))); }
+        catch (InvalidOperationException) { }
+        Console.WriteLine($"current: subscribersAfterFailedSubscribe={current.Subscribers}");
+    }
+}

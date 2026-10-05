@@ -35,19 +35,38 @@ internal sealed class Editor : ReactiveObject, IViewFor<Customer>
 
 internal sealed class Current<T>(T initial) : IObservable<T>
 {
-    private readonly List<IObserver<T>> _observers = [];
+    private readonly List<Registration> _observers = [];
     public T Value { get; private set; } = initial;
     public int Subscribers => _observers.Count;
     public IDisposable Subscribe(IObserver<T> observer)
     {
-        _observers.Add(observer);
-        observer.OnNext(Value);
-        return new Cleanup(() => _observers.Remove(observer));
+        var registration = new Registration(observer);
+        var cleanup = new Cleanup(() => { registration.Active = false; _observers.Remove(registration); });
+        _observers.Add(registration);
+        try
+        {
+            observer.OnNext(Value);
+            return cleanup;
+        }
+        catch
+        {
+            cleanup.Dispose();
+            throw;
+        }
     }
     public void Set(T value)
     {
         Value = value;
-        foreach (var observer in _observers.ToArray()) observer.OnNext(value);
+        foreach (var registration in _observers.ToArray())
+        {
+            if (registration.Active) registration.Observer.OnNext(value);
+        }
+    }
+
+    private sealed class Registration(IObserver<T> observer)
+    {
+        public IObserver<T> Observer { get; } = observer;
+        public bool Active { get; set; } = true;
     }
 }
 
@@ -57,13 +76,23 @@ internal sealed class PropertyValues<T>(INotifyPropertyChanged owner, string nam
 {
     public IDisposable Subscribe(IObserver<T> observer)
     {
+        bool active = true;
         PropertyChangedEventHandler handler = (_, args) =>
         {
-            if (args.PropertyName == name || string.IsNullOrEmpty(args.PropertyName)) observer.OnNext(read());
+            if (active && (args.PropertyName == name || string.IsNullOrEmpty(args.PropertyName))) observer.OnNext(read());
         };
+        var cleanup = new Cleanup(() => { active = false; owner.PropertyChanged -= handler; });
         owner.PropertyChanged += handler;
-        observer.OnNext(read());
-        return new Cleanup(() => owner.PropertyChanged -= handler);
+        try
+        {
+            observer.OnNext(read());
+            return cleanup;
+        }
+        catch
+        {
+            cleanup.Dispose();
+            throw;
+        }
     }
 }
 
@@ -81,22 +110,69 @@ internal sealed class Cleanup(Action cleanup) : IDisposable
 }
 
 #if SAFE_API
+// Install this ownership slot before Subscribe: its initial notification can
+// synchronously replace/dispose the owner before the produced token returns.
+// All adapter notifications and mutations run on the serialized model owner.
+internal sealed class PendingSubscription : IDisposable
+{
+    private IDisposable? _subscription;
+    public bool IsDisposed { get; private set; }
+    public void Assign(IDisposable subscription)
+    {
+        if (IsDisposed) subscription.Dispose();
+        else _subscription = subscription;
+    }
+    public void Dispose()
+    {
+        if (IsDisposed) return;
+        IsDisposed = true;
+        var subscription = _subscription;
+        _subscription = null;
+        subscription?.Dispose();
+    }
+}
+
 // Application-owned nested observation. Missing Address emits null; replacement
 // detaches the previous INPC subscription before subscribing to the new address.
 internal sealed class NestedPostcodes(Customer customer) : IObservable<string?>
 {
     public IDisposable Subscribe(IObserver<string?> observer)
     {
-        IDisposable? inner = null;
+        var outer = new PendingSubscription();
+        PendingSubscription? inner = null;
+        var cleanup = new Cleanup(() => { outer.Dispose(); inner?.Dispose(); });
         void Replace(Address? address)
         {
-            inner?.Dispose();
-            inner = null;
-            if (address is null) observer.OnNext(null);
-            else inner = new PropertyValues<string?>(address, nameof(Address.Postcode), () => address.Postcode).Subscribe(observer);
+            if (outer.IsDisposed) return;
+            var pending = new PendingSubscription();
+            var previous = inner;
+            inner = pending;
+            previous?.Dispose();
+            if (pending.IsDisposed || outer.IsDisposed) return;
+            try
+            {
+                if (address is null) observer.OnNext(null);
+                else pending.Assign(new PropertyValues<string?>(address, nameof(Address.Postcode), () => address.Postcode).Subscribe(new Observer<string?>(value =>
+                {
+                    if (!pending.IsDisposed && !outer.IsDisposed && ReferenceEquals(inner, pending)) observer.OnNext(value);
+                })));
+            }
+            catch
+            {
+                cleanup.Dispose();
+                throw;
+            }
         }
-        var outer = new PropertyValues<Address?>(customer, nameof(Customer.Address), () => customer.Address).Subscribe(new Observer<Address?>(Replace));
-        return new Cleanup(() => { outer.Dispose(); inner?.Dispose(); });
+        try
+        {
+            outer.Assign(new PropertyValues<Address?>(customer, nameof(Customer.Address), () => customer.Address).Subscribe(new Observer<Address?>(Replace)));
+            return cleanup;
+        }
+        catch
+        {
+            cleanup.Dispose();
+            throw;
+        }
     }
 }
 
@@ -106,16 +182,41 @@ internal sealed class HelperSelections(Editor editor) : IObservable<ValidationHe
 {
     public IDisposable Subscribe(IObserver<ValidationHelper?> observer)
     {
-        IDisposable? inner = null;
+        var outer = new PendingSubscription();
+        PendingSubscription? inner = null;
+        var cleanup = new Cleanup(() => { outer.Dispose(); inner?.Dispose(); });
         void Replace(Customer? customer)
         {
-            inner?.Dispose();
-            inner = null;
-            if (customer is null) observer.OnNext(null);
-            else inner = new PropertyValues<ValidationHelper?>(customer, nameof(Customer.AddressRule), () => customer.AddressRule).Subscribe(observer);
+            if (outer.IsDisposed) return;
+            var pending = new PendingSubscription();
+            var previous = inner;
+            inner = pending;
+            previous?.Dispose();
+            if (pending.IsDisposed || outer.IsDisposed) return;
+            try
+            {
+                if (customer is null) observer.OnNext(null);
+                else pending.Assign(new PropertyValues<ValidationHelper?>(customer, nameof(Customer.AddressRule), () => customer.AddressRule).Subscribe(new Observer<ValidationHelper?>(value =>
+                {
+                    if (!pending.IsDisposed && !outer.IsDisposed && ReferenceEquals(inner, pending)) observer.OnNext(value);
+                })));
+            }
+            catch
+            {
+                cleanup.Dispose();
+                throw;
+            }
         }
-        var outer = new PropertyValues<Customer?>(editor, nameof(Editor.ViewModel), () => editor.ViewModel).Subscribe(new Observer<Customer?>(Replace));
-        return new Cleanup(() => { outer.Dispose(); inner?.Dispose(); });
+        try
+        {
+            outer.Assign(new PropertyValues<Customer?>(editor, nameof(Editor.ViewModel), () => editor.ViewModel).Subscribe(new Observer<Customer?>(Replace)));
+            return cleanup;
+        }
+        catch
+        {
+            cleanup.Dispose();
+            throw;
+        }
     }
 }
 #endif
