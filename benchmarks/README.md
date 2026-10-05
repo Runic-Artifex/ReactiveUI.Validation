@@ -61,6 +61,12 @@ Generated projects live in ignored benchmark `bin` directories; reports/logs liv
 at `--artifacts`. Remove task-owned generated projects after consuming their
 reports, and preserve useful reports and shared NuGet caches.
 
+The runner returns a nonzero exit code for invalid options, filters that select
+no measurement workloads, generated-project failures, and failed workloads.
+Validated `--list`, `--help`, `--version`, and `--info` requests remain successful
+without measurements. Invalid options accompanying an information request still
+fail; an empty measurement selection cannot be mistaken for a passing smoke run.
+
 | Workload | One measured invocation |
 | --- | --- |
 | `ContextBenchmarks.ValidityRoundTrip` | Change the last controlled component valid → invalid → valid in an otherwise valid active context. |
