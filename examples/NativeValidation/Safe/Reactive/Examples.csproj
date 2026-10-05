@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>NativeValidation.Reactive</AssemblyName>
+    <DefineConstants>SAFE_API;$(DefineConstants);REACTIVE_SHIM</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Runic.ReactiveUI.Validation.Reactive" Version="$(ValidationVersion)" />
+    <PackageReference Include="ReactiveUI.Reactive" Version="26.0.1" />
+    <PackageReference Include="Runic.DynamicData.Reactive" Version="10.0.0-runic.5" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,161 @@
+{
+  "date": "2026-10-05",
+  "sdk": "10.0.401",
+  "validationReleaseSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+  "validationVersion": "8.1.0-runic.0.790.17",
+  "dynamicDataVersion": "10.0.0-runic.5",
+  "fixtureSources": {
+    "ApplicationModels.cs": "d32d349758e29b95dad1c417dfe8b05d109a5227499b7f9cc305597007894da6",
+    "Program.cs": "5739a94b7ba89038adccd636630d5d7d5c32cd3a8150db92827e1f4cbc78c559",
+    "Imports.cs": "7fb57c5468cd5415c9e7f3b6ace4217b4dd9bd78a0a9640f93f5a6fb409ec832"
+  },
+  "flavors": {
+    "Primitives": {
+      "managedRecords": [
+        {
+          "case": "generic-field",
+          "passed": true
+        },
+        {
+          "case": "nullable-editor-rich-target",
+          "passed": false,
+          "exception": "InvalidOperationException"
+        },
+        {
+          "case": "blocking-advisory-cross-field",
+          "passed": true
+        },
+        {
+          "case": "rows-async-uniqueness",
+          "passed": true
+        }
+      ],
+      "managedKnownGap": "Required-address application policy fails: legacy observation retains valid postcode state when Address is replaced with null.",
+      "strictCompileFailed": true,
+      "diagnostics": [
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Contexts.ValidationContext.ValidationContext()"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule(IObservable<IValidationState>)"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(Expression<Func<TViewModel, TViewModelProp>>, Func<TViewModelProp, Boolean>, String)"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(Expression<Func<TViewModel, TViewModelProp>>, IObservable<Boolean>, String)"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Extensions.ValidationRuleContextExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(IValidationContext, Expression<Func<TViewModel, TViewModelProp>>, Func<TViewModelProp, Boolean>, String)"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Extensions.ValidationStateBindingExtensions.BindValidationState<TView, TViewModel, TOut>(TView, TViewModel, Expression<Func<TViewModel, ValidationHelper>>, Expression<Func<TView, TOut>>, Func<IValidationState, TOut>)"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Helpers.ReactiveValidationObject.ReactiveValidationObject()"
+        },
+        {
+          "code": "IL3050",
+          "member": "ReactiveUI.Validation.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule(IObservable<IValidationState>)"
+        },
+        {
+          "code": "IL3050",
+          "member": "ReactiveUI.Validation.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(Expression<Func<TViewModel, TViewModelProp>>, Func<TViewModelProp, Boolean>, String)"
+        },
+        {
+          "code": "IL3050",
+          "member": "ReactiveUI.Validation.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(Expression<Func<TViewModel, TViewModelProp>>, IObservable<Boolean>, String)"
+        },
+        {
+          "code": "IL3050",
+          "member": "ReactiveUI.Validation.Extensions.ValidationRuleContextExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(IValidationContext, Expression<Func<TViewModel, TViewModelProp>>, Func<TViewModelProp, Boolean>, String)"
+        },
+        {
+          "code": "IL3050",
+          "member": "ReactiveUI.Validation.Extensions.ValidationStateBindingExtensions.BindValidationState<TView, TViewModel, TOut>(TView, TViewModel, Expression<Func<TViewModel, ValidationHelper>>, Expression<Func<TView, TOut>>, Func<IValidationState, TOut>)"
+        }
+      ]
+    },
+    "Reactive": {
+      "managedRecords": [
+        {
+          "case": "generic-field",
+          "passed": true
+        },
+        {
+          "case": "nullable-editor-rich-target",
+          "passed": false,
+          "exception": "InvalidOperationException"
+        },
+        {
+          "case": "blocking-advisory-cross-field",
+          "passed": true
+        },
+        {
+          "case": "rows-async-uniqueness",
+          "passed": true
+        }
+      ],
+      "managedKnownGap": "Required-address application policy fails: legacy observation retains valid postcode state when Address is replaced with null.",
+      "strictCompileFailed": true,
+      "diagnostics": [
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Reactive.Contexts.ValidationContext.ValidationContext()"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Reactive.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule(IObservable<IValidationState>)"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Reactive.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(Expression<Func<TViewModel, TViewModelProp>>, Func<TViewModelProp, Boolean>, String)"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Reactive.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(Expression<Func<TViewModel, TViewModelProp>>, IObservable<Boolean>, String)"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Reactive.Extensions.ValidationRuleContextExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(IValidationContext, Expression<Func<TViewModel, TViewModelProp>>, Func<TViewModelProp, Boolean>, String)"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Reactive.Extensions.ValidationStateBindingExtensions.BindValidationState<TView, TViewModel, TOut>(TView, TViewModel, Expression<Func<TViewModel, ValidationHelper>>, Expression<Func<TView, TOut>>, Func<IValidationState, TOut>)"
+        },
+        {
+          "code": "IL2026",
+          "member": "ReactiveUI.Validation.Reactive.Helpers.ReactiveValidationObject.ReactiveValidationObject()"
+        },
+        {
+          "code": "IL3050",
+          "member": "ReactiveUI.Validation.Reactive.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule(IObservable<IValidationState>)"
+        },
+        {
+          "code": "IL3050",
+          "member": "ReactiveUI.Validation.Reactive.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(Expression<Func<TViewModel, TViewModelProp>>, Func<TViewModelProp, Boolean>, String)"
+        },
+        {
+          "code": "IL3050",
+          "member": "ReactiveUI.Validation.Reactive.Extensions.ValidatableViewModelExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(Expression<Func<TViewModel, TViewModelProp>>, IObservable<Boolean>, String)"
+        },
+        {
+          "code": "IL3050",
+          "member": "ReactiveUI.Validation.Reactive.Extensions.ValidationRuleContextExtensions.extension<TViewModel>(TViewModel).ValidationRule<TViewModelProp>(IValidationContext, Expression<Func<TViewModel, TViewModelProp>>, Func<TViewModelProp, Boolean>, String)"
+        },
+        {
+          "code": "IL3050",
+          "member": "ReactiveUI.Validation.Reactive.Extensions.ValidationStateBindingExtensions.BindValidationState<TView, TViewModel, TOut>(TView, TViewModel, Expression<Func<TViewModel, ValidationHelper>>, Expression<Func<TView, TOut>>, Func<IValidationState, TOut>)"
+        }
+      ]
+    }
+  },
+  "native": "not executed by corpus owner; serialized gate records separate native evidence"
+}

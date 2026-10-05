@@ -79,3 +79,43 @@ internal sealed class Cleanup(Action cleanup) : IDisposable
     private Action? _cleanup = cleanup;
     public void Dispose() => Interlocked.Exchange(ref _cleanup, null)?.Invoke();
 }
+
+#if SAFE_API
+// Application-owned nested observation. Missing Address emits null; replacement
+// detaches the previous INPC subscription before subscribing to the new address.
+internal sealed class NestedPostcodes(Customer customer) : IObservable<string?>
+{
+    public IDisposable Subscribe(IObserver<string?> observer)
+    {
+        IDisposable? inner = null;
+        void Replace(Address? address)
+        {
+            inner?.Dispose();
+            inner = null;
+            if (address is null) observer.OnNext(null);
+            else inner = new PropertyValues<string?>(address, nameof(Address.Postcode), () => address.Postcode).Subscribe(observer);
+        }
+        var outer = new PropertyValues<Address?>(customer, nameof(Customer.Address), () => customer.Address).Subscribe(new Observer<Address?>(Replace));
+        return new Cleanup(() => { outer.Dispose(); inner?.Dispose(); });
+    }
+}
+
+// The outer stream reports both editor model and helper replacement; selector
+// delegates themselves deliberately perform no hidden observation.
+internal sealed class HelperSelections(Editor editor) : IObservable<ValidationHelper?>
+{
+    public IDisposable Subscribe(IObserver<ValidationHelper?> observer)
+    {
+        IDisposable? inner = null;
+        void Replace(Customer? customer)
+        {
+            inner?.Dispose();
+            inner = null;
+            if (customer is null) observer.OnNext(null);
+            else inner = new PropertyValues<ValidationHelper?>(customer, nameof(Customer.AddressRule), () => customer.AddressRule).Subscribe(observer);
+        }
+        var outer = new PropertyValues<Customer?>(editor, nameof(Editor.ViewModel), () => editor.ViewModel).Subscribe(new Observer<Customer?>(Replace));
+        return new Cleanup(() => { outer.Dispose(); inner?.Dispose(); });
+    }
+}
+#endif
