@@ -11,11 +11,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Download the packages verified at this workflow SHA
+      - name: Download packages accepted by both generated consumer hosts at this workflow SHA
         uses: actions/download-artifact@v4
         with:
           name: packages-ubuntu-latest
           path: artifacts/packages
+      - name: Download generated acceptance reports from both hosts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: generated-validation-*
+          path: artifacts/generated-acceptance
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+      - name: Require complete generated acceptance at the release source SHA
+        env:
+          RELEASE_SOURCE: ${{ github.sha }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          expected = {f"{flavor}-{stage}" for flavor in ("Primitives", "Reactive") for stage in ("managed", "trimmed", "native")}
+          expected |= {f"{flavor}-NEGATIVE_{case}" for flavor in ("Primitives", "Reactive") for case in ("STORED_SELECTOR", "COMPUTED_SELECTOR", "INDEXER", "NESTED_TARGET", "NONNOTIFY_RULE", "STRUCT_OWNER")}
+          for rid in ("linux-x64", "win-x64"):
+              report = json.loads(Path(f"artifacts/generated-acceptance/generated-validation-{rid}/results.json").read_text())
+              assert report["source"] == os.environ["RELEASE_SOURCE"] and report["dirty"] is False
+              assert report["rid"] == rid and report["mode"] == "all"
+              assert report["sdk"] == json.loads(Path("global.json").read_text())["sdk"]["version"]
+              assert set(report["packages"]) == {"Primitives", "Reactive"}
+              for package in report["packages"].values():
+                  asset = Path("artifacts/packages") / f"{package['id']}.{package['version']}.nupkg"
+                  assert hashlib.sha256(asset.read_bytes()).hexdigest() == package["sha256"]
+              checks = report["checks"]
+              assert len(checks) == len(expected) and {item["name"] for item in checks} == expected
+              assert all(item["passed"] is True for item in checks)
+          PY
       - name: Release NuGet assets
         env:
           GH_TOKEN: ${{ github.token }}

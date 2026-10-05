@@ -29,6 +29,8 @@ jobs:
           python-version: '3.x'
       - name: Test package dependency guards
         run: python -B -m unittest discover -s eng -p test_verify_packages.py -v
+      - name: Test generated package acceptance guards
+        run: python -B -m unittest discover -s eng -p test_verify_generated_validation.py -v
       - name: Restore pinned Runic DynamicData packages
         run: python eng/restore-fork-dependencies.py
       - name: Build .NET 10
@@ -46,6 +48,12 @@ jobs:
         run: dotnet pack ReactiveUI.Validation.slnx -c Release --no-build -o ../artifacts/packages
       - name: Verify package consumers
         run: python eng/verify-packages.py
+      - name: Execute generated consumers of both packed flavors
+        shell: bash
+        run: |
+          rid=linux-x64
+          if [[ "$RUNNER_OS" == "Windows" ]]; then rid=win-x64; fi
+          python eng/verify-generated-validation.py --rid "$rid" --mode managed --package-feed artifacts/packages
       - name: Upload the exact verified package pair
         uses: actions/upload-artifact@v4.6.2
         with:
@@ -57,3 +65,6 @@ jobs:
           name: validation-${{ matrix.os }}
           path: |
             src/TestResults
+            artifacts/verification/generated-gates/*.log
+            artifacts/verification/generated-gates/*.json
+            artifacts/verification/generated-gates/*-generated/**/*.cs

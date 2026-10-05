@@ -5,7 +5,7 @@ permissions:
   contents: read
 jobs:
   native:
-    timeout-minutes: 35
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -40,6 +40,8 @@ jobs:
           fi
       - name: Test strict verifier guards
         run: python -B -m unittest discover -s eng -p test_verify_native_validation.py -v
+      - name: Test generated acceptance guards
+        run: python -B -m unittest discover -s eng -p test_verify_generated_validation.py -v
       - name: Restore SHA-verified DynamicData pair
         run: python eng/restore-fork-dependencies.py
       - name: Download the same-SHA core package pair
@@ -49,6 +51,8 @@ jobs:
           path: artifacts/packages
       - name: Publish and execute strict consumers of the verified package bytes
         run: python eng/verify-native-validation.py --rid ${{ matrix.rid }} --mode native --package-feed artifacts/packages
+      - name: Publish and execute generated managed, trimmed and NativeAOT consumers
+        run: python eng/verify-generated-validation.py --rid ${{ matrix.rid }} --mode all --package-feed artifacts/packages
       - uses: actions/upload-artifact@v4.6.2
         if: always()
         with:
@@ -56,4 +60,13 @@ jobs:
           path: |
             artifacts/verification/native-gates/*.log
             artifacts/verification/native-gates/*.json
+          retention-days: 14
+      - uses: actions/upload-artifact@v4.6.2
+        if: always()
+        with:
+          name: generated-validation-${{ matrix.rid }}
+          path: |
+            artifacts/verification/generated-gates/*.log
+            artifacts/verification/generated-gates/*.json
+            artifacts/verification/generated-gates/*-generated/**/*.cs
           retention-days: 14
