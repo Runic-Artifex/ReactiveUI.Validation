@@ -192,17 +192,24 @@ from null *binding source*, whose documented projection is valid/empty.
 
 ### Synchronous subscription handoff and initial failure
 
-The example adapters demonstrate the tested ordinary replacement/null/disposal
-flows. They do not establish behavior when an initial `OnNext` reenters parent
-replacement/disposal or throws. A future generator must handle those cases before
-its notification adapter is treated as reusable runtime infrastructure.
+The corpus now explicitly checks its application adapters' synchronous initial
+handoff and failure cleanup in
+[ApplicationAdapterChecks](../examples/NativeValidation/ApplicationAdapterChecks.cs),
+called by the safe `generic-field` case. It covers reentrant Address/editor-model
+replacement and null, latest/outer detachment, owner disposal during initial
+delivery, and initial getter/callback exception cleanup. These checks validate the
+application adapters; no generator is shipped, and equivalent generated-code
+acceptance remains required before its observation infrastructure is supported.
 
-In `NestedPostcodes` and `HelperSelections`, a naive `inner = Subscribe(observer)`
-assignment occurs after synchronous initial delivery. If that delivery replaces
+Earlier `NestedPostcodes` and `HelperSelections` implementations used a naive
+`inner = Subscribe(observer)` assignment after synchronous initial delivery. If
+that delivery replaces
 the parent, a reentered subscription can become current, then be overwritten by
 the older subscription's returned handle. Reentry to a null parent can similarly
-leave the old subscription attached. The generated adapter must install an owned
-pending assignment slot before subscribing. Replacements dispose that slot via a
+leave the old subscription attached. The corrected application adapters install
+pending slots before subscribing and guard notifications by current slot identity
+and disposal state. A generated adapter must likewise install an owned pending
+assignment slot before subscribing. Replacements dispose that slot via a
 serial owner; when an obsolete `Subscribe` finally returns, assigning its handle
 to its already-disposed slot disposes it immediately instead of overwriting the
 current slot. A generation token/disposed guard rejects notifications from a
@@ -219,7 +226,7 @@ A pending slot alone cannot recover a leaked handler inside an arbitrary supplie
 source whose `Subscribe` throws before returning; caller-created sources keep
 their own exception-cleanup contract.
 
-Deferred generated-adapter acceptance cases must exercise the handoff itself:
+Deferred generated-adapter acceptance must reproduce the corpus handoff checks:
 
 | Trigger during synchronous initial delivery | Required evidence |
 | --- | --- |
