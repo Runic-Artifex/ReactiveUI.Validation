@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-05",
+  "sdk": "10.0.401",
+  "candidatePackageSource": "5456da7981701540ff18968d41b9eefaf743c06e",
+  "candidateValidationVersion": "8.1.0-runic.0.790.17.14",
+  "fixtureCommit": "85c63a8",
+  "packageHashes": {
+    "Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.14.nupkg": "8328464be5297156d907c4d7ba8b13073d7a8185296214d8d32057c1e1c5d348",
+    "Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.14.nupkg": "18d59845e29319890edfc3b5adc68dbf8cb5c1a9105432dcf2ec47a2774801d3"
+  },
+  "fixtureSources": {
+    "ApplicationModels.cs": "d32d349758e29b95dad1c417dfe8b05d109a5227499b7f9cc305597007894da6",
+    "Program.cs": "059e4ba7e128c714cd0d88cce6770b100b9aa995616f7ef4393a22cf622e55b9",
+    "Imports.cs": "7fb57c5468cd5415c9e7f3b6ace4217b4dd9bd78a0a9640f93f5a6fb409ec832"
+  },
+  "flavors": {
+    "Primitives": {
+      "managedRecords": [
+        {
+          "case": "generic-field",
+          "passed": true
+        },
+        {
+          "case": "nullable-editor-rich-target",
+          "passed": true
+        },
+        {
+          "case": "blocking-advisory-cross-field",
+          "passed": true
+        },
+        {
+          "case": "rows-async-uniqueness",
+          "passed": true
+        },
+        {
+          "case": "existing-observable-foundation",
+          "passed": true
+        }
+      ],
+      "strictBuildWithAotAndTrimAnalyzers": {
+        "warnings": 0,
+        "errors": 0
+      }
+    },
+    "Reactive": {
+      "managedRecords": [
+        {
+          "case": "generic-field",
+          "passed": true
+        },
+        {
+          "case": "nullable-editor-rich-target",
+          "passed": true
+        },
+        {
+          "case": "blocking-advisory-cross-field",
+          "passed": true
+        },
+        {
+          "case": "rows-async-uniqueness",
+          "passed": true
+        },
+        {
+          "case": "existing-observable-foundation",
+          "passed": true
+        }
+      ],
+      "strictBuildWithAotAndTrimAnalyzers": {
+        "warnings": 0,
+        "errors": 0
+      }
+    }
+  },
+  "native": "not executed by corpus owner; serialized native gate owns full-trim/native publication and execution"
+}

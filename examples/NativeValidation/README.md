@@ -38,6 +38,15 @@ constructors, generated OAPH presentation updates, the supplied-observable
 `ValidationRule` overload whose literal selector is only metadata, per-property
 errors, and current context events/removal. No validation generator is used.
 
+The safe `generic-field` case also checks the application adapters' synchronous
+initial delivery: reentrant parent replacement/null, ownership disposed before
+`Subscribe` returns, and initial getter/callback failures. Pending ownership slots
+reject obsolete tokens and suppress detached notifications; failed subscription
+setup removes its registrations. These checks assume one serialized model owner.
+The compact managed before/after reproduction and source hashes are retained in
+`evidence/adapter-lifecycle-results.json`; they do not establish concurrent or
+transport cancellation behavior.
+
 From the repository root, inside the locked SDK shell:
 
 ```sh

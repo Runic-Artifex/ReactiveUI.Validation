@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-05",
+  "sdk": "10.0.401",
+  "candidatePackageSource": "eae498422aaf55ef9fea765eaff5027fb9d1a289",
+  "candidateValidationVersion": "8.1.0-runic.0.790.17.12",
+  "packageHashes": {
+    "Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.12.nupkg": "b5dbbbd465ef73fe212668ed1a47487f91631ad3aecc6611527a7bf16f906a53",
+    "Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.12.nupkg": "5afe0c7ec174fa5a2bfefe688fcf1d2453263ee23d5566123c7b87a095b207f5"
+  },
+  "beforeAdapterSource": {
+    "commit": "11c52d8",
+    "sha256": "d32d349758e29b95dad1c417dfe8b05d109a5227499b7f9cc305597007894da6"
+  },
+  "afterSources": {
+    "ApplicationModels.cs": "232bae4d8241593284d2835f46d6ad67b8179b6ef79a79e859613c1317ce9cfb",
+    "ApplicationAdapterChecks.cs": "e57f3cd1606df29fabb6bf12ad488ea35cda05b2dfa24513f4b6a3036ffe7bca",
+    "Program.cs": "26ce4144c44abe093b62cb6d0484c55ee68f4ad267d6e129b4e28e33a5beaf1a",
+    "Imports.cs": "7fb57c5468cd5415c9e7f3b6ace4217b4dd9bd78a0a9640f93f5a6fb409ec832"
+  },
+  "reproductionSource": "adapter-repro.cs.txt",
+  "reproductionSourceSha256": "dd77bc3a996679cd7f59af37f26c4ee7c975ddf0816a4e46a64ea6f541df2033",
+  "flavors": {
+    "Primitives": {
+      "beforeManagedOutput": [
+        "nested: staleAfterReplacement=True, newUpdatesAfterDispose=True",
+        "helper: staleAfterReplacement=True, newUpdatesAfterDispose=True",
+        "property: callbacksAfterFailedSubscribe=1",
+        "current: subscribersAfterFailedSubscribe=1"
+      ],
+      "afterManagedOutput": [
+        "nested: staleAfterReplacement=False, newUpdatesAfterDispose=False",
+        "helper: staleAfterReplacement=False, newUpdatesAfterDispose=False",
+        "property: callbacksAfterFailedSubscribe=0",
+        "current: subscribersAfterFailedSubscribe=0"
+      ],
+      "managedCases": [
+        {
+          "case": "generic-field",
+          "passed": true
+        },
+        {
+          "case": "nullable-editor-rich-target",
+          "passed": true
+        },
+        {
+          "case": "blocking-advisory-cross-field",
+          "passed": true
+        },
+        {
+          "case": "rows-async-uniqueness",
+          "passed": true
+        },
+        {
+          "case": "existing-observable-foundation",
+          "passed": true
+        }
+      ],
+      "strictBuildWithAotAndTrimAnalyzers": {
+        "warnings": 0,
+        "errors": 0
+      }
+    },
+    "Reactive": {
+      "beforeManagedOutput": [
+        "nested: staleAfterReplacement=True, newUpdatesAfterDispose=True",
+        "helper: staleAfterReplacement=True, newUpdatesAfterDispose=True",
+        "property: callbacksAfterFailedSubscribe=1",
+        "current: subscribersAfterFailedSubscribe=1"
+      ],
+      "afterManagedOutput": [
+        "nested: staleAfterReplacement=False, newUpdatesAfterDispose=False",
+        "helper: staleAfterReplacement=False, newUpdatesAfterDispose=False",
+        "property: callbacksAfterFailedSubscribe=0",
+        "current: subscribersAfterFailedSubscribe=0"
+      ],
+      "managedCases": [
+        {
+          "case": "generic-field",
+          "passed": true
+        },
+        {
+          "case": "nullable-editor-rich-target",
+          "passed": true
+        },
+        {
+          "case": "blocking-advisory-cross-field",
+          "passed": true
+        },
+        {
+          "case": "rows-async-uniqueness",
+          "passed": true
+        },
+        {
+          "case": "existing-observable-foundation",
+          "passed": true
+        }
+      ],
+      "strictBuildWithAotAndTrimAnalyzers": {
+        "warnings": 0,
+        "errors": 0
+      }
+    }
+  },
+  "scope": "Application adapters only; serialized managed notification ownership. No core library edit and no native publication in this follow-up."
+}
