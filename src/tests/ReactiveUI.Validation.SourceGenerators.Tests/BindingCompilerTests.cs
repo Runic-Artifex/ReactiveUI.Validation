@@ -14,6 +14,12 @@ namespace ReactiveUI.Validation.SourceGenerators.Tests;
 /// <summary>Exercises binding semantics through the actual compiler interceptor pipeline.</summary>
 public sealed class BindingCompilerTests
 {
+    /// <summary>Names the trusted in-memory consumer's test entry point type.</summary>
+    private const string FixtureTypeName = "Fixture";
+
+    /// <summary>Names the trusted in-memory consumer's test entry point method.</summary>
+    private const string FixtureMethodName = "Check";
+
     /// <summary>Consumer checks for rich-state identity, replacement, nulls, cached targets and disposal.</summary>
     private const string ReplacementBody = """
         RxAppBuilder.CreateReactiveUIBuilder().WithCoreServices().BuildApp();
@@ -108,6 +114,25 @@ public sealed class BindingCompilerTests
                     this.RaisePropertyChanged();
                 }
             } = new();
+        }
+        public interface INotifyingView : IViewFor<Model>, System.ComponentModel.INotifyPropertyChanged
+        {
+            string? Message { get; set; }
+        }
+        public struct StructView : INotifyingView
+        {
+            public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+            public Model? ViewModel
+            {
+                get;
+                set
+                {
+                    field = value;
+                    PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(ViewModel)));
+                }
+            }
+            object? IViewFor.ViewModel { get => ViewModel; set => ViewModel = (Model?)value; }
+            public string? Message { get; set; }
         }
         public sealed class Plain { public Panel? Panel { get; set; } }
         public sealed class Panel
@@ -220,7 +245,7 @@ public sealed class BindingCompilerTests
         var emitted = result.Compilation.Emit(stream);
         await Assert.That(string.Join("\n", emitted.Diagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))).IsEmpty();
         var assembly = System.Reflection.Assembly.Load(stream.ToArray());
-        var actual = (bool)assembly.GetType("Fixture")!.GetMethod("Check")!.Invoke(null, null)!;
+        var actual = (bool)assembly.GetType(FixtureTypeName)!.GetMethod(FixtureMethodName)!.Invoke(null, null)!;
         await Assert.That(actual).IsTrue();
     }
 
@@ -271,7 +296,66 @@ public sealed class BindingCompilerTests
         var emitted = result.Compilation.Emit(stream);
         await Assert.That(string.Join("\n", emitted.Diagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))).IsEmpty();
         var assembly = System.Reflection.Assembly.Load(stream.ToArray());
-        await Assert.That((bool)assembly.GetType("Fixture")!.GetMethod("Check")!.Invoke(null, null)!).IsTrue();
+        await Assert.That((bool)assembly.GetType(FixtureTypeName)!.GetMethod(FixtureMethodName)!.Invoke(null, null)!).IsTrue();
+    }
+
+    /// <summary>Rejects concrete struct receivers whose observation and setter ownership would use copies.</summary>
+    /// <param name="reactive">Whether the fixture uses the System.Reactive flavor.</param>
+    /// <returns>The asynchronous assertion work.</returns>
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task ConcreteStructViewsAreRejectedBeforeEmission(bool reactive)
+    {
+        const string body = """
+            var model = new Model();
+            var view = new StructView { ViewModel = model };
+            view.BindValidation(model, x => x.Name, x => x.Message);
+            return true;
+            """;
+        var result = Generate(Source(reactive, body));
+        var diagnostic = result.Diagnostics.Single(static diagnostic => diagnostic.Id == "RUVG006");
+        await Assert.That(diagnostic.Severity).IsEqualTo(DiagnosticSeverity.Error);
+        await Assert.That(diagnostic.GetMessage()).Contains("reference type ownership contract");
+        await Assert.That(diagnostic.GetMessage()).Contains("interface-typed boxed view");
+        await Assert.That(result.Generated).IsEmpty();
+        await Assert.That(Errors(result.Compilation)).IsEmpty();
+        await Assert.That(Warnings(result.Compilation)).IsEmpty();
+    }
+
+    /// <summary>Supports a boxed struct through a stable notifying interface reference.</summary>
+    /// <param name="reactive">Whether the fixture uses the System.Reactive flavor.</param>
+    /// <returns>The asynchronous assertion work.</returns>
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    [SuppressMessage(
+        "Security",
+        "SES1402",
+        Justification = "The test loads only a consumer compiled in memory from this repository's fixed trusted fixture to verify reference ownership.")]
+    public async Task InterfaceTypedBoxedViewsRetainReferenceOwnership(bool reactive)
+    {
+        const string body = """
+            RxAppBuilder.CreateReactiveUIBuilder().WithCoreServices().BuildApp();
+            var model = new Model();
+            using var rule = model.AddObservableRule(new Current(new RichState(false, "required", 1)), new[] { "Name" });
+            INotifyingView view = new StructView { ViewModel = model };
+            using var binding = view.BindValidation(model, x => x.Name, x => x.Message);
+            Require(view.Message == "required", "setter mutates the stable boxed view");
+            view.ViewModel = null;
+            Require(view.Message == "", "boxed view sends replacement notifications");
+            return true;
+            """;
+        var result = Generate(Source(reactive, body));
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Errors(result.Compilation)).IsEmpty();
+        await Assert.That(Warnings(result.Compilation)).IsEmpty();
+        await Assert.That(await DispatchErrors(result.Compilation)).IsEmpty();
+        await using var stream = new MemoryStream();
+        var emitted = result.Compilation.Emit(stream);
+        await Assert.That(string.Join("\n", emitted.Diagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))).IsEmpty();
+        var assembly = System.Reflection.Assembly.Load(stream.ToArray());
+        await Assert.That((bool)assembly.GetType(FixtureTypeName)!.GetMethod(FixtureMethodName)!.Invoke(null, null)!).IsTrue();
     }
 
     /// <summary>Reports unsupported binding inputs at the selector instead of emitting invalid C#.</summary>

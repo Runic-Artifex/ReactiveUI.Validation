@@ -86,7 +86,15 @@ internal static class BindingEmitter
     private static BindingShape CreateShape(CallSite site)
     {
         var shape = new BindingShape(site);
-        if (!Notifies(FindParameterType(site, "view")))
+        var viewType = FindParameterType(site, "view");
+        if (!viewType.IsReferenceType)
+        {
+            throw new UnsupportedBindingException(
+                "The view must have a reference type ownership contract. A concrete value-type view would box notification owners "
+                + "and assign captured copies; use an interface-typed boxed view or an explicit observable and callback.");
+        }
+
+        if (!Notifies(viewType))
         {
             throw new UnsupportedBindingException(
                 "The view must implement System.ComponentModel.INotifyPropertyChanged so ViewModel replacements can be observed.");
