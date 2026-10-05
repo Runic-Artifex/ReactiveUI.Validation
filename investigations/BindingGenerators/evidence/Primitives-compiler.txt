@@ -1,0 +1,6 @@
+/analyzer:/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.binding/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.Analyzer.dll
+/analyzer:/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.binding/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.SourceGenerators.dll
+/analyzer:/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Analyzers.CodeFixes.dll
+/analyzer:/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Roslyn.dll
+/features:"InterceptorsNamespaces=ReactiveUI.Binding.Generated.Interceptors;;Microsoft.Extensions.Validation.Generated"
+No direct ReactiveUI/SourceGenerators package references; rebuild succeeded.

@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Runic.ReactiveUI.Validation" Version="[8.1.0-runic.0.790.17]" />
+    <PackageVersion Include="Runic.ReactiveUI.Validation.Reactive" Version="[8.1.0-runic.0.790.17]" />
+    <PackageVersion Include="Runic.DynamicData" Version="10.0.0-runic.5" />
+    <PackageVersion Include="Runic.DynamicData.Reactive" Version="10.0.0-runic.5" />
+    <PackageVersion Include="ReactiveUI" Version="26.0.1" />
+    <PackageVersion Include="ReactiveUI.Reactive" Version="26.0.1" />
+    <PackageVersion Include="ReactiveUI.SourceGenerators" Version="4.2.0" Condition="'$(PinVmGenerator)' != 'false'" />
+  </ItemGroup>
+</Project>

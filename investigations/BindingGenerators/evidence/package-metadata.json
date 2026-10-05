@@ -1,0 +1,156 @@
+{
+  "ReactiveUI/26.0.1": {
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/reactiveui/reactiveui",
+      "branch": "refs/heads/main",
+      "commit": "88312688d0281fd260977dfd78bb12e1c85ffaaa"
+    },
+    "net10Dependencies": [
+      {
+        "id": "ReactiveUI.Core",
+        "version": "26.0.1",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "ReactiveUI.Binding",
+        "version": "9.1.0",
+        "include": "All"
+      },
+      {
+        "id": "ReactiveUI.Primitives",
+        "version": "9.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "Splat",
+        "version": "21.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "ReactiveUI.Disposables",
+        "version": "9.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "ReactiveUI.Primitives.Core",
+        "version": "9.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "ReactiveUI.SourceGenerators",
+        "version": "4.2.0",
+        "exclude": "Build,Analyzers"
+      }
+    ]
+  },
+  "ReactiveUI.Binding/9.1.0": {
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/reactiveui/ReactiveUI.Binding.SourceGenerators",
+      "branch": "refs/heads/main",
+      "commit": "05c45cec845835d670960fac733bb302bc1c1071"
+    },
+    "net10Dependencies": [
+      {
+        "id": "ReactiveUI.Primitives",
+        "version": "9.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "Splat",
+        "version": "21.0.0",
+        "exclude": "Build,Analyzers"
+      }
+    ]
+  },
+  "ReactiveUI.SourceGenerators/4.2.0": {
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/reactiveui/reactiveui.sourcegenerators",
+      "branch": "refs/heads/main",
+      "commit": "c8a8c38dd7192073540e187b8e8abc8d53e16b1a"
+    },
+    "net10Dependencies": []
+  },
+  "ReactiveUI.Binding.Reactive/9.1.0": {
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/reactiveui/ReactiveUI.Binding.SourceGenerators",
+      "branch": "refs/heads/main",
+      "commit": "05c45cec845835d670960fac733bb302bc1c1071"
+    },
+    "net10Dependencies": [
+      {
+        "id": "ReactiveUI.Primitives.Reactive",
+        "version": "9.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "Splat",
+        "version": "21.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "System.Reactive",
+        "version": "7.0.0",
+        "exclude": "Build,Analyzers"
+      }
+    ]
+  },
+  "ReactiveUI.Reactive/26.0.1": {
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/reactiveui/reactiveui",
+      "branch": "refs/heads/main",
+      "commit": "88312688d0281fd260977dfd78bb12e1c85ffaaa"
+    },
+    "net10Dependencies": [
+      {
+        "id": "ReactiveUI.Core",
+        "version": "26.0.1",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "ReactiveUI.Binding.Reactive",
+        "version": "9.1.0",
+        "include": "All"
+      },
+      {
+        "id": "ReactiveUI.Primitives.Reactive",
+        "version": "9.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "Splat",
+        "version": "21.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "ReactiveUI.Disposables",
+        "version": "9.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "ReactiveUI.Primitives",
+        "version": "9.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "ReactiveUI.Primitives.Core",
+        "version": "9.0.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "ReactiveUI.SourceGenerators",
+        "version": "4.2.0",
+        "exclude": "Build,Analyzers"
+      },
+      {
+        "id": "System.Reactive",
+        "version": "7.0.0",
+        "exclude": "Analyzers"
+      }
+    ]
+  }
+}

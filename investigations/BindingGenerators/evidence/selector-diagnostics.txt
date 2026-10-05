@@ -1,0 +1,11 @@
+<repo>/investigations/BindingGenerators/Program.cs(58,55): error RXUIBIND001: Expression argument must be an inline lambda expression for compile-time optimization. A variable or method reference is not generated, so the call throws unless it names the Unsafe overload. [<repo>/investigations/BindingGenerators/Primitives/BindingGenerators.Primitives.csproj]
+<repo>/investigations/BindingGenerators/Program.cs(58,36): error RXUIBIND021: 'WhenAnyValue' has no generated binding, so it throws at run time; name each member directly in the lambdas, declare a member another source generator adds as a partial property, or call WhenAnyValueUnsafe [<repo>/investigations/BindingGenerators/Primitives/BindingGenerators.Primitives.csproj]
+
+Build FAILED.
+
+<repo>/investigations/BindingGenerators/Program.cs(58,55): error RXUIBIND001: Expression argument must be an inline lambda expression for compile-time optimization. A variable or method reference is not generated, so the call throws unless it names the Unsafe overload. [<repo>/investigations/BindingGenerators/Primitives/BindingGenerators.Primitives.csproj]
+<repo>/investigations/BindingGenerators/Program.cs(58,36): error RXUIBIND021: 'WhenAnyValue' has no generated binding, so it throws at run time; name each member directly in the lambdas, declare a member another source generator adds as a partial property, or call WhenAnyValueUnsafe [<repo>/investigations/BindingGenerators/Primitives/BindingGenerators.Primitives.csproj]
+    0 Warning(s)
+    2 Error(s)
+
+Time Elapsed 00:00:00.39
