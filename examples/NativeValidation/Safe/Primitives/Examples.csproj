@@ -6,6 +6,6 @@
   <ItemGroup>
     <PackageReference Include="Runic.ReactiveUI.Validation" Version="$(ValidationVersion)" />
     <PackageReference Include="ReactiveUI" Version="26.0.1" />
-    <PackageReference Include="Runic.DynamicData" Version="10.0.0-runic.5" />
+    <PackageReference Include="Runic.DynamicData" Version="10.0.0-runic.30" />
   </ItemGroup>
 </Project>
