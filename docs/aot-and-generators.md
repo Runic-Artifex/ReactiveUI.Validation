@@ -241,9 +241,10 @@ its recorded outcome is not relabeled as a single-threaded run.
 | Legacy target setter used only through reflection | Pass | Pass | Dedicated string setter has no ordinary setter calls or member-preservation attributes. |
 | Typed target setter used only through reflection | Pass | Pass | Dedicated bool setter has the same restriction. |
 
-The first two target-binding scenarios also use ordinary setters during setup.
-The final two deliberately avoid those calls, explicit rooting descriptors,
-preservation attributes and complete-type-metadata generation. Their getter
+The earlier target scenarios share a `View` type whose bool setter is also used
+by the direct-setter control. The final two use a separate target type and avoid
+ordinary setter calls, explicit rooting descriptors, preservation attributes
+and complete-type-metadata generation. Their getter
 expressions still refer to the concrete property. These results cover those
 known scalar properties; they do not cover arbitrary runtime-selected members,
 nested target hosts, custom structs, platform UI controls or every overload.
