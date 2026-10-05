@@ -22,6 +22,9 @@ Download those assets and the matching DynamicData packages into a local NuGet
 feed to consume the fork. AndroidX and platform samples are retained outside
 core CI and releases. This fork will not be proposed upstream.
 
+The [upstream review](docs/upstream/README.md) catalogs every accessible issue and
+pull request, with Runic priorities, implementation plans and diagnostic evidence.
+
 ---
 
 The upstream usage guide and contributor history below are retained for reference.

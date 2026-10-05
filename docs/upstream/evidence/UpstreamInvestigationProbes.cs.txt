@@ -1,0 +1,81 @@
+// Copyright (c) 2019-2026 ReactiveUI and Contributors. All rights reserved.
+// ReactiveUI and Contributors licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for full license information.
+
+using System.Reactive.Subjects;
+
+#if REACTIVE_SHIM
+namespace ReactiveUI.Validation.Reactive.Tests;
+#else
+namespace ReactiveUI.Validation.Tests;
+#endif
+
+/// <summary>Diagnostic expectations for the upstream review, outside the shipping test suite.</summary>
+public class UpstreamInvestigationProbes
+{
+    /// <summary>A valid property value used by the probes.</summary>
+    private const string ValidName = "valid";
+
+    /// <summary>Checks that replacing a view model detaches its old validation stream.</summary>
+    /// <returns>The asynchronous test.</returns>
+    [Test]
+    public async Task ReplacingViewModelDetachesOldValidation()
+    {
+        using var first = new TestViewModel { Name = string.Empty };
+        using var second = new TestViewModel { Name = ValidName };
+        using var firstRule = first.ValidationRule(vm => vm.Name, static name => !string.IsNullOrEmpty(name), "First error");
+        using var secondRule = second.ValidationRule(vm => vm.Name, static name => !string.IsNullOrEmpty(name), "Second error");
+        var view = new TestView(first);
+        using var binding = view.BindValidation(first, vm => vm.Name, v => v.NameErrorLabel);
+        view.ViewModel = second;
+        await Assert.That(view.NameErrorLabel).IsEqualTo(string.Empty);
+        first.Name = ValidName;
+        first.Name = string.Empty;
+        await Assert.That(view.NameErrorLabel).IsEqualTo(string.Empty);
+    }
+
+    /// <summary>Checks that disposing a binding twice is safe.</summary>
+    /// <returns>The asynchronous test.</returns>
+    [Test]
+    public async Task BindingDisposalIsIdempotent()
+    {
+        using var model = new TestViewModel();
+        using var rule = model.ValidationRule(vm => vm.Name, static name => !string.IsNullOrEmpty(name), "Required");
+        var view = new TestView(model);
+        var binding = view.BindValidation(model, vm => vm.Name, v => v.NameErrorLabel);
+        binding.Dispose();
+        await Assert.That(() => binding.Dispose()).ThrowsNothing();
+    }
+
+    /// <summary>Checks whether validation is current in a plain property-change callback.</summary>
+    /// <returns>The asynchronous test.</returns>
+    [Test]
+    public async Task HasErrorsIsCurrentInsidePropertyChanged()
+    {
+        using var model = new IndeiTestViewModel();
+        using var rule = model.ValidationRule(vm => vm.Name, static name => !string.IsNullOrEmpty(name), "Required");
+        List<bool> observed = [];
+        model.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(model.Name))
+            {
+                observed.Add(model.HasErrors);
+            }
+        };
+        model.Name = ValidName;
+        await Assert.That(observed).IsNotEmpty();
+        await Assert.That(observed.TrueForAll(static hasErrors => !hasErrors)).IsTrue();
+    }
+
+    /// <summary>Checks whether object-level errors are exported through INotifyDataErrorInfo.</summary>
+    /// <returns>The asynchronous test.</returns>
+    [Test]
+    public async Task EntityValidationAppearsInGetErrors()
+    {
+        using var model = new IndeiTestViewModel();
+        using var valid = new BehaviorSubject<bool>(false);
+        using var rule = model.ValidationRule(valid, "Entity error");
+        await Assert.That(model.HasErrors).IsTrue();
+        await Assert.That(model.GetErrors(null).Cast<string>()).Contains("Entity error");
+    }
+}
