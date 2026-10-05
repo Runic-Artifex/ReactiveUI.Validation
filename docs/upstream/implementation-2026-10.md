@@ -108,10 +108,10 @@ regression preservation, rather than a second historical patch import. The
 ## Explicit deferrals and superseded proposals
 
 NativeAOT/generator follow-up dated **2026-10-05** is recorded in the
-[separate investigation](../aot-and-generators.md). It establishes specific
-released-package native executions and generated consumer output while retaining
-the public warnings. It does not adopt native APIs, change annotations or expand
-the supported platform/cohort scope; those remain future support work.
+[separate investigation](../aot-and-generators.md). Its dated released-package executions and generated consumer output retain
+the historical warnings. The subsequent runtime/examples-first candidate below
+adds explicit streams and narrows audited annotations; it does not relabel the
+immutable release or establish broader platform/cohort support.
 
 | Source | Decision / reason | Reconsider when |
 | --- | --- | --- |
@@ -121,7 +121,7 @@ the supported platform/cohort scope; those remain future support work.
 | #66 / #67 legacy scheduler default | Do not restore platform-conditioned task-pool defaults; use explicit serialized model scheduling. | A supported consumer demonstrates a scheduler contract that needs a scoped adapter. |
 | #833, #992 / .NET 11, #4/#9/#135/#414 and other native platform proposals | AndroidX, desktop/mobile samples, obsolete UWP/Xamarin and .NET 11 remain outside current .NET 10 core CI/release support. | Explicit platform support decision, workload/cohort and consumer/API/release gates. |
 | #990 binding source-generator caveat | Anonymous/private selector issue is unreproduced against the resolved 9.1 generator generation; no speculative workaround. | Exact selectors reproduce the generator diagnostic/output issue. |
-| Native AOT | Dynamic-code/trimming annotations remain. Typed state callbacks do not prove blanket AOT compatibility. | A concrete generated rule/binding publish-and-run scenario establishes support requirements. |
+| Native AOT | The immutable release retains its historical annotations. Runtime/examples-first candidate uses explicit streams and audited annotation boundaries; a Validation generator remains deferred. | Record strict actual-package safe-path publish/run evidence at the exact integrated source and host before claiming support. |
 | Remaining abandoned repository/platform proposals and routine updates | Preserve dated disposition; no historical badge, coverage uploader, version bump, analyzer cleanup, platform downgrade or dependency-update queue is replayed. | Current supported scenario or intentional tested dependency cohort requires it. |
 
 ## Dependency decision
@@ -196,3 +196,29 @@ and both expanded consumers. The prior `.790` tag still targets `509dd45`.
 The subsequent documentation-only update reuses unchanged code/CI evidence;
 its own commit is not the released shipping source. Published tags and assets
 remain immutable. No upstream message or contribution is part of this work.
+
+
+## Native runtime and examples first candidate
+
+The follow-up starts at `e653e52eb6abba95d3a5787771df01c4e570e309` on
+**2026-10-05**, after the immutable release recorded above. Status is
+**candidate implementation**. It adds explicit observable rule registration and
+outer-selection typed callbacks, enables producer AOT/trim analysis and uses
+realistic released-package strict failures with safe runtime counterparts.
+The [runtime recipe](../examples/native-validation.md),
+[NativeAOT status](../aot-and-generators.md) and
+[follow-up review](reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
+define the contract and keep topic, integration and publication evidence separate.
+
+Audit `4cdf89ab1d2de08dc3b85c48db2aee7418aa85c1` removes false RDC requirements,
+narrows blanket RUC on generated OAPH and supplied-observable paths, and preserves
+RUC on legacy reflection. Both producers pass warnings-as-errors analysis and
+48 focused tests per flavor; that topic evidence does not substitute for final
+integrated core/native gates. The [structured follow-up evidence](evidence/native-runtime-implementation.json)
+records exact audit counts and historical probe identities.
+
+No Validation generator package or MVP ships in this pass. The
+[future generator design](../generated-validation-design.md) maps the realistic
+cases to direct runtime operations and retains a managed synthetic interceptor
+proof. No dependency SDK/DynamicData update, blanket `IsAotCompatible`, additional
+UI platform or bridge/browser end-to-end support follows from this candidate.

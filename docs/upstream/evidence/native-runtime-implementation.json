@@ -1,0 +1,200 @@
+{
+  "date": "2026-10-05",
+  "status": "candidate",
+  "base": "e653e52eb6abba95d3a5787771df01c4e570e309",
+  "scope": "Runtime and examples first; no Validation generator package or MVP",
+  "published_baseline": {
+    "version": "8.1.0-runic.0.790.17",
+    "source": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+    "immutable": true,
+    "contains_additive_observable_apis": false
+  },
+  "historical_investigations": {
+    "base_native_probe": {
+      "results": "investigations/NativeAot/evidence/results.json",
+      "platform": "linux-x64",
+      "scenarios": 10,
+      "flavors": 2,
+      "modes": [
+        "managed",
+        "trimmed",
+        "native"
+      ],
+      "scenario_executions_passed": 60,
+      "native_warning_occurrences_per_flavor": 49,
+      "strict_zero_warning_gate": false
+    },
+    "generated_native_probe": {
+      "results": "investigations/BindingGenerators/evidence/native-summary.json",
+      "platform": "linux-x64",
+      "native_warning_occurrences_per_flavor": 10,
+      "strict_zero_warning_gate": false
+    }
+  },
+  "producer_audit": {
+    "topic_source": "4cdf89ab1d2de08dc3b85c48db2aee7418aa85c1",
+    "local_evidence": "artifacts/verification/native-audit",
+    "summary": {
+      "declarations": {
+        "RequiresDynamicCode": {
+          "before": 45,
+          "after": 0
+        },
+        "RequiresUnreferencedCode": {
+          "before": 62,
+          "after": 41
+        }
+      },
+      "public_api": {
+        "ReactiveUI.Validation": {
+          "signatures_unchanged": true,
+          "RDC_removed": 41,
+          "RUC_removed": 19
+        },
+        "ReactiveUI.Validation.Reactive": {
+          "signatures_unchanged": true,
+          "RDC_removed": 41,
+          "RUC_removed": 19
+        }
+      },
+      "base": "e653e52eb6abba95d3a5787771df01c4e570e309",
+      "sdk": "10.0.401",
+      "dependencies": {
+        "ReactiveUI": "26.0.1",
+        "Binding": "9.1.0",
+        "Binding_source": "05c45cec845835d670960fac733bb302bc1c1071",
+        "Runic.DynamicData": "10.0.0-runic.5"
+      },
+      "policy": {
+        "IsAotCompatible": false,
+        "producer_analyzers": [
+          "EnableAotAnalyzer",
+          "EnableTrimAnalyzer"
+        ],
+        "core_flavors_only": true,
+        "no_warning_suppression": true,
+        "no_behavior_change": true
+      },
+      "audit": {
+        "baseline_diagnostic_locations_per_flavor": 3,
+        "baseline_diagnostics": [
+          "IL3050"
+        ],
+        "reopened_diagnostic_locations_per_flavor": 16,
+        "reopened_diagnostics": [
+          "IL2026"
+        ],
+        "final_warnings_per_flavor": 0,
+        "final_errors_per_flavor": 0,
+        "safe": [
+          "ValidationContext constructors",
+          "ValidationHelper constructors",
+          "ReactiveValidationObject constructors",
+          "RegisterValidation helpers",
+          "supplied-observable ValidationRule overloads, including metadata selectors"
+        ],
+        "retained_RUC": [
+          "BasePropertyValidation runtime property observation and predicate ValidationRule overloads",
+          "legacy view/model/helper/context reflection observation",
+          "legacy target reflection assignment"
+        ],
+        "RDC_removal_basis": "Both producer bodies reopened with AOT/trim analysis; pinned Binding observation, expression rewrite and setter paths use reflection without runtime code generation. Context/helper generated code uses direct OAPH.Create/static notification delegates and current emitted IL calls those interceptors."
+      },
+      "tests": {
+        "primitives-context-tests.txt": {
+          "total": 20,
+          "failed": 0,
+          "passed": true
+        },
+        "reactive-context-tests.txt": {
+          "total": 20,
+          "failed": 0,
+          "passed": true
+        },
+        "primitives-helper-tests.txt": {
+          "total": 5,
+          "failed": 0,
+          "passed": true
+        },
+        "primitives-error-info-tests.txt": {
+          "total": 23,
+          "failed": 0,
+          "passed": true
+        },
+        "reactive-helper-tests.txt": {
+          "total": 5,
+          "failed": 0,
+          "passed": true
+        },
+        "reactive-error-info-tests.txt": {
+          "total": 23,
+          "failed": 0,
+          "passed": true
+        }
+      },
+      "artifacts": {
+        "primitives-baseline.txt": "8cf37a3fb49f243640d34cc799d89fd6e74a7111b73839e48a6ec54900c0b9b1",
+        "reactive-baseline.txt": "52697467d9d592d25d66d6749b830c6c9b76e55b8387037129abdac940c76e09",
+        "primitives-reopened.txt": "99f7860129afd236abe82646c22560a2b11788929dda88390dc581224b723a39",
+        "reactive-reopened.txt": "bd20c72e8e417552d7d9aeceedfb498bc99064553c131799e0aeec20cb39a178",
+        "primitives-final-build.txt": "1795cf5858a37e4f5135d40198b875a950ea689a3be43dfeccdb166c56408f34",
+        "reactive-final-build.txt": "e1d2edddfdfcf352037a2f187cf51581384a0d93624e7c3fe5edba1f6b9ec189",
+        "primitives-context-tests.txt": "b4553ff01fe5781d12f7e4462d464f0fb6289dcddf2f5e1375e2dfcc934b4919",
+        "current-oaph-il.txt": "30305b442ca921adc64451fea547edaa48133255bd3c80b9c9f58ed0b3d44967",
+        "reactive-context-tests.txt": "3d388e155a13725d5cc72d48664de2609474b25e461409a2b46074772ecdcc87",
+        "primitives-baseline.txt.diagnostics.txt": "8c330b033d8a3c6d063244abc90d1ee011344ae9e6eb6127e83291751b427326",
+        "primitives-reopened.txt.diagnostics.txt": "6b3703bcfba8f704f2992e04b42a13c252327c1bdafc21eaec994496dffa85d6",
+        "primitives-final-build.txt.diagnostics.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "ReactiveUI.Validation-ToPropertyDispatch.g.cs.txt": "a62a2624a69ac00e4eda7da751953a310147d7908cfbbd60c4df03d35f875edc",
+        "reactive-baseline.txt.diagnostics.txt": "87a96d8e1e7597490c07a6284ba1034ebaf458d06693596ae674de7af82673c7",
+        "reactive-reopened.txt.diagnostics.txt": "f91a47b74163339282ccbf025d876c3c9cd81f7d20bcd40769ba89c3eabfcf9c",
+        "reactive-final-build.txt.diagnostics.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "ReactiveUI.Validation.Reactive-ToPropertyDispatch.g.cs.txt": "b06399f8a05c6033fbcff921164e36b0698ec8b59c1abd41f57ba730fc1d95a3",
+        "primitives-helper-tests.txt": "5a09e1f11534504d2aaa72027c51a061cac3246ebc6ea48baf67e04578b8bb32",
+        "primitives-error-info-tests.txt": "e29c3314b8e8c43cbe3c64fc76468db9cd9ecb560390082cd81b06b29b239846",
+        "reactive-helper-tests.txt": "3031fad03f6621e66234544af5af4e9cb1210be27367dc03d13a8e914680edcb",
+        "reactive-error-info-tests.txt": "0fc73f8ea2ee25bcae948c083c4192f05cb9053d1bd46c164eabbf932d1d5c9d"
+      }
+    }
+  },
+  "integration_and_release": {
+    "candidate_final_gate_recorded": false,
+    "new_release_verified": false
+  },
+  "realistic_corpus": {
+    "baseline_topic": "4c55026",
+    "safe_topic": "95ca295",
+    "results": "examples/NativeValidation/evidence/baseline-results.json",
+    "baseline_version": "8.1.0-runic.0.790.17",
+    "managed_case_results_per_flavor": [
+      true,
+      false,
+      true,
+      true
+    ],
+    "known_gap": "Application requires missing address to be invalid; legacy nested observation retains last valid postcode state.",
+    "strict_diagnostics": [
+      "IL2026",
+      "IL3050"
+    ],
+    "safe_counterpart_verified": false
+  },
+  "strict_gate": {
+    "topic_sources": [
+      "ee7d0db",
+      "ba30d02"
+    ],
+    "runner": "eng/verify-native-validation.py",
+    "modes": [
+      "managed",
+      "trimmed",
+      "native"
+    ],
+    "accepted_rids": [
+      "linux-x64",
+      "win-x64"
+    ],
+    "accepted_rids_are_not_execution_proof": true,
+    "final_integrated_results_recorded": false
+  }
+}
