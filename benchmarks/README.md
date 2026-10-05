@@ -48,8 +48,8 @@ Select comparable warmed measurements, running flavors sequentially on an idle
 machine:
 
 ```sh
-dotnet run --project benchmarks/Primitives/ReactiveUI.Validation.Benchmarks.csproj -c Release -- --smoke --job short --filter '*ContextBenchmarks.InvalidMessageRoundTrip*' '*RuleBenchmarks.PropertyValidityRoundTrip*' --artifacts artifacts/benchmarks/primitives-short
-dotnet run --project benchmarks/Reactive/ReactiveUI.Validation.Reactive.Benchmarks.csproj -c Release -- --smoke --job short --filter '*ContextBenchmarks.InvalidMessageRoundTrip*' '*RuleBenchmarks.PropertyValidityRoundTrip*' --artifacts artifacts/benchmarks/reactive-short
+dotnet run --project benchmarks/Primitives/ReactiveUI.Validation.Benchmarks.csproj -c Release -- --smoke --job short --filter '*ContextBenchmarks.InvalidMessageRoundTrip*' '*RuleBenchmarks.PropertyValidityRoundTrip*' '*BindingBenchmarks.ReplaceModelRoundTrip*' --artifacts artifacts/benchmarks/primitives-short
+dotnet run --project benchmarks/Reactive/ReactiveUI.Validation.Reactive.Benchmarks.csproj -c Release -- --smoke --job short --filter '*ContextBenchmarks.InvalidMessageRoundTrip*' '*RuleBenchmarks.PropertyValidityRoundTrip*' '*BindingBenchmarks.ReplaceModelRoundTrip*' --artifacts artifacts/benchmarks/reactive-short
 ```
 
 For deeper investigation, omit `--smoke` to cover **1, 10, 100, and 1000**
@@ -60,6 +60,12 @@ avoid overlapping CI or other benchmarks, and retain relevant result summaries.
 Generated projects live in ignored benchmark `bin` directories; reports/logs live
 at `--artifacts`. Remove task-owned generated projects after consuming their
 reports, and preserve useful reports and shared NuGet caches.
+
+The runner returns a nonzero exit code for invalid options, filters that select
+no measurement workloads, generated-project failures, and failed workloads.
+Validated `--list`, `--help`, `--version`, and `--info` requests remain successful
+without measurements. Invalid options accompanying an information request still
+fail; an empty measurement selection cannot be mistaken for a passing smoke run.
 
 | Workload | One measured invocation |
 | --- | --- |
@@ -111,5 +117,6 @@ check just these three workloads. All eleven workloads remain available through
 the separate solution. These binding measurements exercise library subscription,
 projection, and ordinary CLR property assignment; they do not measure a native
 UI toolkit, dispatcher, rendering, or end-to-end latency. No core algorithm is
-changed by this benchmark project. [Recorded measurements](results/2026-10-05.md)
-identify the core revision for each run and the limits on interpreting it.
+changed by this benchmark project. [Final candidate measurements](results/2026-10-05-final.md) and the
+[historical baseline](results/2026-10-05.md) identify the core and workload
+revisions for each run and the limits on interpreting it.
