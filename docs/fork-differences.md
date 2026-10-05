@@ -4,7 +4,8 @@ Baseline **2026-10-05**: Runic `origin/main` at [`a4cfecf`](https://github.com/R
 
 Keep stable IDs and update the source/adoption commits, dependencies, regression evidence and retirement conditions when behavior changes. `active` means intentional fork policy/adaptation; `retained` means inherited behavior to protect; `retired` means verified replacement/removal. Keep retired entries as history. The dated research catalogs do not update this register automatically.
 
-Live candidate **2026-10-05**: `e9ab48a3e7d46f9a20eb0c0f5e1777887599dbe8`.
+Live candidate **2026-10-05**: `d6d634e43d109b848a06b960a29704aede2b100f`
+(shipping pin `5d433128e0692af112f43a7e09409a43b7210edc`).
 The integration owner has adopted the topic commits listed below into this
 candidate; final core/consumer/OS gates and maintained-branch integration remain
 pending. `active` records the intended adopted contract, not a claim that all
@@ -33,6 +34,13 @@ Unless noted otherwise, the adoption source for these entries is Runic commit `5
 | RUV-012 / active | [Typed state bindings](../src/ReactiveUI.Validation/Extensions/ValidationStateBindingExtensions.cs), adopted at `acf8d7178b639d68ea3b5eaf474fdf5d521d4321`: `BindValidationState` projects complete helper/property rule states to typed targets/actions without deriving validity from text. | Preserve both public API baselines, [typed regressions](../src/tests/ReactiveUI.Validation.Tests/ValidationStateBindingTests.cs), bool/enum/nullable projections, custom class/struct metadata, actual initial state, empty/null behavior and replacement/disposal. Dynamic-code/trimming limits remain. Final candidate gates pending. | Equivalent supported projection API and documented migration preserve state/metadata/lifetime semantics; retain regressions. |
 | RUV-013 / active | [Opt-in benchmark solution](../benchmarks/ReactiveUI.Validation.Benchmarks.slnx), adopted at `a23693e7990c9ba2539237db8ca5533ca8d54102`; binding workloads added at `587c1b0bf11c1b02b6adb0df34d85e7b8eeecd48`. Identical shared workloads measure both flavors outside shipping builds. | Preserve [commands and workload contracts](../benchmarks/README.md), bounded smoke/correctness checks, explicit measurement source/cohort and [baseline limitations](../benchmarks/results/2026-10-05.md). No algorithm or UI-latency improvement is inferred. Final candidate smoke pending. | Equivalent opt-in performance workflow preserves both flavor comparisons, correctness checks and reproducible source/cohort evidence. |
 
+## Model scheduling and executable recipes
+
+| ID / status | Source, adopting commit and contract | Dependencies / verification to preserve | Retirement condition |
+| --- | --- | --- | --- |
+| RUV-014 / active | [Context domain streams](../src/ReactiveUI.Validation/Contexts/ValidationContext.cs), adopted at `0a94cea64958de8221059dbcef03d791d05544fc`: raw membership, `Valid`, `ValidationStatusChange` and public `Validations` delivery are synchronous on the owner; `IsValid`/`Text` OAPH properties remain scheduled presentation. Fixes stale same-turn rule-add/remove validity and command admission. | Preserve [manual queue regressions](../src/tests/ReactiveUI.Validation.Tests/ValidationContextSchedulingTests.cs), reentrant removal/disposal and [ordering contract](examples/validation-ordering.md). Consumers dispatch native/UI presentation explicitly; no concurrent mutation or global scheduler change is promised. Final gates pending. | A reviewed scheduler/domain redesign preserves current validity, status payload consistency, ownership and documented observable delivery; retain regressions and migration guidance. |
+| RUV-015 / active | [Shared collection recipe](../examples/CollectionValidation/CollectionValidationRecipe.cs) and [ordering probe](../examples/ValidationOrdering/Program.cs), adopted at `004a17c84c264f50ece8f65400fe5373668bfa4f`: matching flavor imports, stable child keys, initial snapshot, refresh/removal/replacement/disposal and current command admission. | Preserve [collection regressions](../src/tests/ReactiveUI.Validation.Tests/CollectionValidationRecipeTests.cs), [ordering regressions](../src/tests/ReactiveUI.Validation.Tests/ValidationOrderingTests.cs), both ordinary executable flavors and opt-in SDK adapter source probes pinned at `e878a4f361a7c4b9326f54663defa7debe41adb9`. CI adoption `667978c` runs ordinary examples, not SDK probes. No bridge/browser E2E claim. Final gates pending. | Equivalent supported examples retain initial emission, stable identity, lifecycle, presentation/domain distinction and both flavor/scheduler evidence. |
+
 ## Inherited contracts to retain
 
 | ID / status | Source and scope | Verification / retirement condition |
@@ -45,17 +53,18 @@ Unless noted otherwise, the adoption source for these entries is Runic commit `5
 The [October implementation ledger](upstream/implementation-2026-10.md) and
 [implementation review](upstream/reviews/2026-10-implementation.md) record the
 candidate and its logical adoption SHAs. Binding lifetime, explicit contexts,
-typed state projections, opt-in benchmarks and graph hardening are implemented
-in the candidate; final integration verification remains pending.
+typed state projections, collection/scheduler correction, opt-in benchmarks and
+graph hardening are implemented in the candidate; final integration verification
+remains pending.
 
 The original [investigation](upstream/README.md#binding-lifetime) reproduced
 old-model updates and binding double-disposal failures at `509dd45` in both
 flavors. Its [diagnostics](upstream/evidence/README.md) remain historical evidence;
 RUV-010 now points to permanent regressions for the adopted correction.
 
-Collection examples and command/scheduler work remain in progress. A newly
-reproduced explicit-model-turn rule-membership bug leaves current validity/error
-state stale until queued publication; its correction/adoption is pending.
-[The ledger](upstream/implementation-2026-10.md#implemented-behavior-and-remaining-scheduling-fix)
-records its scope. No completion, broad Native AOT support or ReactiveUI 25
-compatibility follows from this candidate record.
+RUV-014 records the newly reproduced same-turn membership correction, including
+its deliberate observable delivery change. RUV-015 records the compiled shared
+collection examples and source-level SDK adapter probes. The
+[ledger](upstream/implementation-2026-10.md#implemented-behavior-and-scheduling-correction)
+records the shipping pin, API parity approval and remaining final gates. No broad
+Native AOT support or ReactiveUI 25 compatibility follows from this candidate.
