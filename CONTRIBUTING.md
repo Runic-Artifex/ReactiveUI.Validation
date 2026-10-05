@@ -12,8 +12,10 @@ runtime and examples first implementation from dated warning-bearing
 investigations. The strict
 [actual-package gate](eng/verify-native-validation.py) publishes and runs the
 explicit safe subset; it retains warning-as-error analysis and exact flavor,
-version and source checks. A Validation generator remains deferred. No blanket
-package NativeAOT compatibility or retained UI-platform support is implied.
+version and source checks. The working branch's generated/Unsafe API split is
+**UNRELEASED**; see the [generator contract](docs/generated-validation-design.md)
+and [migration recipe](docs/examples/generated-validation.md). No blanket package
+NativeAOT compatibility or retained UI-platform support is implied.
 
 Use .NET SDK 10.0.401, pinned in the root `global.json`, and Python 3 for the
 dependency bootstrap. On the Runic desktop, reuse the locked development shell
@@ -72,3 +74,38 @@ attaches the two core `.nupkg` assets to a prerelease on this fork. It does not
 publish under upstream package IDs or push to NuGet.org. MinVer uses an 8.1
 floor, `runic-v` tag prefix and `runic.0` prerelease identifiers. Preserve upstream MIT licensing and
 authorship. This fork is maintained for Runic and will not be proposed upstream.
+
+## Generated call-site verification
+
+The core packages embed `ReactiveUI.Validation.SourceGenerators.dll` under
+`analyzers/dotnet/roslyn5.9/cs`, plus their matching `buildTransitive` props.
+Those props add `ReactiveUI.Validation.Generated` to `InterceptorsNamespaces`.
+Build with the pinned SDK 10.0.401/C#14 (actual Roslyn 5.9.0); inspect a packed
+consumer's analyzer inputs and imported props when diagnosing missing generation. The normal
+expression APIs require recompilation with these assets. Do not exclude
+`analyzers` or `buildTransitive` assets from a project that uses them. No separate
+Validation generator package reference is needed.
+
+For generator changes, preserve both-flavor compilation/diagnostic checks and
+inspect emitted direct getters, notification sources, full paths and setters.
+Generated output must not call expression APIs, `WhenAnyValueUnsafe` or the
+Validation `Unsafe` methods, or assume Binding will process newly emitted calls.
+Retain actionable diagnostic errors for unsupported inputs and tests that
+uninstrumented normal calls throw. Explicit Unsafe calls retain their warning
+contract. Check null/default semantics, synchronous subscription handoff and
+initial-failure cleanup, source replacement, strict matching, complete custom
+states and subscription ownership. The realistic GeneratedValidation consumers
+must use actual packed packages and execute under managed/full-trim/native modes
+with warnings as errors; record exact source/package/host identities separately
+from earlier released runtime consumers. The generator split remains unreleased
+until its current revision passes the required Linux/Windows integration gates.
+
+The safe observable rule/binding files deliberately use traditional `this`
+extensions: the locked C#14 compiler's nullable-generic synthesized static bridge
+produces CS8714. Their narrow SST1703 exception records this measured compiler
+issue; do not restore extension blocks without reproducing the corrected
+compiler behavior. CLR signatures/inferred calls remain compatible, but explicit
+observable binding source calls now supply `<TSource, TOut>` instead of only
+`<TOut>`. `AddObservableRule<TValue>` keeps its arity. Review both API baselines
+and fresh compiler-aligned regressions; do not suppress IL diagnostics or add
+tuple-based signature workarounds.

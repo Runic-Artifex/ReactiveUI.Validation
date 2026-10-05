@@ -121,7 +121,7 @@ immutable release or establish broader platform/cohort support.
 | #66 / #67 legacy scheduler default | Do not restore platform-conditioned task-pool defaults; use explicit serialized model scheduling. | A supported consumer demonstrates a scheduler contract that needs a scoped adapter. |
 | #833, #992 / .NET 11, #4/#9/#135/#414 and other native platform proposals | AndroidX, desktop/mobile samples, obsolete UWP/Xamarin and .NET 11 remain outside current .NET 10 core CI/release support. | Explicit platform support decision, workload/cohort and consumer/API/release gates. |
 | #990 binding source-generator caveat | Anonymous/private selector issue is unreproduced against the resolved 9.1 generator generation; no speculative workaround. | Exact selectors reproduce the generator diagnostic/output issue. |
-| Broader NativeAOT support | The immutable `.790.17` release retains historical annotations. The `.15` native follow-up supports the verified explicit-stream console paths on Linux/Windows x64; whole-library and untested-platform support remain deferred, as does a Validation generator. | A concrete additional path/cohort/host passes accurate producer analysis and strict actual-package publish/run gates. |
+| Broader NativeAOT support | The immutable `.790.17` release retains historical annotations. The `.15` native follow-up supports the verified explicit-stream console paths on Linux/Windows x64; whole-library and untested-platform support remain deferred. That released pass deferred a Validation generator; the later unreleased split is recorded below. | A concrete additional path/cohort/host passes accurate producer analysis and strict actual-package publish/run gates. |
 | Remaining abandoned repository/platform proposals and routine updates | Preserve dated disposition; no historical badge, coverage uploader, version bump, analyzer cleanup, platform downgrade or dependency-update queue is replayed. | Current supported scenario or intentional tested dependency cohort requires it. |
 
 ## Dependency decision
@@ -242,10 +242,11 @@ nuspec source and independently downloaded assets are verified; the [structured 
 records exact local versions/hashes and the separately retained preliminary
 package identities.
 
-No Validation generator package or MVP ships in this pass. The
-[future generator design](../generated-validation-design.md) maps the realistic
-cases to direct runtime operations and retains a managed synthetic interceptor
-proof. Equivalent generated-adapter handoff/error-cleanup tests remain deferred.
+No Validation generator package or MVP shipped in this released pass. Its
+then-future design mapped realistic cases to direct runtime operations and
+retained a managed synthetic interceptor proof. Generated-adapter acceptance was
+deferred at that release; the [current contract](../generated-validation-design.md)
+and unreleased follow-up below supersede that decision.
 No dependency SDK/DynamicData update, blanket `IsAotCompatible`, retained UI
 platform or bridge/browser end-to-end support follows from this implementation.
 
@@ -258,3 +259,58 @@ These differ from local and CI verification package hashes. The `.790` and
 reuses unchanged released code/workflow evidence; its own commit is not the
 shipping package source. Version/tag/asset immutability is fork policy, not a
 GitHub-enforced immutable-release claim.
+
+## Unreleased generated and Unsafe API split
+
+Decision **2026-10-06**, following immutable runtime release source
+`f22d2bb42c30d66df19a59333ed4fa633b241940`: implement the primary supported
+inline-lambda API with a Validation interceptor generator, replacing the earlier
+partial-method/attribute deferral. This working-branch change is **UNRELEASED**
+until current-source integration CI passes. Historical release/probe evidence
+above remains pinned to its original source and assets.
+
+Normal predicate `ValidationRule`, `BindValidation`, `BindValidationContext` and
+`BindValidationState` calls require generation; their ungenerated bodies throw.
+Matching explicit Unsafe methods retain runtime reflection and trimming warnings.
+Generated normal property text bindings expose actual initial rule states without
+the legacy synthetic empty prelude, which Unsafe property callbacks retain.
+Previously compiled normal callers must be rebuilt with the matching core
+package analyzer/configuration assets, or explicitly migrate to Unsafe. Both
+core packages embed the analyzer DLL and their matching allowlist props. Safe
+observable/metadata-only overloads remain supported without new interception.
+
+The [design](../generated-validation-design.md),
+[migration/corpus recipe](../examples/generated-validation.md),
+[maintenance boundary](../maintenance.md#generated-and-unsafe-api-boundary) and
+[RUV-018](../fork-differences.md#unreleased-generated-api-contract) record literal
+selector constraints, diagnostics, null/default policy, contexts, strict paths,
+complete custom states and ownership/disposal. Current-source generated package
+consumer results must be recorded independently of the existing runtime gates;
+focused current-code verification reports 29 passing compiler-fixture tests
+using matched Roslyn 5.9 against both runtime flavors, covering all four rule and
+14 binding overloads, with zero build/emitted warnings or errors. Generated
+runtime infrastructure passes 14 tests per flavor with strict producer analysis
+and zero warnings. Twenty Python guard checks passed across focused runs (eight
+package, six runtime-native and six generated). These are working-tree results;
+full core, final clean-source package/native gates and Linux/Windows integration
+CI remain pending.
+
+The dependency cohort remains SDK 10.0.401/.NET 10, ReactiveUI 26.0.1 and the
+matching released DynamicData 10.0.0-runic.5 pair. No sibling adoption or blanket
+package `IsAotCompatible`, all-reflection-removed, UI-platform or bridge/browser
+support follows.
+
+The generator/tooling cohort is aligned to the locked SDK's actual Roslyn 5.9.0
+compiler and `analyzers/dotnet/roslyn5.9/cs` package path. A reproduced
+nullable-generic CS8714 in C#14's synthesized static bridge requires the six safe
+observable methods to use traditional `this` extensions. CLR signatures and
+inferred calls remain compatible; explicit observable binding source calls now
+use `<TSource, TOut>`, while `AddObservableRule<TValue>` keeps its arity. The
+narrow SST1703 exception addresses that measured compiler error, without IL
+suppression or tuple-based signatures. The unchanged direct-static nullable
+callers reproduce eight CS8714 errors
+before the correction and zero warnings/errors after it; inferred receiver calls
+passed before it. Retained proof/source/log inputs are under
+`artifacts/verification/generator-nullability`, including `results.json`.
+Compiler/runtime focused checks pass as recorded above; final clean-source gates
+remain pending. Historical proof/release source and package inputs are unchanged.

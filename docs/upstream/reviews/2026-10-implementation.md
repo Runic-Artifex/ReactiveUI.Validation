@@ -224,8 +224,9 @@ notes without changing the tag or assets.
 
 Started **2026-10-05** from `e653e52eb6abba95d3a5787771df01c4e570e309`.
 Status: **released; tag and both assets independently verified**, separate from the immutable `.790.17`
-release above. The selected scope is runtime APIs and realistic examples first;
-a [Validation generator design](../../generated-validation-design.md) is deferred.
+release above. That released pass selected runtime APIs and realistic examples
+first and deferred a Validation generator. The [current design](../../generated-validation-design.md)
+and unreleased follow-up below supersede that deferral.
 No generator package, generator-only runtime surface, dependency upgrade,
 platform UI support or SDK/DynamicData source change is part of this pass.
 
@@ -235,7 +236,7 @@ platform UI support or SDK/DynamicData source change is part of this pass.
 | Explicit observable runtime | `67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195`: six methods (`AddObservableRule` in four forms and two typed observable bindings); [runtime contract](../../examples/native-validation.md). | Independently reviewed and adopted in released `f22d2bb`; +21 baseline lines per flavor. Producer-analysis warnings-as-errors build passes with zero warnings/errors. 12 new [runtime regressions](../../../src/tests/ReactiveUI.Validation.Tests/ObservableRuntimeApiTests.cs) per flavor pass; final integrated core/native gates remain separate. |
 | Realistic application examples | Baseline `4c55026`, safe counterpart `85c63a8`; [package corpus](../../../examples/NativeValidation/README.md): generic fields, nullable nested editor/rich typed target, blocking/advisory cross-field rules, row-owned asynchronous state and existing observable foundation. | Both baseline flavors record three managed case passes and the expected required-null-policy gap, plus strict IL2026/IL3050 with Validation call provenance. The final safe fixtures, including adapter correction `07ab9ca`, pass five cases in all three local modes at exact clean `f22d2bb`; final CI and both actual native RIDs pass; published tag/source/assets are independently verified. |
 | Native package gates | `ee7d0db`, `ba30d02` and strengthening `c026ec0`, integrated at `eae4984`; [strict runner](../../../eng/verify-native-validation.py): producer/package analysis, exact graphs, trimmed and native publish/run, and CI artifact/source identity. | Final local actual-package gate at exact clean `f22d2bb` passes all three modes with warning-as-error analysis and actual Linux native execution. Final CI and both actual native RIDs pass; published tag/source/assets are independently verified. |
-| Future generator | `b2043da`, `ebb726d`, `eba235a`, handoff follow-up `9fb933f` / `ef69fa0`; [deferred design](../../generated-validation-design.md). | Reviewed design and managed compiler proof only. The synthetic annotated call still produces IL2026/IL3050 despite interception. No native or shipping generator claim. |
+| Future generator | `b2043da`, `ebb726d`, `eba235a`, handoff follow-up `9fb933f` / `ef69fa0`; [current design, retaining historical proof](../../generated-validation-design.md). | Reviewed design and managed compiler proof only. The synthetic annotated call still produces IL2026/IL3050 despite interception. No native or shipping generator claim. |
 
 The [structured evidence](../evidence/native-runtime-implementation.json) records
 the audited annotation counts and preserves historical release-probe identity.
@@ -399,6 +400,52 @@ not marked as an enforced immutable release.
 The final review stamp changes documentation and evidence metadata only. It
 reuses exact released code/workflow verification under the maintenance policy;
 its own commit is not the shipping package source. `RUV-016` and `RUV-017` are
-active released contracts. No generator package/MVP, whole-library
+active released contracts. That release makes no generator package/MVP, whole-library
 `IsAotCompatible`, retained UI-platform support, other RID or bridge/browser
 end-to-end result is claimed.
+
+## Unreleased generated API follow-up
+
+**2026-10-06 working-branch status; integration/verification pending.** The
+approved implementation direction supersedes the earlier generator deferral:
+supported inline-lambda normal calls generate direct Validation operations,
+while explicit Unsafe calls retain reflection and its trimming boundary. Normal
+calls without an interceptor throw, including already compiled call sites;
+consumers must recompile with the embedded analyzer and allowlist props or
+explicitly migrate. Generated normal property text bindings deliver actual
+initial rule text without the legacy synthetic empty-list prelude; Unsafe
+property callbacks retain that intentional migration boundary. Both core package
+IDs, namespace flavors, public API baselines and the released matching
+DynamicData `.5` cohort are preserved.
+
+The [generator contract](../../generated-validation-design.md),
+[recipe](../../examples/generated-validation.md) and
+[RUV-018](../../fork-differences.md#unreleased-generated-api-contract) define
+supported input/diagnostics, full paths/strictness, context independence, null
+policy, complete state projection and subscription ownership. The new generated
+actual-package gate records current-source managed/trim/native outcomes and
+package identities separately from all previous evidence. Current-source
+Linux/Windows CI, final package hashes and executed native hosts must be added
+by the integration owner after the corresponding gates finish. This entry
+records focused current-code results: 29 passing compiler-fixture tests with
+matched Roslyn 5.9 against both runtime flavors, covering all four rule and 14
+binding overloads, and zero build/emitted warnings or errors. Generated runtime
+infrastructure passes 14 tests per flavor with strict producer analysis and zero
+warnings. Twenty Python guards passed across focused runs (eight package, six
+runtime-native and six generated). These working-tree checks are not final
+clean-source full-core, actual-package native or Linux/Windows CI verification.
+
+The generator/tooling cohort is aligned to the locked SDK's actual Roslyn 5.9.0
+compiler and `analyzers/dotnet/roslyn5.9/cs` package path. A reproduced
+nullable-generic CS8714 in C#14's synthesized static bridge requires the six safe
+observable methods to use traditional `this` extensions. CLR signatures and
+inferred calls remain compatible; explicit observable binding source calls now
+use `<TSource, TOut>`, while `AddObservableRule<TValue>` keeps its arity. The
+narrow SST1703 exception addresses that measured compiler error, without IL
+suppression or tuple-based signatures. The same direct-static nullable caller
+sources produced eight CS8714 errors
+before correction and zero warnings/errors afterward; inferred receiver callers
+already passed. The retained proof is
+`artifacts/verification/generator-nullability/results.json`, with before,
+inferred and after logs/source inputs. Aligned focused compiler/runtime checks
+pass as recorded above; final clean-source gates remain pending. Historical proof/release source and package inputs are unchanged.

@@ -90,6 +90,32 @@ Verify the completed run's exact head SHA and both OS jobs; a prior green main r
 
 AndroidX and native samples remain in [the platform solution](../src/ReactiveUI.Validation.Platforms.slnx), outside core CI/releases. Expanding support requires workloads, platform/API verification, branded consumer tests and deliberate release inclusion. Check project/temp storage before large runs, use conservative concurrency and avoid overlapping matrices. On storage failure, stop and diagnose; remove only task-owned disposable artifacts and preserve shared caches, useful logs and Nix store paths.
 
+## Generated and Unsafe API boundary
+
+The working branch's generator/API split is **UNRELEASED** until the current
+revision passes integration CI. Preserve [RUV-018](fork-differences.md#unreleased-generated-api-contract)
+in monthly merges: inline supported lambda calls use generated direct operations;
+explicit `Unsafe` calls own the reflection/trimming boundary. Normal ungenerated
+calls must throw with an actionable message. Do not restore hidden reflection
+fallbacks to retain binary behavior; document that precompiled consumers need
+recompilation or an explicit Unsafe migration.
+
+Both branded core packages must carry the same Validation analyzer DLL and their
+matching flavor-named `buildTransitive` interceptor allowlist props. Verify actual
+package imports/analyzer inputs, generated code, exact matching graphs, negative
+selector diagnostics and normal-stub failure behavior. Safe observable and
+metadata overloads retain their runtime contract. Generated notification sources
+must handle initial callbacks, replacement/null, stale-source rejection and
+failure cleanup without owning models, contexts or supplied sources. Require
+actual-package generated consumers with warning-as-error managed/trim/native
+analysis and execution on each claimed host. Earlier green release gates prove
+their pinned revision only. Keep accurate RUC warnings on Unsafe/reflection
+operations; do not infer whole-package `IsAotCompatible` or platform support.
+
+This boundary does not authorize a dependency update: retain released matching
+DynamicData 10.0.0-runic.5 packages, their hashes and ReactiveUI 26.0.1 pins.
+Never adopt sibling SDK/DynamicData source as an implicit generator dependency.
+
 ## Releases and retirement
 
 Release a tested source commit with a unique version/tag. MinVer settings in [src/Directory.Build.props](../src/Directory.Build.props) use the `runic-v` tag prefix, 8.1 minimum and `runic.0` prerelease identifiers; inspect the produced version rather than infer it from an upstream tag. The [manual release workflow](../.github/workflows/release.yml) builds/tests/packs/verifies both core packages and publishes GitHub prerelease assets. It does not replace the prior Windows gate or publish to NuGet.org.

@@ -30,6 +30,31 @@ For monthly syncs and retained fork adaptations, see the
 [maintenance policy](docs/maintenance.md) and
 [fork difference register](docs/fork-differences.md).
 
+## Unreleased generated validation API
+
+The working branch makes inline-lambda predicate `ValidationRule` and expression
+`BindValidation`, `BindValidationContext` and `BindValidationState` calls the
+primary generated surface. The matching core package embeds the Validation
+analyzer and interceptor allowlist props; consuming projects must retain those
+assets and recompile their call sites. Supported calls generate direct property
+observation and typed assignment. Unsupported selectors produce build errors.
+A normal call left unintercepted throws, including a previously compiled call;
+there is no reflection fallback. Generated normal property text bindings expose
+actual initial invalid text immediately; explicit Unsafe property callbacks
+retain the legacy synthetic empty-list prelude.
+
+Use `ValidationRuleUnsafe`, `BindValidationUnsafe`,
+`BindValidationContextUnsafe` or `BindValidationStateUnsafe` when deliberately
+using runtime expressions. Those methods retain trimming warnings. Supplied
+observable/metadata rule overloads and the explicit observable APIs remain
+available. See the [migration and examples](docs/examples/generated-validation.md)
+and [generator contract](docs/generated-validation-design.md).
+
+This change is **UNRELEASED** until the new revision passes integration CI.
+Published releases and their source/package evidence retain their historical
+behavior. Generated-path NativeAOT claims require the new actual-package gates;
+prior release results do not verify this change.
+
 ---
 
 The upstream usage guide and contributor history below are retained for reference.

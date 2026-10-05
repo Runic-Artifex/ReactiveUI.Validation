@@ -1,9 +1,31 @@
 # NativeAOT and ReactiveUI generators
 
-The current NativeAOT implementation follows the runtime and examples first
-approach: explicit observable rules, explicit replacement streams and typed
-callbacks. A Validation generator remains a [future design](generated-validation-design.md).
-No generator package or generator MVP is part of this implementation.
+The working branch adds the **UNRELEASED generated/Unsafe API split** described
+in the [generator contract](generated-validation-design.md) and
+[migration recipe](examples/generated-validation.md). Supported inline-lambda
+predicate rules and expression bindings generate direct observation/assignment;
+normal unintercepted calls throw. Consumers must recompile with the matching
+core package's embedded analyzer and interceptor allowlist props. Runtime
+expressions require explicit annotated Unsafe methods; no hidden reflection
+fallback is provided. Safe observable APIs remain available.
+
+The new [actual-package generated gate](../eng/verify-generated-validation.py)
+requires warning-as-error managed/full-trim/native publication and execution in
+both flavors at the current source. Its integration and host evidence must be
+recorded separately. Focused current-code verification reports 29 passing
+compiler-fixture tests with matched Roslyn 5.9 against both runtime flavors,
+covering all four rule and 14 binding overloads, with zero build/emitted warnings
+or errors. Generated runtime infrastructure passes 14 tests per flavor and strict
+producer analysis with zero warnings. Twenty Python guard checks passed across
+focused runs (eight package, six runtime-native and six generated).
+
+These are working-tree checks, not a clean source-pinned final gate. Full core,
+actual-package native execution and Linux/Windows integration CI remain pending.
+Earlier release gates below retain their historical identities and do not verify
+the generated split. No blanket `IsAotCompatible` or whole-library reflection-free
+contract is declared.
+
+## Released runtime evidence (before the generator split)
 
 The released [**8.1.0-runic.0.790.17.15**](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15) is exact source
 `f22d2bb42c30d66df19a59333ed4fa633b241940`, based on `e653e52`. Both flavors
@@ -60,7 +82,7 @@ These are application-policy and metadata adaptations, not blanket legacy fixes.
 The final fixture installs pending subscription slots before initial callbacks;
 it checks synchronous parent replacement/null, disposal, and initial getter or
 callback failure cleanup. These are application-observation contracts, separate
-from the already audited library APIs and deferred generated-adapter acceptance.
+from the already audited library APIs and the new generated-code acceptance.
 
 The [strict package gate](../eng/verify-native-validation.py) must consume actual
 packed assets, retain
@@ -173,7 +195,7 @@ changing the graph rather than inferring availability from one nuspec entry.
 The [official generator documentation](https://www.reactiveui.net/documentation/binding/source-generators/)
 describes how Binding recognizes members written by SourceGenerators. Generators
 run separately: arbitrary code produced by one generator is not intercepted by
-the other. A future Validation generator should emit direct runtime operations,
+the other. The new Validation generator must emit direct runtime operations,
 for example the appropriate `ObservedProperty` API, rather than emit fresh
 `WhenAnyValue` calls and assume another generator will rewrite them.
 
@@ -364,9 +386,28 @@ audit.
 
 Use the [explicit observable runtime recipe](examples/native-validation.md) for
 new native consumers. It retains standard context aggregation, captured rule
-ownership, synchronous domain state and matching-flavor imports. Keep existing
-expression APIs available for existing consumers; moving to typed callbacks
-alone does not replace their reflective source selection.
+ownership, synchronous domain state and matching-flavor imports. For the
+immutable runtime release, expression APIs retain reflective source selection even when they use typed callbacks. On the working branch, supported
+normal calls instead require generation; retained reflection is explicitly
+selected with `ValidationRuleUnsafe`, `BindValidationUnsafe`,
+`BindValidationContextUnsafe` or `BindValidationStateUnsafe`. See the
+[migration recipe](examples/generated-validation.md) for precompiled-call and
+package-asset requirements.
+
+The generator/tooling cohort is aligned to the locked SDK's actual Roslyn 5.9.0
+compiler and `analyzers/dotnet/roslyn5.9/cs` package path. A reproduced
+nullable-generic CS8714 in C#14's synthesized static bridge requires the six safe
+observable methods to use traditional `this` extensions. CLR signatures and
+inferred calls remain compatible; explicit observable binding source calls now
+use `<TSource, TOut>`, while `AddObservableRule<TValue>` keeps its arity. The
+narrow SST1703 exception addresses that measured compiler error, without IL
+suppression or tuple-based signatures. The same direct-static nullable caller
+sources produced eight CS8714 errors
+before the correction and zero warnings/errors afterward; inferred receiver
+calls already passed before it. The retained proof is
+`artifacts/verification/generator-nullability/results.json`, with before,
+inferred and after logs/source inputs. Focused aligned compiler/runtime checks
+pass as recorded above; final clean-source gates remain pending. Historical proof/release source and package inputs are unchanged.
 
 The producer audit distinguishes dynamic-code requirements from trimming
 requirements. In the audited .NET 10 cohort, legacy reflection operations
@@ -393,7 +434,7 @@ paths, dependency cohort and actual host executions recorded in the review.
 | Explicit observables, delegates and state subscriptions | Released safe console contract | Explicit rules and replacement streams expose ownership and direct callbacks | Both-flavor API review, producer analysis and strict actual-package consumer gates for the recorded host scope. |
 | Binding interceptors in the application | Optional | Generates recognized application observation/binding calls | Compiler/interceptor configuration and generated-output verification; does not replace package-internal calls. |
 | SourceGenerators in the application | Optional | Reduces reactive property, command and notification boilerplate | Select compatible flavor/output, inspect generated code; OAPH/view generation belongs to Binding in the current split. |
-| Validation-specific source generator | [Future convenience design](generated-validation-design.md) | Could preserve selector syntax while producing explicit observations and metadata | No generator shipped in this pass. A later package needs selector diagnostics, compilation/flavor tests and versioning after the runtime contract is stable. |
+| Validation-specific source generator | [Unreleased primary normal-call implementation](generated-validation-design.md) | Preserves supported inline selectors while emitting direct observations, full metadata and typed assignment | Embedded analyzer/props, recompilation, diagnostic/compilation/flavor checks and current-source strict packaged consumers required. Unsupported normal shapes are errors; ungenerated normal calls throw. |
 | Library `IsAotCompatible` contract | Future support decision | Enables producer analyzers and communicates the compatibility contract | Audit exposed unannotated paths and dependencies, retain warnings on unsafe APIs, verify safe-subset native gates and define platform scope. |
 
 ## Native platform scope

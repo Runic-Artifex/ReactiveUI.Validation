@@ -1,312 +1,263 @@
-# Validation generator design after the observable runtime path
+# Generated validation and explicit Unsafe APIs
 
-Design date: **2026-10-05**, investigation base `e653e52`. The selected scope is
-runtime APIs and realistic examples first. This document proposes a later
-convenience generator; it does not add an analyzer package, generator-only stub
-API, interceptor or production dependency. The [native investigation](aot-and-generators.md)
-remains the source of current platform and released-package evidence.
+Implementation decision **2026-10-06: UNRELEASED working branch**. This
+replaces the 2026-10-05 recommendation to defer a Validation generator and
+prefer attributes on partial methods. The primary surface preserves supported
+existing inline-lambda calls. Integration CI and current-source package/native
+evidence remain required; [historical released
+evidence](aot-and-generators.md) does not verify the new generator.
 
-## Decision and existing compiler evidence
+## Normal calls require generation
 
-Use application-created observables, static full property paths and typed
-callbacks with the new `AddObservableRule`, `BindObservableValidationState` and
-`BindObservablePropertyValidationState` APIs. Existing Binding generation already
-reduces application observation boilerplate. A Validation generator should add
-metadata and declared observation conveniences only after those APIs and their
-package consumers are verified.
+Four predicate `ValidationRule` overloads (default/explicit context and
+constant/delegate message) and the six `BindValidation`, four
+`BindValidationContext` and four `BindValidationState` expression overloads
+have normal generated entry points. Their bodies throw if a call was not
+intercepted. They have matching explicit `Unsafe` methods containing the
+reflection-based implementation with its `RequiresUnreferencedCode` warnings.
+There is no hidden Unsafe fallback. Supplied-observable and metadata-only rule
+overloads, plus the explicit observable APIs, retain their runtime contract.
 
-The [Binding compiler inputs](../investigations/BindingGenerators/evidence/Primitives-compiler.txt)
-contain Binding **9.1.0** and ReactiveUI.SourceGenerators **4.2.0** with C#14 and
-Binding's own interceptor namespace. Their
-[emitted observation](../investigations/BindingGenerators/evidence/Primitives/WhenAnyValueDispatch.g.cs.txt)
-contains direct property getters and notification mechanisms. Their
-[emitted setter](../investigations/BindingGenerators/evidence/Primitives/BindToDispatch.g.cs.txt)
-contains direct typed assignment. An application generator cannot change the
-already compiled Validation package's internal Unsafe observation or reflected
-setter. The released
-[OAPH IL inspection](../investigations/BindingGenerators/evidence/released-oaph-il.txt)
-also establishes that generator support already exists in this cohort; adding a
-second generator is not a prerequisite for the safe observable APIs.
+This is a binary behavior change. An already compiled caller cannot gain an
+interceptor when its referenced package is replaced: recompile supported call
+sites with the matching core package's analyzer/build assets, or rebuild calls
+against the explicit Unsafe API. Disabling analyzers, stripping package build
+assets or calling the normal method indirectly does not select runtime
+reflection.
 
-A small [managed compiler proof](../investigations/BindingGenerators/evidence/interceptor-annotation-proof.txt)
-uses SDK **10.0.401**, C#14 and ILLink analyzers **10.0.12**. An unannotated
-interceptor replaces a synthetic RDC/RUC-annotated `UnsafeApi.Read` call and executes the distinct
-`safe-interceptor` result. The original call still produces **IL2026 and IL3050**.
-This rules out promising zero warnings merely by intercepting existing annotated
-Validation methods. Both diagnostics remain visible; the isolated proof records
-warning severity to allow execution, with no suppression. It does not publish a
-native executable or establish native behavior.
+The same analyzer DLL is embedded in both branded core packages under
+`analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll`.
+`buildTransitive/Runic.ReactiveUI.Validation.props` and
+`buildTransitive/Runic.ReactiveUI.Validation.Reactive.props` respectively add
+`ReactiveUI.Validation.Generated` to `InterceptorsNamespaces`. No separate
+Validation generator package is required. The supported compiler cohort is SDK
+10.0.401, C#14 and Roslyn 5.9.0. Use exactly one matching
+Validation/ReactiveUI/ DynamicData flavor. Primitives uses
+`ReactiveUI.Validation.*` and `DynamicData`; Reactive uses
+`ReactiveUI.Validation.Reactive.*`, `DynamicData.Reactive` and the
+System.Reactive scheduler/observable cohort.
 
-[Roslyn's interceptor design](https://github.com/dotnet/roslyn/blob/main/docs/features/interceptors.md)
-defines compile-time call substitution and a dedicated allowed namespace. Its
-[current API](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp.csharpextensions.getinterceptablelocation?view=roslyn-dotnet-5.0.0)
-provides encoded locations rather than manually maintained source line numbers.
-The managed proof tests the annotation behavior on the pinned toolchain instead
-of inferring it from runtime reachability. Annotations justified by the producer audit remain; narrowing an overly broad
-annotation is a separate runtime change.
-[Microsoft's trimming guidance](https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/fixing-warnings)
-treats warnings as evidence about supported inputs and recommends resolving the
-underlying unsupported behavior.
+## Observable extension compatibility correction
 
-## Runtime contract consumed by generated code
+The locked SDK's actual compiler is Roslyn 5.9.0
+(`5.9.0-1.26423.113`). Generator/driver references and the analyzer asset path are
+aligned with that compiler, replacing the initial 5.0 tooling assumption from
+older investigation material. Historical proof inputs retain their dated identity.
 
-The exact additive contract has four rule overloads: state/value streams on
-`IValidationContext`, and the same pair on `IValidatableViewModel`. The value
-variant takes `Func<TValue,IValidationState>`; every variant takes explicit
-`IEnumerable<string>` full paths. Generated calls use these APIs directly,
-without expression overloads or a call to a runtime Unsafe method.
+The same compiler reports CS8714 for certain nullable-generic calls through
+C#14's synthesized static bridge for the six safe observable methods. The
+observable rule and binding APIs therefore use traditional `this` extension
+methods. Their CLR signatures and runtime semantics remain compatible, and
+ordinary calls with inferred type arguments are unchanged. Explicit generic
+source binding syntax changes from
+`sources.BindObservableValidationState<TOut>(...)` to
+`sources.BindObservableValidationState<TSource, TOut>(...)`; the property-state
+binding requires the same two explicit type arguments. Prefer inference when
+possible. `AddObservableRule<TValue>(...)` keeps its single explicit type
+argument.
 
-The caller supplies an initial value/state. Empty metadata means a model-wide
-rule. `"Address.Postcode"` retains the full path; `"Postcode"` is a different
-property. Paths are ordinal, dot-separated, nonempty and whitespace-free; an
-empty segment is invalid. Multi-property metadata contains every associated full
-path, with duplicates counted once. Strict property matching includes only a
-rule exclusively associated with that one path. Registering two independent
-rules is not a semantic replacement for one rule carrying two paths: exclusive
-matching and membership differ.
+The narrowly scoped SST1703 exception in those two observable extension files is
+justified by the reproduced compiler bridge error. It does not suppress trimming
+or NativeAOT diagnostics or introduce tuple-based workarounds. Both flavor API
+baselines track this correction. Focused aligned checks pass 29 compiler-fixture tests
+against both runtime flavors and 14 runtime infrastructure tests per flavor,
+with zero build/emitted/producer warnings or errors. Identical direct-static
+nullable caller sources change from eight CS8714 errors before correction to
+zero warnings/errors afterward; inferred calls already passed. Proof/source/log
+inputs are retained under `artifacts/verification/generator-nullability`, with
+`results.json`. These are working-tree results; full core, current clean-source
+package/native gates and Linux/Windows CI remain pending.
 
-The helper captures the registration context once, unregisters its own component
-and disposes that component's subscriptions. It never owns the context or supplied
-observable object. Dynamic row removal disposes the row's helper; application
-ownership cancels a request if cancellation is required. No source generator can
-infer a request's ownership or make a runtime-discovered collection static.
+## Selector and assignment support
 
-`BindObservableValidationState` accepts an outer nullable source stream, a
-`Func<TSource,IObservable<IValidationState>?>`, a complete-state projection and
-an ordinary `Action<TOut>`. The source may be a model, helper or context. A null
-source/selected stream yields `ValidationState.Valid`. Active streams supply their
-own initial state; no synthetic valid state precedes an active invalid rule.
+Selectors must be inline simple/property-chain lambdas over user-declared,
+readable instance properties accessible to the emitted code. A notification
+source requires reference-type owners implementing `INotifyPropertyChanged` at
+every observed chain segment. Generated code attaches notifications, reads
+direct getters initially and on matching or empty property-name notifications,
+switches nested subscriptions on replacement, and detaches on disposal. It
+emits direct runtime operations, never fresh `WhenAnyValue` calls for Binding
+to intercept later. Metadata-only property selectors need a readable full path
+but no notification source/getter execution.
 
-`BindObservablePropertyValidationState` accepts an outer nullable source stream,
-a direct context selector, full path, `Func<IList<IValidationState>,TOut>`, typed
-callback and explicit strict flag. Null selection/no matching rules yields an
-empty list. New membership and state changes remain live.
+A null intermediate owner emits `default` for the selected value. Reference
+and nullable values therefore emit null; nonnullable value types emit their
+default value. Predicates and message delegates must define what that value
+means. A missing address does not retain the previous postcode. This fixed
+rule-source policy is distinct from a null binding model/helper/context, whose
+aggregate projection is valid and property projection is empty.
 
-Selectors are delegates, not observations. The outer stream must report each
-model, helper or selected context replacement. For example, a stream emitting
-only `Editor.ViewModel` changes cannot discover `Customer.AddressRule` changing
-inside the same model. Supply a stream of current helpers, or combine both
-notification levels before calling the binding. Replacement switches and detaches
-the old stream; binding disposal detaches all binding subscriptions. It does not
-dispose the model/helper/context.
+Writable accessible view properties support typed output, including bool,
+enums and nullable custom structs; text targets must accept a string. Nested
+target chains require reference-type intermediate parents and
+`INotifyPropertyChanged` on observed owners; the final property has an
+accessible ordinary non-init setter. Parent replacement replays the latest
+projected output to the new target. A null target skips assignment while
+retaining the latest value for a later replacement; model/rule changes
+continue to update that cached value. A leaf owner that is only assigned need
+not notify. For unsupported target shapes, use a callback with an explicit
+application-owned target replacement stream, or explicitly choose Unsafe.
 
-All custom `IValidationState` values pass through intact, including a boxed struct,
-code, severity and revision. Generated code must not reconstruct a state from
-text or filter updates only by validity/text. `Presentation?`, enums and other
-custom target types are ordinary generic outputs. The supplied callback calls
-the setter statically. UI dispatch belongs in that callback or a caller-chosen
-presentation stream; domain validity remains synchronous on its owner.
+Private/inaccessible or open generic model/view/output call types are outside
+the initial scope. A call inside a private or generic containing host can
+still work when every type named by the generated call is accessible and
+closed. Internal types in the same consumer assembly are supported. No hosted
+partial implementation or attribute API is shipped. Members that exist only in
+another generator's output are not automatically discovered from the original
+compilation.
 
-## Realistic case mapping
-
-The [NativeValidation corpus](../examples/NativeValidation/Program.cs) uses
-notifying application types, rather than treating a non-notifying anonymous
-object as a generator failure. Its expected-failure and migrated variants cover
-the following contracts.
-
-| Corpus case | Safe runtime implementation | Later generator contribution | Boundary |
-| --- | --- | --- | --- |
-| `generic-field` | Reusable field takes `IObservable<TValue>`, complete-state delegate and static paths; direct notification adapter observes `Customer.Email`. | Generate a declared Email observation and `"Email"` metadata at the model declaration. | An `Expression<Func<TModel,TValue>>` received as a parameter is not a literal selector available to the generator. No reflection fallback. |
-| `nullable-editor-rich-target` | Observe `Customer.Address` then the current `Address.Postcode`; null address explicitly emits a value mapped to invalid state. Observe current editor model and its helper replacements; project to `Presentation?` and assign `Editor.Status` directly. | Generate the typed notification chain and full `"Address.Postcode"` path, with explicit null behavior. | A delegate reading `AddressRule` does not observe helper replacement. A generated nested chain that emits nothing on null leaves stale validation. |
-| `blocking-advisory-cross-field` | Observe both Email and Confirmation, register a combined rule with both paths in the blocking context; register hint separately in advisory context. | Generate ordered full-path metadata and declared field observations; retain the supplied matching state/predicate. | Advisory rules do not automatically become `HasErrors` or command-admission rules. Strict matching excludes a multi-property rule. |
-| `rows-async-uniqueness` | Register each supplied state stream; retain rich `UniquenessState` and row helper ownership, detach on removal and ignore late removed results. | At most generate static field metadata for a declared row model. | Request execution/cancellation, stable row identity and runtime membership remain application code. |
-
-The corpus also needs direct property error export (`GetErrors`), `HasErrors`,
-initial invalid state, replaced/null sources and cleanup evidence. A generator
-is not successful merely because emitted C# compiles. Its generated observation
-must reproduce the migrated corpus behavior with the same warning policy and
-matching released package graph. Current native execution evidence belongs to
-the package consumer gate, not this design document.
-
-## Recommended future declaration and emitted shape
-
-Prefer attributes on explicit partial methods over interception of legacy calls.
-A declaration can require a supplied stream and ask the generator to provide only
-validated metadata. The syntax below is a **proposed future declaration**, not
-an installed API:
-
-```csharp
-// Future analyzer-owned attribute; no runtime stub fallback.
-[ValidationPaths("Email", "Confirmation")]
-private partial ValidationHelper AttachMatching(
-    IValidationContext destination,
-    IObservable<IValidationState> states);
-```
-
-The generated implementation uses the actual runtime API:
-
-```csharp
-private partial ValidationHelper AttachMatching(
-    IValidationContext destination,
-    IObservable<IValidationState> states)
-{
-    return destination.AddObservableRule(states, new[] { "Email", "Confirmation" });
-}
-```
-
-For example, the following is the concrete generated-operation target for the
-corpus, using its existing application adapters and the actual runtime APIs:
-
-```csharp
-var emailValues = new PropertyValues<string>(
-    customer, nameof(Customer.Email), () => customer.Email);
-var emailRule = customer.AddObservableRule(
-    emailValues,
-    static email => new ValidationState(email.Contains('@'), "email-required"),
-    new[] { "Email" });
-var postcodeRule = customer.AddObservableRule(
-    new NestedPostcodes(customer),
-    static postcode => new ValidationState(postcode?.Length == 5, "postcode-required"),
-    new[] { "Address.Postcode" });
-var presentation = new HelperSelections(editor).BindObservableValidationState(
-    static helper => helper.ValidationChanged,
-    Project,
-    value => editor.Status = value);
-```
-
-`PropertyValues`, `NestedPostcodes`, `HelperSelections` and `Project` here are
-application-owned corpus code, not assumed library APIs. A future observation
-generator emits equivalent typed notification/subscription operations with the
-handoff safeguards below, or accepts caller streams under their declared
-observation contract. The snippet never asks another generator to transform its
-emitted code. The model owner retains and disposes `emailRule`/`postcodeRule`;
-the editor owner retains and disposes `presentation`.
-
-For an observation declaration, the initial supported input should be real
-user-declared readable properties and `INotifyPropertyChanged` on each observed
-node. The generated method can use the same contract as the corpus's
-`PropertyValues<T>` adapter: attach a notification handler, emit the direct getter
-initially and on matching/empty property-name notifications, and detach on
-subscription disposal. It may emit that adapter itself. It must not silently
-infer notifications for a plain object. Nested chains switch subscriptions and
-must explicitly emit the declared null value when a parent is null. Full paths
-come from the original root, even though notification subscriptions attach to
-individual segments.
-
-Binding's retained nested-chain output returns an empty inner signal when a
-parent is null. That output is valid evidence for the tested Binding behavior;
-it does not meet this corpus's policy that a missing address becomes invalid.
-The Validation observation declaration must specify the null policy explicitly,
-or the caller must supply a null-aware observable. This is a distinct choice
-from null *binding source*, whose documented projection is valid/empty.
-
-### Synchronous subscription handoff and initial failure
-
-The corpus now explicitly checks its application adapters' synchronous initial
-handoff and failure cleanup in
-[ApplicationAdapterChecks](../examples/NativeValidation/ApplicationAdapterChecks.cs),
-called by the safe `generic-field` case. It covers reentrant Address/editor-model
-replacement and null, latest/outer detachment, owner disposal during initial
-delivery, and initial getter/callback exception cleanup. These checks validate the
-application adapters; no generator is shipped, and equivalent generated-code
-acceptance remains required before its observation infrastructure is supported.
-
-Earlier `NestedPostcodes` and `HelperSelections` implementations used a naive
-`inner = Subscribe(observer)` assignment after synchronous initial delivery. If
-that delivery replaces
-the parent, a reentered subscription can become current, then be overwritten by
-the older subscription's returned handle. Reentry to a null parent can similarly
-leave the old subscription attached. The corrected application adapters install
-pending slots before subscribing and guard notifications by current slot identity
-and disposal state. A generated adapter must likewise install an owned pending
-assignment slot before subscribing. Replacements dispose that slot via a
-serial owner; when an obsolete `Subscribe` finally returns, assigning its handle
-to its already-disposed slot disposes it immediately instead of overwriting the
-current slot. A generation token/disposed guard rejects notifications from a
-superseded or disposed generation. This is a subscription ownership requirement
-within the serialized owner model, not a promise of concurrent mutation support.
-
-Initial failure requires source-side cleanup too: a subscription that attaches an
-event handler and then throws during its getter/initial `OnNext` returns no handle
-for its caller to dispose. Generated notification sources must construct cleanup
-before initial delivery and detach their handlers if that delivery fails, then
-propagate the original error. Generated nested sources must also dispose all
-already-installed outer/inner pending slots on construction/subscription failure.
-A pending slot alone cannot recover a leaked handler inside an arbitrary supplied
-source whose `Subscribe` throws before returning; caller-created sources keep
-their own exception-cleanup contract.
-
-Deferred generated-adapter acceptance must reproduce the corpus handoff checks:
-
-| Trigger during synchronous initial delivery | Required evidence |
+| Diagnostic | Meaning and action |
 | --- | --- |
-| Initial postcode callback replaces Address; initial helper callback replaces editor ViewModel | Latest source remains owned; subsequent old-source changes emit nothing; disposal detaches both old and latest handlers. |
-| Initial callback changes the parent to null | Explicit null policy is delivered; the returning old subscription is disposed; old-source changes emit nothing. |
-| Initial callback disposes an owner whose pending subscription slot is already installed | Returned handles are disposed immediately; after `Subscribe` returns, no handler or later callback survives disposal. |
-| Initial getter or callback throws after event attachment, including a nested subscription | Original error propagates; all task-owned outer/inner handlers are detached despite no returned subscription handle. |
+| `RUVG001` (error) | Unsupported call or selector: stored expression, method/indexer/cast/computed selector, unsupported notification contract. Use a supported inline path, explicit observable API/callback, or deliberately choose Unsafe. |
+| `RUVG002` (error) | Call types cannot be named by emitted code, including inaccessible/open generic types. Move the call to a supported accessible closed shape or use explicit observables/Unsafe. |
+| `RUVG003` (error) | The compiler cannot provide an encoded interception location. Use the pinned compiler and inspect the actual analyzer/build configuration. |
+| `RUVG004` (error) | The required runtime generation contract is missing. Use the matching core runtime package containing the generated observation support and safe observable APIs, with its bundled analyzer. |
+| `RUVG005` (error) | A normal invocation still lacks generated interception in the final compilation. Retain analyzer/props, declare selectors in original source, or use explicit observables/Unsafe. This check also covers calls and members introduced by other generators. |
+| `RUVG006` (error) | Unsupported binding selector/target: use an inline readable source path and an accessible ordinary setter with supported notifying reference parents, or an explicit callback/Unsafe. |
+| `RUVG007` (error) | A normal method is referenced indirectly as a method group/delegate. Use a direct inline call, an explicit observable API, or an explicit Unsafe delegate. `nameof` references remain allowed. |
 
-A target generator is optional: a caller-written `value => editor.Status = value`
-already has typed reachability and supports nullable/custom targets. Generating
-that one assignment adds little value. Generating a notification chain and its
-full metadata can remove substantially more repetitive code.
+Unsafe calls and safe supplied-observable/metadata rule overloads are not
+intercepted. Unsupported normal calls are build errors, not warnings that can
+silently choose reflection. A final-compilation dispatch analyzer checks
+resolved normal invocations after all generators run, including generated
+source, using the compiler's interceptor lookup. Other generators' output and
+indirect method references cannot silently bypass the normal generation
+requirement. Removing or suppressing that analyzer does not add runtime
+fallback: the normal body still throws. Generator diagnostics do not prove
+native support; that requires actual-package publish and execution evidence.
 
-## Compiler pipeline, diagnostics and support limits
+## Runtime semantics and ownership
 
-[Roslyn's source-generator design](https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.md)
-states that ordinary generators see the same input compilation and cannot access
-one another's generated files. Emitting a fresh `WhenAnyValue(...)` call from a
-Validation generator and assuming Binding will subsequently intercept it is not
-a supported pipeline. Emit direct notification code, accept caller observables,
-or refer to a generated member whose contract is declared in the original source
-and verified in the final compilation. Do not depend on generator execution order.
+Generated rules register through `AddObservableRule`: full ordinal root paths,
+initial values, preserved complete states and captured registration context.
+`Address.Postcode` differs from `Postcode`. Empty metadata means a model-wide
+rule; multi-property metadata belongs to one component and is not equivalent
+to two separate rules. Exact-path matching applies in both modes; `strict:
+true` additionally includes only a rule exclusively associated with that one
+path. Invalid/empty/whitespace path segments remain rejected by the runtime
+API.
 
-The initial design supports user-declared properties. ReactiveUI `[Reactive]`
-field-to-property output is a separate compatibility feature: it requires a
-versioned understanding of the source declaration or an explicit user-authored
-contract. The new generator must not claim semantic discovery of a property
-that exists only in another generator's output. Private/nested types require
-partial containing types for hosted implementations; generic declarations must
-retain their type parameters and constraints.
+A helper removes its component from the captured context and disposes that
+component's subscriptions. It owns neither the context nor a supplied
+observable object. Blocking and advisory contexts stay independent. Replacing
+a model's context property does not transfer existing registrations. Advisory
+state does not automatically become command admission or default
+`HasErrors`/`GetErrors`.
 
-A proposed generator must emit actionable errors for these inputs, with no
-reflection or Unsafe fallback:
+Generated bindings follow the view's current model and the selected
+helper/context, detaching old selections. Null aggregate selections emit
+`ValidationState.Valid`; null/empty property selections emit an empty list.
+Typed/context property bindings seed actual membership and wait for active
+rules' own initial states, without inserting a synthetic valid state.
+Generated normal property text bindings expose actual initial rule states
+immediately and omit the legacy synthetic empty-list prelude for active rules.
+Explicit Unsafe property callbacks retain that legacy prelude. This
+intentional migration difference changes the initial emission sequence, not
+current rule validity. Projection delegates see complete custom
+`IValidationState` objects, including boxed structs and their
+code/severity/revision; generation must not rebuild states from text or filter
+metadata changes solely by validity/text. Ordinary aggregate context states
+retain their aggregation contract.
 
-| Diagnostic category | Required explanation/action |
-| --- | --- |
-| Selector is a variable, parameter or runtime configuration | Supply a typed observable and full metadata, or move the static declaration to the model. |
-| Method call, indexer, computed member or unsupported conversion in a selector | Declare supported readable property paths or provide a custom observable. |
-| A chain node lacks a supported notification contract | Provide an observable reporting changes; a plain anonymous object is not notifying. |
-| Missing/inaccessible property or type only generated by another generator | Declare the contract in user source or enable a specifically tested compatibility mapping. |
-| Nullable parent without a null policy | Declare what null emits; do not preserve an old value silently. |
-| Invalid path or inconsistent multi-property metadata | Identify the segment/path and require a complete ordinal root path. |
-| Missing partial container or mismatched declaration signature | Identify the declaration that needs a partial container or supported signature. |
-| Both flavor assemblies or unsupported runtime API version | Require exactly one matching flavor and the tested API cohort. |
+Binding disposal detaches subscriptions, without disposing selected models,
+helpers, contexts or rules. Callback/setter execution follows the source
+thread; UI dispatch belongs at the presentation boundary. Domain
+validity/membership remain synchronous on the serialized model owner. This
+promises no arbitrary concurrent mutation.
 
-Runtime-configured names, plugin-discovered models, arbitrary reflection-only
-members and request lifetimes are not compile-time inputs. Supplying explicit
-observables remains the supported escape route. Intentionally using a legacy
-Unsafe/expression path retains its legitimate RUC/trimming warnings. The current
-producer audit removes overly broad RDC annotations; the synthetic proof above
-tests both annotation kinds independently, and the released-cohort evidence is
-dated historical behavior.
+Notification sources own event registrations and refresh the complete
+descriptor chain through a serialized pending-refresh drain. They attach
+before initial getter delivery, rebind after reentrant replacement/null,
+reject stale generation notifications and detach all registrations on disposal
+or initial getter/callback failure. Value observations use default equality;
+model/helper/context and target reference selections use identity so an
+equal-comparing replacement is followed.
 
-## Alternative costs and acceptance criteria
+Nested-target binding support separately installs pending owned slots for its
+target and validation subscriptions before synchronous delivery. If reentry
+replaces/nulls/disposes their owner, an obsolete returned handle is disposed
+instead of overwriting the current selection. Initial failures clean up
+installed subscriptions/registrations and retain the original error; if
+cleanup also fails, its error is reported alongside the original. A
+caller-supplied source that throws before returning a handle still owns its
+own failure-cleanup contract.
 
-| Approach | Benefit | Cost and decision |
-| --- | --- | --- |
-| Existing Binding-generated application observations plus safe Validation APIs | Uses current analyzers and direct setters; no new package. | Best starting point for supported literal observation shapes. Stored selectors/null policies need explicit adapters. |
-| New interceptor for existing legacy Validation calls | Familiar syntax for compile-time literals. | Original RDC/RUC analyzer diagnostics persist on the pinned compiler; does not solve opaque selector parameters or compiled package internals. Defer. |
-| New safe literal-rule interceptor surface | Can couple selector metadata and generated observations. | Adds a separate public API, namespace configuration and a required generation/failure contract; ungenerated fallback cannot safely reflect. Reassess only after the runtime contract is stable. |
-| Attributes and explicit partial methods | No unsafe runtime stub; missing generation fails compilation; clear static inputs and emitted implementations. | New analyzer packaging, IDE diagnostics, both-flavor snapshots and compilation tests. Recommended form for a later narrowly scoped metadata/observation generator. |
+Asynchronous requests, cancellation, row identity and runtime collection
+membership remain application responsibilities. Safe observable rule
+registration is the supported path for those runtime inputs. A generator
+cannot infer request ownership from a literal property selector.
 
-A later implementation should start with full-path/multi-property metadata and
-single declared notifying-property observation, then nullable chains after
-replacement/null policy tests. Required acceptance includes both flavors,
-private/nested partial hosts, generic types, custom struct state identity,
-nullable enum/struct targets, metadata strictness, initial state and
-model/helper/context replacement/disposal. Negative compilation tests must
-assert diagnostic IDs and locations. Snapshot checks must verify emitted direct
-getters/setters and the absence of calls to expression/Unsafe APIs. Final package
-consumers must publish and execute the safe subset with no IL2026/IL3050/trim
-suppression; producer analysis must continue to preserve warnings on genuinely
-unsafe surfaces. Native platform claims require the corresponding actual gate.
+## Realistic consumers and acceptance
 
-## Reproducing the managed annotation proof
+The [GeneratedValidation recipe](examples/generated-validation.md) and
+[corpus](../examples/GeneratedValidation/Program.cs) cover initial
+property/text updates, nested null/replacement, model/helper rich-state
+replacement, independent contexts, property membership/strictness, nested
+target handoff and row-owned observable results in both flavors. This is
+separate from the immutable NativeValidation release corpus and its
+caller-written adapters.
 
-The [source bundle](../investigations/BindingGenerators/evidence/interceptor-annotation-proof-sources.json)
-contains the exact standalone inputs, including the SDK pin and isolated
-warning-severity settings. Extract it into a task-owned temporary directory,
-reusing the locked SDK environment and dependency cache. Run:
+Required gates inspect emitted direct notification/getter/setter operations,
+absence of Unsafe/expression calls, exact branded/flavor/version package
+graphs, negative diagnostic IDs/locations and ungenerated normal-stub
+failures. Preserve synchronous handoff/null/disposal/error cleanup, full
+metadata/strictness, custom-state identity, typed nullable output, membership
+and formatter behavior. The package gate verifies all 18 distinct normal
+overload shapes, analyzer/props assets and the absence of Roslyn/compiler
+runtime dependencies. Six isolated negative build configurations cover
+stored/computed/indexed rule selectors, nonnotifying nested targets and rule
+parents, and notifying struct chain owners, in each flavor. Packaged consumers
+must publish with warning-as-error policy and execute under managed, full
+trimming and actual NativeAOT on each claimed host. Record exact source,
+package hashes and executed platform separately; do not reuse old release
+results for changed generated code.
+
+No blanket `IsAotCompatible`, all-reflection-removed, retained UI-platform or
+bridge/browser claim follows. Explicit Unsafe APIs and some retained runtime
+components remain reflection boundaries. Preserve producer analysis and their
+accurate warnings. The released DynamicData 10.0.0-runic.5 and ReactiveUI
+26.0.1 cohort remains pinned; no sibling source adoption is required.
+
+## Historical annotation proof and superseded alternatives
+
+The [managed compiler
+proof](../investigations/BindingGenerators/evidence/interceptor-annotation-proof.txt)
+at SDK 10.0.401/C#14 with ILLink 10.0.12 intercepted a synthetic
+RDC/RUC-annotated `UnsafeApi.Read` with an unannotated method and executed
+`safe-interceptor`. The original call still produced IL2026 and IL3050. The
+proof changed warning severity to permit inspection, without suppression, and
+published no native binary. It remains historical evidence explaining why
+simply intercepting an annotated expression API does not remove caller
+warnings.
+
+The new split instead moves actual reflection to explicit annotated Unsafe
+methods and leaves normal generated-only stubs unannotated. This changes the
+public contract and requires both API baselines to be reviewed; it does not
+erase the proof or alter its immutable source/evidence.
+
+The prior future partial-method/attribute recommendation is superseded for
+this implementation. Explicit observables remain a supported runtime surface;
+a later attribute API would be a separate scoped feature. Inaccessible/open
+generic call types, other generators' output and additional target shapes
+require their own implementation/diagnostics/acceptance before being
+advertised.
+
+Roslyn's [interceptor
+design](https://github.com/dotnet/roslyn/blob/main/docs/features/interceptors.md)
+and [encoded location
+API](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp.csharpextensions.getinterceptablelocation?view=roslyn-dotnet-5.0.0)
+underlie the call substitution. Its [generator pipeline
+design](https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.md)
+explains why generated Validation operations must not depend on another
+generator processing newly emitted calls. The existing [Binding
+output](../investigations/BindingGenerators/evidence/Primitives/WhenAnyValueDispatch.g.cs.txt)
+and [released OAPH
+IL](../investigations/BindingGenerators/evidence/released-oaph-il.txt) remain
+dated evidence about their original cohort, not generated Validation support.
+
+To reproduce only the historical managed annotation proof, extract the [source
+bundle](../investigations/BindingGenerators/evidence/interceptor-annotation-proof-sources.json)
+into a task-owned directory and reuse the locked environment:
 
 ```sh
 direnv exec "$RUNIC_SDK" dotnet run --project "$PROOF_ROOT/Emitter/Emitter.csproj" \
@@ -314,7 +265,7 @@ direnv exec "$RUNIC_SDK" dotnet run --project "$PROOF_ROOT/Emitter/Emitter.cspro
 direnv exec "$RUNIC_SDK" dotnet run --project "$PROOF_ROOT/Consumer/Consumer.csproj"
 ```
 
-The first command emits the modern interceptor location used in the bundled
-consumer. The second retains the two original-call warnings and prints
-`safe-interceptor`. Remove task-owned `bin`/`obj` after inspection; retain the
-source and log when comparing a later compiler/analyzer version.
+The first command emits the encoded location, the second retains both warnings
+and prints `safe-interceptor`. Keep the source/log and remove task-owned
+temporary outputs after inspection. This reproduction is not a
+generated-package gate.
