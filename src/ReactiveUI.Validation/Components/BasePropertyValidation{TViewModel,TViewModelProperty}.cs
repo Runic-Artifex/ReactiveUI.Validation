@@ -91,7 +91,6 @@ public sealed class BasePropertyValidation<TViewModel, TViewModelProperty> : Bas
     /// <param name="viewModelProperty">ViewModel property.</param>
     /// <param name="isValidFunc">Func to define if the viewModelProperty is valid or not.</param>
     /// <param name="messageFunc">Func to define the validation error message based on the viewModelProperty and isValidFunc values.</param>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     internal BasePropertyValidation(
         TViewModel viewModel,

@@ -30,7 +30,6 @@ public static class ValidationRuleContextExtensions
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="message"/> is empty.</exception>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
         [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp>(
             IValidationContext context,
@@ -67,7 +66,6 @@ public static class ValidationRuleContextExtensions
         /// <param name="message">Func to define the validation error message based on the viewModelProperty value.</param>
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
         [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp>(
             IValidationContext context,
@@ -104,8 +102,6 @@ public static class ValidationRuleContextExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule(
             IValidationContext context,
             IObservable<bool> validationObservable,
@@ -137,8 +133,6 @@ public static class ValidationRuleContextExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule(
             IValidationContext context,
             IObservable<IValidationState> validationObservable)
@@ -170,8 +164,6 @@ public static class ValidationRuleContextExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp>(
             IValidationContext context,
             Expression<Func<TViewModel, TViewModelProp>> viewModelProperty,
@@ -209,8 +201,6 @@ public static class ValidationRuleContextExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp>(
             IValidationContext context,
             Expression<Func<TViewModel, TViewModelProp>> viewModelProperty,
@@ -238,14 +228,13 @@ public static class ValidationRuleContextExtensions
     /// <param name="context">The destination context.</param>
     /// <param name="validation">The rule to add.</param>
     /// <returns>A helper that removes and disposes this rule, without disposing the context.</returns>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+    /// <exception cref="AggregateException">Registration and subsequent rollback both fail; the original failure is the first inner exception.</exception>
     internal static ValidationHelper RegisterValidation<TValidationComponent>(
         IValidationContext context,
         TValidationComponent validation)
         where TValidationComponent : IValidationComponent, IDisposable
     {
-        context.Add(validation);
-        return new(validation, Disposable.Create(
+        var cleanup = Disposable.Create(
             (context, validation),
             static state =>
             {
@@ -260,6 +249,24 @@ public static class ValidationRuleContextExtensions
                 {
                     state.validation.Dispose();
                 }
-            }));
+            });
+        try
+        {
+            context.Add(validation);
+            return new(validation, cleanup);
+        }
+        catch (Exception registrationError)
+        {
+            try
+            {
+                cleanup.Dispose();
+            }
+            catch (Exception cleanupError)
+            {
+                throw new AggregateException("Validation registration and rollback both failed.", registrationError, cleanupError);
+            }
+
+            throw;
+        }
     }
 }

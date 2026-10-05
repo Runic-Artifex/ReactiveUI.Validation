@@ -34,7 +34,6 @@ public static class ValidationContextBindingExtensions
     /// <param name="formatter">The text formatter, or null for the registered default.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view or an expression is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding BindValidationContext<TView, TViewModel>(
         this TView view,
@@ -64,7 +63,6 @@ public static class ValidationContextBindingExtensions
     /// <param name="strict">Whether to include only rules validating this property exclusively.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view or an expression is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding BindValidationContext<TView, TViewModel, TProperty>(
         this TView view,
@@ -94,7 +92,6 @@ public static class ValidationContextBindingExtensions
     /// <param name="action">Receives aggregate validity and text, including a valid state while the selection is null.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view, contextProperty or action is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding BindValidationContext<TView, TViewModel>(
         this TView view,
@@ -120,7 +117,6 @@ public static class ValidationContextBindingExtensions
     /// <param name="strict">Whether to include only rules validating this property exclusively.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view, an expression or action is null.</exception>
-    [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public static IValidationBinding BindValidationContext<TView, TViewModel, TProperty>(
         this TView view,
