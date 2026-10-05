@@ -365,3 +365,7 @@ src/*.Tests/API/*.received.txt
 src/Tools/
 .dotnet/
 dotnet-install.sh
+
+# Downloaded fork dependencies and generated packages/reports.
+artifacts/
+.cache/

@@ -1,21 +1,45 @@
 name: Build
-
 on:
   push:
-    branches: [ main ]
+    branches: [main, 'runic/**']
   pull_request:
-    branches: [ main ]
-
+  workflow_dispatch:
 permissions:
   contents: read
-  actions: write
-
 jobs:
   build:
-    uses: reactiveui/actions-common/.github/workflows/workflow-common-setup-and-build.yml@main
-    with:
-      configuration: Release
-      productNamespacePrefix: "ReactiveUI.Validation"
-      installWorkloads: true
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v5.3.0
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+      - name: Restore pinned Runic DynamicData packages
+        run: python eng/restore-fork-dependencies.py
+      - name: Build .NET 10
+        working-directory: src
+        run: dotnet build ReactiveUI.Validation.slnx -c Release -warnaserror
+      - name: Test both flavors
+        working-directory: src
+        run: dotnet test --solution ReactiveUI.Validation.slnx -c Release -- --maximum-parallel-tests 4 --report-trx
+      - name: Pack Runic libraries
+        working-directory: src
+        run: dotnet pack ReactiveUI.Validation.slnx -c Release --no-build -o ../artifacts/packages
+      - name: Verify package consumers
+        run: python eng/verify-packages.py
+      - uses: actions/upload-artifact@v4.6.2
+        if: always()
+        with:
+          name: validation-${{ matrix.os }}
+          path: |
+            artifacts/packages
+            src/TestResults

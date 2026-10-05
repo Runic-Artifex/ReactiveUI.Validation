@@ -4,7 +4,6 @@
 
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using DynamicData;
 
 #if REACTIVE_SHIM
 namespace ReactiveUI.Validation.Reactive.Extensions;
@@ -58,7 +57,7 @@ public static class ValidationContextExtensions
                 .Connect()
                 .ToCollection()
                 .Select(validations =>
-                    System.Reactive.Linq.Observable.CombineLatest(SelectStatusChanges(validations, propertyName, strict))
+                    SelectStatusChanges(validations, propertyName, strict).CombineLatest()
                         .StartWith(InitialValidationStates))
                 .SwitchTo();
         }

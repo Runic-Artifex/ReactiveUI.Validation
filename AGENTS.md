@@ -1,3 +1,12 @@
+# Runic fork instructions
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before building. Run the dependency
+bootstrap first, reuse the Runic SDK's locked shell on NixOS, and build/test from
+`src`. Only the core .NET 10 solution is required by CI; platform projects are
+retained separately. Both validation flavors must use their matching released
+Runic DynamicData package. Preserve branded package IDs and the MIT license.
+The upstream guidance below applies within this fork's support and build scope.
+
 # AGENTS.md
 
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.

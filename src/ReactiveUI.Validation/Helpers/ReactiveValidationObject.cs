@@ -6,7 +6,6 @@ using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using DynamicData;
 
 #if REACTIVE_SHIM
 namespace ReactiveUI.Validation.Reactive.Helpers;

@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup Label="Core packages">
-    <PackageVersion Include="DynamicData" Version="9.4.33" />
+    <PackageVersion Include="Runic.DynamicData" Version="10.0.0-runic.5" />
+    <PackageVersion Include="Runic.DynamicData.Reactive" Version="10.0.0-runic.5" />
     <PackageVersion Include="ReactiveUI" Version="26.0.1" />
     <PackageVersion Include="ReactiveUI.AndroidX" Version="26.0.1" />
     <PackageVersion Include="ReactiveUI.AndroidX.Reactive" Version="26.0.1" />
@@ -27,18 +28,9 @@
     <PackageVersion Include="Xamarin.AndroidX.Activity.Ktx" Version="1.13.0.1" />
   </ItemGroup>
 
-  <Choose>
-    <When Condition="$(TargetFramework.StartsWith('net11.0'))">
-      <ItemGroup>
-        <PackageVersion Include="System.Collections.Immutable" Version="11.0.0-rc.1.26425.128" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageVersion Include="System.Collections.Immutable" Version="10.0.12" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
+  <ItemGroup>
+    <PackageVersion Include="System.Collections.Immutable" Version="10.0.12" />
+  </ItemGroup>
 
   <ItemGroup Label="Build tools">
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
@@ -52,7 +44,7 @@
   <ItemGroup Label="Test packages">
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageVersion Include="Microsoft.Reactive.Testing" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.11.2" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.4.1" />
     <PackageVersion Include="TUnit" Version="1.72.16" />
   </ItemGroup>
 </Project>

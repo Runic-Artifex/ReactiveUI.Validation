@@ -122,7 +122,7 @@ namespace ReactiveUI.Validation.Reactive.Contexts
     public interface IValidationContext : ReactiveUI.IReactiveObject, ReactiveUI.Primitives.Disposables.IsDisposed, ReactiveUI.Validation.Reactive.Components.Abstractions.IValidationComponent
     {
         System.IObservable<bool> Valid { get; }
-        DynamicData.IObservableList<ReactiveUI.Validation.Reactive.Components.Abstractions.IValidationComponent> Validations { get; }
+        DynamicData.Reactive.IObservableList<ReactiveUI.Validation.Reactive.Components.Abstractions.IValidationComponent> Validations { get; }
         void Add(ReactiveUI.Validation.Reactive.Components.Abstractions.IValidationComponent validation) { }
         bool GetIsValid() { }
         void Remove(ReactiveUI.Validation.Reactive.Components.Abstractions.IValidationComponent validation) { }
@@ -140,7 +140,7 @@ namespace ReactiveUI.Validation.Reactive.Contexts
         public ReactiveUI.Validation.Reactive.Collections.IValidationText Text { get; }
         public System.IObservable<bool> Valid { get; }
         public System.IObservable<ReactiveUI.Validation.Reactive.States.IValidationState> ValidationStatusChange { get; }
-        public DynamicData.IObservableList<ReactiveUI.Validation.Reactive.Components.Abstractions.IValidationComponent> Validations { get; }
+        public DynamicData.Reactive.IObservableList<ReactiveUI.Validation.Reactive.Components.Abstractions.IValidationComponent> Validations { get; }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public void Add(ReactiveUI.Validation.Reactive.Components.Abstractions.IValidationComponent validation) { }
         public void Dispose() { }
