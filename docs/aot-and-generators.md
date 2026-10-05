@@ -9,8 +9,8 @@ core package's embedded analyzer and interceptor allowlist props. Runtime
 expressions require explicit annotated Unsafe methods; no hidden reflection
 fallback is provided. Safe observable APIs remain available.
 
-At tested source `cf2cd2d3812706141a3157bf9a230027e7404b22`, the local strict
-Release gate passes **679 tests** (323 per library flavor and 33 compiler-fixture
+At tested source `2550376b230ccfb78beb8d3b4ced8866b65d809e`, the local strict
+Release gate passes **683 tests** (323 per library flavor and 37 compiler-fixture
 tests), 20 Python guards, two collection examples and both independent package
 consumers, with zero warnings/errors. Local actual-package generated consumers
 pass managed, full trimming and actual Linux x64 NativeAOT: **42 behavioral case
@@ -18,13 +18,13 @@ executions and 12 negative builds**, all 18 normal overloads in every emitted
 stage. The existing runtime corpus separately passes **30 behavioral case
 executions and two historical baseline checks** in local all-mode execution.
 
-All four jobs in [CI 37384820581](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
-pass at the same source: 679 tests per OS, generated managed/full-trim/native
+All four jobs in [CI 37386897109](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109)
+pass at the same source: 683 tests per OS, generated managed/full-trim/native
 execution on both Linux x64 and Windows x64 (42 cases and 12 negative builds per
 RID), and the runtime safe subset in native mode (10 cases and two historical
 checks per RID). Positive paths have zero warnings/errors. Both native hosts
 consume the same verified Ubuntu package pair, version
-`8.1.0-runic.0.790.17.15.8`; its hashes are distinct from the local pair.
+`8.1.0-runic.0.790.17.15.10`; its hashes are distinct from the local pair.
 The [review](upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
 and [structured evidence](upstream/evidence/generated-api-implementation.json)
 retain exact package/source/host identities and emitted-source evidence.
@@ -461,7 +461,7 @@ Windows evidence is actual native execution with trimming enabled. The dated
 warning-bearing investigations above establish only Linux x64. Linux Arm64,
 macOS and cross-compilation need matching toolchains and actual host execution.
 
-The new generated split at `cf2cd2d` adds actual managed/full-trim/native
+The new generated split at `2550376` adds actual managed/full-trim/native
 consumer execution on both Linux x64 and Windows x64, in both flavors. The
 runtime gate at that source independently executes native with trimming on both
 CI hosts; its standalone fully trimmed managed run remains local Linux evidence.

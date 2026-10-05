@@ -1,11 +1,11 @@
 # Generated validation and explicit Unsafe APIs
 
 Implementation decision **2026-10-06**, implemented and verified at tested source
-`cf2cd2d3812706141a3157bf9a230027e7404b22`. The change remains **UNRELEASED**
+`2550376b230ccfb78beb8d3b4ced8866b65d809e`. The change remains **UNRELEASED**
 until publication. This replaces the earlier recommendation to defer a Validation
 generator and prefer attributes on partial methods. The primary surface preserves
 supported inline-lambda calls. Local strict package gates and all four
-[Linux/Windows CI jobs](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
+[Linux/Windows CI jobs](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109)
 pass; the [verification record](upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
 separates tested source and local/CI package identities from this later
 documentation record and immutable historical releases.
@@ -62,8 +62,8 @@ argument.
 The narrowly scoped SST1703 exception in those two observable extension files is
 justified by the reproduced compiler bridge error. It does not suppress trimming
 or NativeAOT diagnostics or introduce tuple-based workarounds. Both flavor API
-baselines track this correction. The final core gate passes 679 tests (323 per
-library flavor plus 33 compiler-fixture tests); the 14 generated-runtime
+baselines track this correction. The final core gate passes 683 tests (323 per
+library flavor plus 37 compiler-fixture tests); the 14 generated-runtime
 infrastructure tests per flavor are included in that library count. Builds and
 emitted source have zero warnings/errors at the tested source. Identical
 direct-static nullable caller sources change from eight CS8714 errors before
@@ -92,6 +92,13 @@ means. A missing address does not retain the previous postcode. This fixed
 rule-source policy is distinct from a null binding model/helper/context, whose
 aggregate projection is valid and property projection is empty.
 
+A binding view's static type must be a reference type implementing
+`INotifyPropertyChanged`. Concrete struct view receivers produce `RUVG006`:
+boxing the notification owner and capturing setter copies would lose stable
+ownership/mutation. A stable boxed view referenced through a supported notifying
+view interface remains valid. Both shapes have compiler regressions in both
+flavors; this reference-ownership guard is recorded in final source `2550376`.
+
 Writable accessible view properties support typed output, including bool,
 enums and nullable custom structs; text targets must accept a string. Nested
 target chains require reference-type intermediate parents and
@@ -118,7 +125,7 @@ compilation.
 | `RUVG003` (error) | The compiler cannot provide an encoded interception location. Use the pinned compiler and inspect the actual analyzer/build configuration. |
 | `RUVG004` (error) | The required runtime generation contract is missing. Use the matching core runtime package containing the generated observation support and safe observable APIs, with its bundled analyzer. |
 | `RUVG005` (error) | A normal invocation still lacks generated interception in the final compilation. Retain analyzer/props, declare selectors in original source, or use explicit observables/Unsafe. This check also covers calls and members introduced by other generators. |
-| `RUVG006` (error) | Unsupported binding selector/target: use an inline readable source path and an accessible ordinary setter with supported notifying reference parents, or an explicit callback/Unsafe. |
+| `RUVG006` (error) | Unsupported binding receiver/selector/target: require a notifying reference-type view (a stable interface-typed box is supported), use an inline readable source path and an accessible ordinary setter with supported notifying reference parents, or an explicit callback/Unsafe. |
 | `RUVG007` (error) | A normal method is referenced indirectly as a method group/delegate. Use a direct inline call, an explicit observable API, or an explicit Unsafe delegate. `nameof` references remain allowed. |
 
 Unsafe calls and safe supplied-observable/metadata rule overloads are not

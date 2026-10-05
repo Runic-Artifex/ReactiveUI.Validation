@@ -4,7 +4,7 @@
     "implementation": "implemented and verified",
     "publication": "UNRELEASED; no new release/tag/assets published"
   },
-  "testedSource": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+  "testedSource": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
   "documentationRecord": "This later documentation-only record reuses the exact tested implementation; its own commit is not the tested/package source.",
   "compiler": {
     "sdk": "10.0.401",
@@ -25,13 +25,13 @@
     "siblingSourceAdopted": false
   },
   "localCore": {
-    "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+    "source": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
     "passed": true,
     "warnings": 0,
     "errors": 0,
-    "tests": 679,
+    "tests": 683,
     "libraryTestsEachFlavor": 323,
-    "compilerFixtureTests": 33,
+    "compilerFixtureTests": 37,
     "pythonGuards": 20,
     "collectionExamples": 2,
     "independentPackageConsumers": 2,
@@ -40,21 +40,21 @@
   "localPackages": {
     "Primitives": {
       "id": "Runic.ReactiveUI.Validation",
-      "version": "8.1.0-runic.0.790.17.15.8",
-      "sha256": "dc7ebe680d4c9dd59966defa8de4815952dd14208ffc1328c3722869de4a0ca7",
+      "version": "8.1.0-runic.0.790.17.15.10",
+      "sha256": "ffea7c200bde9893b535dcf3dc9d8fe81ddaba747aad3f95d8b24315218b01c5",
       "analyzer": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
       "props": "buildTransitive/Runic.ReactiveUI.Validation.props"
     },
     "Reactive": {
       "id": "Runic.ReactiveUI.Validation.Reactive",
-      "version": "8.1.0-runic.0.790.17.15.8",
-      "sha256": "8beceea545b870d82709298e75f9f8c2efe2bdb65b44ee36759d8bce110ee9dd",
+      "version": "8.1.0-runic.0.790.17.15.10",
+      "sha256": "1f1cb6b0b8404d0914d935306575f2c399b7686e302846b2627f513112ca1a46",
       "analyzer": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
       "props": "buildTransitive/Runic.ReactiveUI.Validation.Reactive.props"
     }
   },
   "localGenerated": {
-    "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+    "source": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
     "rid": "linux-x64",
     "mode": "all",
     "positiveBuildsAndRuns": 6,
@@ -63,24 +63,24 @@
     "typedOverloadsPerStage": 18,
     "retainedSourceFiles": 6,
     "positiveWarnings": 0,
-    "report": "artifacts/verification/generated-support/cf2cd2d/generated-gates/results.json",
-    "reportSha256": "a4d6e440fc206e8cecbf636a5b9eb50667d919870c16778d7fe4c070192d16d5"
+    "report": "artifacts/verification/generated-support/2550376/generated-gates/results.json",
+    "reportSha256": "fc1e428e4870d729928c1950398d2f5e51f714c36e1c2057d58401fbb199f32e"
   },
   "localRuntime": {
-    "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+    "source": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
     "rid": "linux-x64",
     "mode": "all",
     "positiveBuildsAndRuns": 6,
     "applicationCaseExecutions": 30,
     "immutableBaselineDiagnosticBuilds": 2,
     "positiveWarnings": 0,
-    "report": "artifacts/verification/generated-support/cf2cd2d/native-gates/results.json",
-    "reportSha256": "042e18d0381beef2c73881acc9bbb95e9ee28a46394aae20d24555ac2ee20855"
+    "report": "artifacts/verification/generated-support/2550376/native-gates/results.json",
+    "reportSha256": "f578470db47cb3888f08f6822cf7a3d5589560afd985b6cc1bab9c8b9aba670f"
   },
   "ci": {
-    "run": 37384820581,
-    "url": "https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581",
-    "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+    "run": 37386897109,
+    "url": "https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109",
+    "source": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
     "conclusion": "success",
     "jobs": [
       {
@@ -101,35 +101,65 @@
       }
     ],
     "coreEachOS": {
-      "tests": 679,
+      "tests": 683,
       "libraryTestsEachFlavor": 323,
-      "compilerFixtureTests": 33,
+      "compilerFixtureTests": 37,
       "pythonGuards": 20,
       "warnings": 0,
       "errors": 0,
       "collectionExamples": 2,
       "independentPackageConsumers": 2
     },
+    "coreJobs": [
+      {
+        "os": "ubuntu-latest",
+        "tests": {
+          "total": 683,
+          "passed": 683,
+          "failed": 0,
+          "skipped": 0
+        },
+        "strictBuildWarnings": 0,
+        "strictBuildErrors": 0,
+        "managedGeneratedConsumerPassed": true,
+        "bothCollectionExamplesPassed": true,
+        "bothIndependentPackageConsumersPassed": true
+      },
+      {
+        "os": "windows-latest",
+        "tests": {
+          "total": 683,
+          "passed": 683,
+          "failed": 0,
+          "skipped": 0
+        },
+        "strictBuildWarnings": 0,
+        "strictBuildErrors": 0,
+        "managedGeneratedConsumerPassed": true,
+        "bothCollectionExamplesPassed": true,
+        "bothIndependentPackageConsumersPassed": true
+      }
+    ],
     "shippingPackages": {
       "Primitives": {
         "id": "Runic.ReactiveUI.Validation",
-        "version": "8.1.0-runic.0.790.17.15.8",
-        "sha256": "243231896aa1b1673a34e53568b7c54fee8ae7906df1ebc7380779d610c59c54",
-        "bytes": 221317,
-        "file": "ci/packages-ubuntu-latest/Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.15.8.nupkg",
+        "version": "8.1.0-runic.0.790.17.15.10",
+        "sha256": "b68cfe33d5f1bf4aeee612bd2baaffdb25f1a0a918d6594db65e592a844ac800",
+        "bytes": 221606,
+        "file": "ci/packages-ubuntu-latest/Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.15.10.nupkg",
         "analyzer": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
         "props": "buildTransitive/Runic.ReactiveUI.Validation.props",
-        "analyzerSha256": "074aa4af6268f24647370f27c9dff8678c712ece5e16fd50251450fc078a410a"
+        "analyzerSha256": "f42985b5b64d0400a5280dc42c799be428331c6d29e1aba78a5d62edaf8bd79d"
       },
       "Reactive": {
         "id": "Runic.ReactiveUI.Validation.Reactive",
-        "version": "8.1.0-runic.0.790.17.15.8",
-        "sha256": "fac3baed7bd8b0877afba89f12955285e573b7b4f2264d2e8c9d3db900dcbf85",
-        "bytes": 221961,
-        "file": "ci/packages-ubuntu-latest/Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.15.8.nupkg",
+        "version": "8.1.0-runic.0.790.17.15.10",
+        "sha256": "c1c921c16ee79018fcaa4b881c810f850d3018fde70400064b73a0308bd028e6",
+        "bytes": 222232,
+        "file": "ci/packages-ubuntu-latest/Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.15.10.nupkg",
         "analyzer": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
         "props": "buildTransitive/Runic.ReactiveUI.Validation.Reactive.props",
-        "analyzerSha256": "074aa4af6268f24647370f27c9dff8678c712ece5e16fd50251450fc078a410a"
+        "analyzerSha256": "f42985b5b64d0400a5280dc42c799be428331c6d29e1aba78a5d62edaf8bd79d"
       }
     },
     "reports": [
@@ -180,9 +210,9 @@
     ],
     "sameLinuxShippingArtifactUsedOnBothRIDs": true,
     "localByteHashesAreSeparate": true,
-    "audit": "artifacts/verification/generated-support/cf2cd2d/ci-audit.json",
-    "auditSha256": "e62ea64b2d01f5497c02cf32b64163ebeab908f4f004d80c8df404c8bceac9f0",
-    "artifactRoot": "artifacts/verification/generated-support/cf2cd2d"
+    "artifactRoot": "artifacts/verification/generated-support/2550376",
+    "audit": "artifacts/verification/generated-support/2550376/ci-audit.json",
+    "auditSha256": "dfa8ccde881cd762a1094d0cd9696972e8e8d0e6a8043dbedfd8463357968362"
   },
   "nullableStaticBridgeProof": {
     "sdk": "10.0.401",
@@ -242,5 +272,44 @@
       "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
       "contract": "Observe through IValidationContext and dispatch IValidationComponent.ValidationStatusChange through its interface, including concrete subtype inaccessible/misleading shadows"
     }
+  },
+  "localSummary": {
+    "report": "artifacts/verification/generated-support/2550376/summary.json",
+    "sha256": "b420f279e80b97b576f0e1d69edcc8215d0996deacda0a44e5bc330b1b84d781"
+  },
+  "priorVerifiedCandidates": [
+    {
+      "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+      "recordCommit": "a6a084670143f1bd7f60565e56ec38f40d921047",
+      "recordPath": "docs/upstream/evidence/generated-api-implementation.json",
+      "verificationVersion": "8.1.0-runic.0.790.17.15.8",
+      "coreTestsEachOS": 679,
+      "compilerFixtureTests": 33,
+      "ciRun": 37384820581,
+      "ciConclusion": "success",
+      "localPackageSha256": {
+        "Primitives": "dc7ebe680d4c9dd59966defa8de4815952dd14208ffc1328c3722869de4a0ca7",
+        "Reactive": "8beceea545b870d82709298e75f9f8c2efe2bdb65b44ee36759d8bce110ee9dd"
+      },
+      "ciPackageSha256": {
+        "Primitives": "243231896aa1b1673a34e53568b7c54fee8ae7906df1ebc7380779d610c59c54",
+        "Reactive": "fac3baed7bd8b0877afba89f12955285e573b7b4f2264d2e8c9d3db900dcbf85"
+      },
+      "generatedLocalCaseExecutions": 42,
+      "generatedCiCaseExecutionsEachRID": 42,
+      "generatedNegativeBuildsEachRID": 12,
+      "runtimeLocalCaseExecutions": 30,
+      "runtimeCiCaseExecutionsEachRID": 10,
+      "historicalBaselineChecksEachRID": 2,
+      "supersededBy": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
+      "reason": "Reference-type binding view ownership guard and concrete-struct negative/stable-interface-boxed positive compiler regressions; prior results remain valid for their pinned source.",
+      "recordUrl": "https://github.com/Runic-Artifex/ReactiveUI.Validation/blob/a6a084670143f1bd7f60565e56ec38f40d921047/docs/upstream/evidence/generated-api-implementation.json"
+    }
+  ],
+  "bindingViewOwnership": {
+    "source": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
+    "contract": "The binding view static type must be a reference type implementing INotifyPropertyChanged",
+    "concreteStructViews": "RUVG006 error to prevent boxing/captured setter copies",
+    "stableInterfaceTypedBoxedViews": "Supported when one stable box is referenced through a notifying view interface; both-flavor positive compiler regression"
   }
 }

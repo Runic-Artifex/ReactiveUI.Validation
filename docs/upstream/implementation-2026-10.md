@@ -266,7 +266,7 @@ Decision **2026-10-06**, following immutable runtime release source
 `f22d2bb42c30d66df19a59333ed4fa633b241940`: the primary supported inline-lambda
 API is implemented with a Validation interceptor generator, replacing the earlier
 partial-method/attribute deferral. Implementation and verification are complete
-at tested source `cf2cd2d3812706141a3157bf9a230027e7404b22`; the change remains
+at tested source `2550376b230ccfb78beb8d3b4ced8866b65d809e`; the change remains
 **UNRELEASED until publication**. This later documentation record is not the
 tested/package source. Historical release/probe evidence remains pinned to its
 original source and assets.
@@ -296,8 +296,14 @@ literal selector diagnostics, full paths/strictness, null/default policies,
 independent contexts, complete custom states, target replay and subscription
 ownership/disposal.
 
-The final clean local Release gate passes **679 tests** (323 per library flavor
-plus 33 compiler-fixture tests), 20 Python guards, two collection examples and
+Final guard `2550376` requires binding view static types to be reference types
+implementing `INotifyPropertyChanged`. Concrete struct views produce `RUVG006`
+to avoid boxing notification owners/capturing setter copies; one stable boxed
+view accessed through a notifying view interface remains supported. Both
+negative and positive shapes have both-flavor compiler regressions.
+
+The final clean local Release gate passes **683 tests** (323 per library flavor
+plus 37 compiler-fixture tests), 20 Python guards, two collection examples and
 both independent package consumers, with zero warnings/errors. The 14 focused
 generated-runtime infrastructure tests per flavor are included in the library
 count. Local actual-package generated consumers pass all six flavor/stage runs
@@ -306,13 +312,13 @@ negative builds; every emitted stage covers all 18 normal overloads. The runtime
 corpus separately passes **30 behavioral executions**, plus two immutable-release
 baseline checks, in local all-mode execution.
 
-[CI 37384820581](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
-passes all four jobs at exact `cf2cd2d`: **679 tests per OS**, generated
+[CI 37386897109](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109)
+passes all four jobs at exact `2550376`: **683 tests per OS**, generated
 managed/full-trim/native execution on Linux x64 and Windows x64 (42 cases and 12
 negative builds per RID), and runtime native-with-trimming execution (10 cases
 and two historical baseline checks per RID). Positive diagnostics are zero.
 Both native hosts consume the same verified Ubuntu package pair, version
-`8.1.0-runic.0.790.17.15.8`. Its hashes are distinct from the local verification
+`8.1.0-runic.0.790.17.15.10`. Its hashes are distinct from the local verification
 pair; the [review](reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
 and [structured evidence](evidence/generated-api-implementation.json) record
 exact identities and retained emitted-source/report hashes. No release was
@@ -336,3 +342,11 @@ context interface-dispatch fixes and their regressions. Released DynamicData
 10.0.0-runic.5 and ReactiveUI 26.0.1 pins/hashes remain unchanged, with no sibling
 source adoption. No blanket `IsAotCompatible`, all-reflection-removed, retained
 UI-platform or bridge/browser support follows.
+
+The earlier `cf2cd2d` candidate remains a valid historical verification at its
+own source: 679 tests, verification version `.15.8` and all four CI jobs in run
+37384820581 passed. Final `2550376` supersedes it with the reference-view guard;
+its counts/packages are not relabeled as final. The exact
+[prior structured record](https://github.com/Runic-Artifex/ReactiveUI.Validation/blob/a6a084670143f1bd7f60565e56ec38f40d921047/docs/upstream/evidence/generated-api-implementation.json)
+is preserved at documentation commit `a6a0846`, and the active evidence retains a
+compact prior-candidate summary with its distinct local/CI hashes.

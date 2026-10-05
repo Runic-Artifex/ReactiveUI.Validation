@@ -51,9 +51,9 @@ available. See the [migration and examples](docs/examples/generated-validation.m
 and [generator contract](docs/generated-validation-design.md).
 
 This change is implemented and verified at source
-`cf2cd2d3812706141a3157bf9a230027e7404b22`, and remains **UNRELEASED** until
-publication. Local and [Linux/Windows CI](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
-pass 679 tests; actual-package generated consumers pass managed, full trimming
+`2550376b230ccfb78beb8d3b4ced8866b65d809e`, and remains **UNRELEASED** until
+publication. Local and [Linux/Windows CI](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109)
+pass 683 tests; actual-package generated consumers pass managed, full trimming
 and NativeAOT on Linux/Windows x64 with zero positive warnings/errors. The
 [verification record](docs/upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
 keeps tested source and local/CI package hashes separate. Published releases and

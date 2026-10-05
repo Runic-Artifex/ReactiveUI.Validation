@@ -93,7 +93,7 @@ AndroidX and native samples remain in [the platform solution](../src/ReactiveUI.
 ## Generated and Unsafe API boundary
 
 The generator/API split is implemented and verified at
-`cf2cd2d3812706141a3157bf9a230027e7404b22`, and remains **UNRELEASED** until
+`2550376b230ccfb78beb8d3b4ced8866b65d809e`, and remains **UNRELEASED** until
 publication. The [verification record](upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
 separates this tested source from the later documentation record and historical
 releases. Preserve [RUV-018](fork-differences.md#unreleased-generated-api-contract)

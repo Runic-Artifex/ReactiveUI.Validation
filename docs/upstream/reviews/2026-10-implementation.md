@@ -408,7 +408,7 @@ end-to-end support.
 ## Unreleased generated API follow-up
 
 **2026-10-06: implementation and verification complete; UNRELEASED until
-publication.** Tested source is `cf2cd2d3812706141a3157bf9a230027e7404b22`.
+publication.** Tested source is `2550376b230ccfb78beb8d3b4ced8866b65d809e`.
 This later documentation/evidence record reuses unchanged implementation and CI
 results; its own commit is not the tested/package source. No new release/tag or
 published package assets are claimed.
@@ -432,7 +432,16 @@ complete custom states, target replay and ownership/disposal.
 | Generator and final-compilation dispatch analyzer | `16b717822fb4806d99066c6717960c508e8e87b3`; bundled Roslyn 5.9 analyzer/props, direct notification/getter/setter output, seven error diagnostic IDs and indirect-call checks. |
 | Realistic actual-package corpus/gates | `a674a805672676a671aca9392d82aad0cd2a0cac` and assertion correction `b1f7a14`; seven application cases, all 18 overloads, six isolated negative configurations per flavor and exact graphs/source/package identities. |
 | Default-rule context interface dispatch | `33e1f28ba93f1539ce7f43921a7d1b8af90a873e`: read `IValidatableViewModel.ValidationContext`, including explicit default implementations and private shadows; both-flavor compiler regressions. |
-| Selected-context state interface dispatch | Final `cf2cd2d3812706141a3157bf9a230027e7404b22`: observe through `IValidationContext` and dispatch `IValidationComponent.ValidationStatusChange` through its interface, including concrete subtype shadows/inaccessible or misleading streams; both-flavor compiler regressions. |
+| Selected-context state interface dispatch | `cf2cd2d3812706141a3157bf9a230027e7404b22`: observe through `IValidationContext` and dispatch `IValidationComponent.ValidationStatusChange` through its interface, including concrete subtype shadows/inaccessible or misleading streams; both-flavor compiler regressions. |
+| Binding view reference ownership | Final `2550376b230ccfb78beb8d3b4ced8866b65d809e`: require a reference-type static view contract with INPC, reject concrete struct views with RUVG006, support one stable box accessed through a notifying view interface; both-flavor negative/positive compiler regressions. |
+
+Generated bindings require the view's static type to be a reference type
+implementing `INotifyPropertyChanged`. A concrete struct receiver would box event
+owners and mutate captured setter copies, so it is rejected with `RUVG006`.
+A stable boxed view accessed through a supported notifying interface remains
+valid. The final compiler fixture count includes both-flavor negative struct and
+positive interface-boxed cases; the six isolated corpus negative configurations
+remain unchanged.
 
 The locked SDK 10.0.401 compiler is Roslyn `5.9.0-1.26423.113`; analyzer/driver
 references and `analyzers/dotnet/roslyn5.9/cs` match it. The six safe observable
@@ -446,44 +455,60 @@ before correction and zero warnings/errors afterward; inferred receiver callers
 already passed. Exact proof inputs/logs are retained under
 `artifacts/verification/generator-nullability`, including `results.json`.
 
-### Final verification at cf2cd2d
+### Final verification at 2550376
 
 | Gate | Result / scope |
 | --- | --- |
-| Clean local Release build and tests | Zero warnings/errors; **679 tests**: 323 per library flavor and 33 compiler-fixture tests. The 14 focused generated-runtime infrastructure tests per flavor are included in the library count. |
+| Clean local Release build and tests | Zero warnings/errors; **683 tests**: 323 per library flavor and 37 compiler-fixture tests. The 14 focused generated-runtime infrastructure tests per flavor are included in the library count. |
 | Local guards/examples/package consumers | 20 Python guards (eight package, six runtime-native, six generated); two collection examples and both independent actual-package consumers pass. |
 | Local generated actual-package gate | `linux-x64`, all mode: six flavor/stage runs, **42 behavioral case executions**, 12 isolated negative builds, all 18 typed overload shapes in every emitted stage, six retained generated-source files; zero positive warnings/errors. |
 | Local existing runtime actual-package gate | `linux-x64`, all mode: six flavor/stage runs, **30 behavioral case executions**, two immutable-release diagnostic baseline checks; zero positive warnings/errors. |
-| CI Linux/Windows core jobs | [Run 37384820581](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581), exact `cf2cd2d`: both OS jobs pass **679 tests each**, zero warnings/errors, 20 guards, both collection examples and both package consumers. |
+| CI Linux/Windows core jobs | [Run 37386897109](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109), exact `2550376`: both OS jobs pass **683 tests each**, zero warnings/errors, 20 guards, both collection examples and both package consumers. |
 | CI generated consumers, each RID | The same run's `linux-x64` and `win-x64` jobs each execute managed, standalone full-trim managed and actual NativeAOT in both flavors: six stage runs, **42 behavioral executions**, 12 negative builds, all 18 overloads per stage and six retained emitted-source files; zero positive warnings/errors. |
 | CI existing runtime consumers, each RID | Both native jobs independently execute two flavor-native runs: **10 behavioral executions**, plus two historical baseline checks; zero positive warnings/errors. Native publishing includes trimming; standalone full-trim managed runtime evidence remains local Linux. |
-| Artifact/source audit | `artifacts/verification/generated-support/cf2cd2d/ci-audit.json`: all four jobs pass, exact source/version/analyzer/props/nuspec and branded/flavor graphs audited; both RIDs' reports match the same verified Ubuntu package pair. Emitted-source and shipping-package hashes independently verified. |
+| Artifact/source audit | `artifacts/verification/generated-support/2550376/ci-audit.json`: all four jobs pass, exact source/version/analyzer/props/nuspec and branded/flavor graphs audited; both RIDs' reports match the same verified Ubuntu package pair. Emitted-source and shipping-package hashes independently verified. |
 
-Local and CI package pairs share version **8.1.0-runic.0.790.17.15.8** and tested
-source `cf2cd2d`, with distinct bytes. CI native/generated jobs consume only the
+Local and CI package pairs share version **8.1.0-runic.0.790.17.15.10** and tested
+source `2550376`, with distinct bytes. CI native/generated jobs consume only the
 Ubuntu shipping artifact; Windows core package bytes are not substituted for it.
 
 | Verification artifact / flavor | SHA-256 |
 | --- | --- |
-| Local Primitives | `dc7ebe680d4c9dd59966defa8de4815952dd14208ffc1328c3722869de4a0ca7` |
-| Local Reactive | `8beceea545b870d82709298e75f9f8c2efe2bdb65b44ee36759d8bce110ee9dd` |
-| CI Ubuntu Primitives | `243231896aa1b1673a34e53568b7c54fee8ae7906df1ebc7380779d610c59c54` |
-| CI Ubuntu Reactive | `fac3baed7bd8b0877afba89f12955285e573b7b4f2264d2e8c9d3db900dcbf85` |
+| Local Primitives | `ffea7c200bde9893b535dcf3dc9d8fe81ddaba747aad3f95d8b24315218b01c5` |
+| Local Reactive | `1f1cb6b0b8404d0914d935306575f2c399b7686e302846b2627f513112ca1a46` |
+| CI Ubuntu Primitives | `b68cfe33d5f1bf4aeee612bd2baaffdb25f1a0a918d6594db65e592a844ac800` |
+| CI Ubuntu Reactive | `c1c921c16ee79018fcaa4b881c810f850d3018fde70400064b73a0308bd028e6` |
 
 The identical analyzer bundled in both CI packages has SHA-256
-`074aa4af6268f24647370f27c9dff8678c712ece5e16fd50251450fc078a410a`.
+`f42985b5b64d0400a5280dc42c799be428331c6d29e1aba78a5d62edaf8bd79d`.
 The [structured evidence](../evidence/generated-api-implementation.json) records
 local reports, CI RID reports/audit, package hashes, source and the distinct
 historical release. Retained local results are
-`artifacts/verification/generated-support/cf2cd2d/generated-gates/results.json`
-and `artifacts/verification/generated-support/cf2cd2d/native-gates/results.json`;
+`artifacts/verification/generated-support/2550376/generated-gates/results.json`
+and `artifacts/verification/generated-support/2550376/native-gates/results.json`;
 CI evidence is retained under that directory's `ci/` child.
 
 The preliminary `b1f7a14` local core/guard/package-consumer gate is superseded by
 the context fixes; cancelled CI `37384112590` establishes no final/native result.
-Final evidence uses exact `cf2cd2d`. Earlier published `.790`, `.790.17` and
+Final evidence uses exact `2550376`. Earlier published `.790`, `.790.17` and
 `.790.17.15` tags/assets/source and all warning-bearing proofs remain unchanged.
 No new published asset hash or release identity is inferred from this verification
 version. Released DynamicData 10.0.0-runic.5 and ReactiveUI 26.0.1 remain pinned;
 no sibling source adoption, blanket `IsAotCompatible`, all-reflection-removed,
 retained UI-platform or bridge/browser support follows.
+
+### Prior verified candidate
+
+Earlier tested source `cf2cd2d3812706141a3157bf9a230027e7404b22` remains a
+valid historical candidate record: **679 tests per OS** (323 per flavor plus
+33 compiler fixtures), verification version **8.1.0-runic.0.790.17.15.8**, and
+all four jobs in [CI 37384820581](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
+passed. Its local generated/runtime counts were 42/30; CI generated/runtime
+counts were 42/10 per RID, with 12 negative builds/two baseline checks. Its local
+and CI package hashes remain distinct and are retained in the active evidence's
+`priorVerifiedCandidates` array. The exact
+[prior full structured record](https://github.com/Runic-Artifex/ReactiveUI.Validation/blob/a6a084670143f1bd7f60565e56ec38f40d921047/docs/upstream/evidence/generated-api-implementation.json)
+is preserved at documentation commit `a6a084670143f1bd7f60565e56ec38f40d921047`.
+Final `2550376` supersedes that candidate with the reference-view guard and fresh
+gates. Neither candidate is a published release; prior bytes/results are not
+relabeled as final source evidence.

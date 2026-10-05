@@ -98,7 +98,7 @@ states and subscription ownership. The realistic GeneratedValidation consumers
 must use actual packed packages and execute under managed/full-trim/native modes
 with warnings as errors; record exact source/package/host identities separately
 from earlier released runtime consumers. The generator split is verified at
-`cf2cd2d3812706141a3157bf9a230027e7404b22`, with all four Linux/Windows core
+`2550376b230ccfb78beb8d3b4ced8866b65d809e`, with all four Linux/Windows core
 and consumer CI jobs passing. It remains unreleased until publication; the
 [verification record](docs/upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
 identifies exact source/packages and preserves historical release evidence.

@@ -1,7 +1,7 @@
 # Generated validation and explicit Unsafe migration
 
 **Implemented and verified, UNRELEASED until publication; 2026-10-06.** Tested
-source is `cf2cd2d3812706141a3157bf9a230027e7404b22`, distinct from this later
+source is `2550376b230ccfb78beb8d3b4ced8866b65d809e`, distinct from this later
 documentation record. The immutable `.790.17.15` release retains its earlier
 runtime behavior. The [verification record](../upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
 identifies the new local/CI packages and executed hosts separately.
@@ -29,8 +29,12 @@ These fragments assume accessible user-declared notifying application types. A
 property chain must consist of supported inline readable instance properties.
 Observed chain owners must be reference types implementing
 `INotifyPropertyChanged`; selectors used only as rule metadata do not require
-observation. Store every returned helper/binding under an application owner
-and dispose it at the matching lifetime boundary.
+observation. Binding view static types must be reference types implementing
+`INotifyPropertyChanged`. Concrete struct views fail with `RUVG006`, because
+notification boxing and captured setter copies cannot preserve ownership. A
+stable box referenced through a supported notifying view interface is supported;
+both shapes have both-flavor compiler regressions. Store every returned
+helper/binding under an application owner and dispose it at the matching lifetime boundary.
 
 ```csharp
 var nameRule = model.ValidationRule(
@@ -205,9 +209,9 @@ native host. The runner verifies actual package identity and current clean
 source, exact flavor/version graphs, emitted code, diagnostics and executed
 output with warnings as errors. Native CI hosts must consume the same verified
 Linux shipping artifact. A CLI option or prior passed release gate does not
-establish execution on a platform. At tested `cf2cd2d`, local Linux execution
+establish execution on a platform. At tested `2550376`, local Linux execution
 passes all six flavor/stage runs (42 behavioral cases) and 12 negative builds.
-[CI 37384820581](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
+[CI 37386897109](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109)
 repeats managed, full-trim managed and actual native generated execution on both
 Linux x64 and Windows x64, with 42 cases and 12 negative builds per RID. Every
 emitted stage covers all 18 normal overloads; positive paths have zero
