@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Libraries/">
+    <Project Path="../src/ReactiveUI.Validation/ReactiveUI.Validation.csproj" />
+    <Project Path="../src/ReactiveUI.Validation.Reactive/ReactiveUI.Validation.Reactive.csproj" />
+  </Folder>
+  <Project Path="Primitives/ReactiveUI.Validation.Benchmarks.csproj" />
+  <Project Path="Reactive/ReactiveUI.Validation.Reactive.Benchmarks.csproj" />
+</Solution>
