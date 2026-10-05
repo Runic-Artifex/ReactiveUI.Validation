@@ -157,92 +157,100 @@ using {validation}.Contexts;
 using {validation}.Extensions;
 using {validation}.Helpers;
 
-RxAppBuilder.CreateReactiveUIBuilder().WithCoreServices().BuildApp();
-using var model = new Model();
-var rule = model.ValidationRule(x => x.Name, name => !string.IsNullOrEmpty(name), "Required");
-DynamicData{suffix}.IObservableList<IValidationComponent> rules = model.ValidationContext.Validations;
-if (rules.Count != 1 || model.ValidationContext.IsValid || !model.HasErrors)
-    throw new InvalidOperationException("Expected an invalid empty name");
-model.Name = "Runic";
-if (!model.ValidationContext.IsValid || model.HasErrors)
-    throw new InvalidOperationException("Expected validation to react to the property change");
-using var advice = new ValidationContext();
-model.Advice = advice;
-using var adviceRule = model.ValidationRule(advice, x => x.Name, name => name == "Excellent", "Improve the name");
-if (!model.ValidationContext.GetIsValid() || model.HasErrors || advice.GetIsValid())
-    throw new InvalidOperationException("Advice must not invalidate the default blocking context");
-model.Name = "";
-if (model.ValidationContext.GetIsValid() || !model.HasErrors)
-    throw new InvalidOperationException("Blocking rules must invalidate the default context");
-model.Name = "Runic";
+namespace Runic.Validation.PackageConsumer;
 
-using var replacement = new Model();
-using var replacementRule = replacement.ValidationRule(x => x.Name, name => !string.IsNullOrEmpty(name), "Required");
-using var replacementAdvice = new ValidationContext();
-using var emptyAdvice = new ValidationContext();
-replacement.Advice = replacementAdvice;
-using var replacementAdviceRule = replacement.ValidationRule(
-    replacementAdvice, x => x.Name, name => name == "Excellent", "Replacement advice");
-var view = new ModelView {{ ViewModel = model }};
-var stateValues = new List<bool>();
-var projections = new List<ValidationProjection>();
-using var stateBinding = view.BindValidationState(
-    model, x => x.Name, states => states.All(state => state.IsValid), stateValues.Add, true);
-using var contextBinding = view.BindValidationContext(
-    model, x => x.Advice, state => projections.Add(new ValidationProjection(state.IsValid, state.Text.ToSingleLine())));
-if (!stateValues[^1] || projections[^1].IsValid || projections[^1].Text != "Improve the name")
-    throw new InvalidOperationException("Expected typed blocking validity and a separate advice projection");
+public static class Program
+{{
+    public static void Main()
+    {{
+        RxAppBuilder.CreateReactiveUIBuilder().WithCoreServices().BuildApp();
+        using var model = new Model();
+        var rule = model.ValidationRule(x => x.Name, name => !string.IsNullOrEmpty(name), "Required");
+        DynamicData{suffix}.IObservableList<IValidationComponent> rules = model.ValidationContext.Validations;
+        if (rules.Count != 1 || model.ValidationContext.IsValid || !model.HasErrors)
+            throw new InvalidOperationException("Expected an invalid empty name");
+        model.Name = "Runic";
+        if (!model.ValidationContext.IsValid || model.HasErrors)
+            throw new InvalidOperationException("Expected validation to react to the property change");
+        using var advice = new ValidationContext();
+        model.Advice = advice;
+        using var adviceRule = model.ValidationRule(advice, x => x.Name, name => name == "Excellent", "Improve the name");
+        if (!model.ValidationContext.GetIsValid() || model.HasErrors || advice.GetIsValid())
+            throw new InvalidOperationException("Advice must not invalidate the default blocking context");
+        model.Name = "";
+        if (model.ValidationContext.GetIsValid() || !model.HasErrors)
+            throw new InvalidOperationException("Blocking rules must invalidate the default context");
+        model.Name = "Runic";
 
-view.ViewModel = replacement;
-if (stateValues[^1] || projections[^1].Text != "Replacement advice")
-    throw new InvalidOperationException("Bindings must switch to the replacement model");
-var stateCount = stateValues.Count;
-var contextCount = projections.Count;
-model.Name = "Excellent";
-if (stateValues.Count != stateCount || projections.Count != contextCount)
-    throw new InvalidOperationException("Detached model must not update either binding");
-replacement.Name = "Runic";
-if (!stateValues[^1] || projections[^1].IsValid)
-    throw new InvalidOperationException("Replacement blocking rules and advice must remain independent");
+        using var replacement = new Model();
+        using var replacementRule = replacement.ValidationRule(x => x.Name, name => !string.IsNullOrEmpty(name), "Required");
+        using var replacementAdvice = new ValidationContext();
+        using var emptyAdvice = new ValidationContext();
+        replacement.Advice = replacementAdvice;
+        using var replacementAdviceRule = replacement.ValidationRule(
+            replacementAdvice, x => x.Name, name => name == "Excellent", "Replacement advice");
+        var view = new ModelView {{ ViewModel = model }};
+        var stateValues = new List<bool>();
+        var projections = new List<ValidationProjection>();
+        using var stateBinding = view.BindValidationState(
+            model, x => x.Name, states => states.All(state => state.IsValid), stateValues.Add, true);
+        using var contextBinding = view.BindValidationContext(
+            model, x => x.Advice, state => projections.Add(new ValidationProjection(state.IsValid, state.Text.ToSingleLine())));
+        if (!stateValues[^1] || projections[^1].IsValid || projections[^1].Text != "Improve the name")
+            throw new InvalidOperationException("Expected typed blocking validity and a separate advice projection");
 
-replacement.Advice = emptyAdvice;
-if (!projections[^1].IsValid || projections[^1].Text.Length != 0)
-    throw new InvalidOperationException("Empty replacement context must clear the projection");
-contextCount = projections.Count;
-replacement.Name = "Excellent";
-if (projections.Count != contextCount)
-    throw new InvalidOperationException("Detached advice context must not update the projection");
-view.ViewModel = null;
-if (!stateValues[^1] || !projections[^1].IsValid || projections[^1].Text.Length != 0)
-    throw new InvalidOperationException("Null model must produce the documented empty selections");
-stateCount = stateValues.Count;
-contextCount = projections.Count;
-replacement.Name = "";
-if (stateValues.Count != stateCount || projections.Count != contextCount)
-    throw new InvalidOperationException("Null model must detach both subscriptions");
+        view.ViewModel = replacement;
+        if (stateValues[^1] || projections[^1].Text != "Replacement advice")
+            throw new InvalidOperationException("Bindings must switch to the replacement model");
+        var stateCount = stateValues.Count;
+        var contextCount = projections.Count;
+        model.Name = "Excellent";
+        if (stateValues.Count != stateCount || projections.Count != contextCount)
+            throw new InvalidOperationException("Detached model must not update either binding");
+        replacement.Name = "Runic";
+        if (!stateValues[^1] || projections[^1].IsValid)
+            throw new InvalidOperationException("Replacement blocking rules and advice must remain independent");
 
-view.ViewModel = replacement;
-stateBinding.Dispose();
-stateBinding.Dispose();
-contextBinding.Dispose();
-contextBinding.Dispose();
-stateCount = stateValues.Count;
-contextCount = projections.Count;
-replacement.Name = "Runic";
-replacement.Advice = replacementAdvice;
-if (stateValues.Count != stateCount || projections.Count != contextCount)
-    throw new InvalidOperationException("Disposed bindings must stop projection updates");
-if (replacementAdvice.Validations.Count != 1 || replacementAdvice.IsDisposed || emptyAdvice.IsDisposed)
-    throw new InvalidOperationException("Bindings must not own selected contexts or rules");
+        replacement.Advice = emptyAdvice;
+        if (!projections[^1].IsValid || projections[^1].Text.Length != 0)
+            throw new InvalidOperationException("Empty replacement context must clear the projection");
+        contextCount = projections.Count;
+        replacement.Name = "Excellent";
+        if (projections.Count != contextCount)
+            throw new InvalidOperationException("Detached advice context must not update the projection");
+        view.ViewModel = null;
+        if (!stateValues[^1] || !projections[^1].IsValid || projections[^1].Text.Length != 0)
+            throw new InvalidOperationException("Null model must produce the documented empty selections");
+        stateCount = stateValues.Count;
+        contextCount = projections.Count;
+        replacement.Name = "";
+        if (stateValues.Count != stateCount || projections.Count != contextCount)
+            throw new InvalidOperationException("Null model must detach both subscriptions");
 
-model.Advice = emptyAdvice;
-adviceRule.Dispose();
-if (advice.Validations.Count != 0 || replacementAdvice.Validations.Count != 1)
-    throw new InvalidOperationException("Helper removal must use its original explicit context");
-rule.Dispose();
-if (rules.Count != 0 || !model.ValidationContext.IsValid)
-    throw new InvalidOperationException("Expected disposal to remove the default validation rule");
-Console.WriteLine("{package_id}: package consumer passed (default, explicit context and typed projections)");
+        view.ViewModel = replacement;
+        stateBinding.Dispose();
+        stateBinding.Dispose();
+        contextBinding.Dispose();
+        contextBinding.Dispose();
+        stateCount = stateValues.Count;
+        contextCount = projections.Count;
+        replacement.Name = "Runic";
+        replacement.Advice = replacementAdvice;
+        if (stateValues.Count != stateCount || projections.Count != contextCount)
+            throw new InvalidOperationException("Disposed bindings must stop projection updates");
+        if (replacementAdvice.Validations.Count != 1 || replacementAdvice.IsDisposed || emptyAdvice.IsDisposed)
+            throw new InvalidOperationException("Bindings must not own selected contexts or rules");
+
+        model.Advice = emptyAdvice;
+        adviceRule.Dispose();
+        if (advice.Validations.Count != 0 || replacementAdvice.Validations.Count != 1)
+            throw new InvalidOperationException("Helper removal must use its original explicit context");
+        rule.Dispose();
+        if (rules.Count != 0 || !model.ValidationContext.IsValid)
+            throw new InvalidOperationException("Expected disposal to remove the default validation rule");
+        Console.WriteLine("{package_id}: package consumer passed (default, explicit context and typed projections)");
+    }}
+}}
 
 public sealed record ValidationProjection(bool IsValid, string Text);
 
