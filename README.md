@@ -24,6 +24,9 @@ core CI and releases. This fork will not be proposed upstream.
 
 The [upstream review](docs/upstream/README.md) catalogs every accessible issue and
 pull request, with Runic priorities, implementation plans and diagnostic evidence.
+For monthly syncs and retained fork adaptations, see the
+[maintenance policy](docs/maintenance.md) and
+[fork difference register](docs/fork-differences.md).
 
 ---
 

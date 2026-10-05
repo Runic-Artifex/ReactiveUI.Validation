@@ -1,5 +1,10 @@
 # ReactiveUI.Validation upstream review for Runic
 
+This is dated research at the commits recorded below. Follow the
+[maintenance policy](../maintenance.md), [difference register](../fork-differences.md)
+and [monthly review records](reviews/2026-10.md) for integration decisions and
+actual adoption. Verify findings against the current branch before implementation.
+
 This review inventories upstream issues and pull requests and identifies useful work for our .NET 10 fork. The immediate recommendation is to fix binding lifetime behavior, then add explicit validation-context selection and a Runic collection-validation example. Typed state bindings and benchmarks are useful follow-ups. Most historical dependency upgrades and bug fixes are already inherited and should not be replayed.
 
 The inventory contains **53 issues and 936 pull requests**, covering open, closed and merged records as of **2026-10-05**. Five issues are open; no pull requests are open. The assessment below separates upstream reports, observations in our fork, and proposed implementation work. No product fixes were applied during this review.

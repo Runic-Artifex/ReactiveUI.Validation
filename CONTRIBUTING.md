@@ -1,5 +1,11 @@
 # Building the Runic fork
 
+For monthly upstream reviews, integration ownership, urgent ports and immutable
+releases, follow the [maintenance policy](docs/maintenance.md). Review and update
+the [fork difference register](docs/fork-differences.md) when adding, changing or
+retiring an adaptation. The [upstream investigation](docs/upstream/README.md) is
+dated research; review records and the register track actual adoption.
+
 Use .NET SDK 10.0.401, pinned in the root `global.json`, and Python 3 for the
 dependency bootstrap. On the Runic desktop, reuse the locked development shell
 with `direnv exec ../runic-sdk <command>` from this repository root (or
