@@ -12,8 +12,8 @@ runtime and examples first implementation from dated warning-bearing
 investigations. The strict
 [actual-package gate](eng/verify-native-validation.py) publishes and runs the
 explicit safe subset; it retains warning-as-error analysis and exact flavor,
-version and source checks. The working branch's generated/Unsafe API split is
-**UNRELEASED**; see the [generator contract](docs/generated-validation-design.md)
+version and source checks. The generated/Unsafe API split is implemented and verified,
+but **UNRELEASED** until publication; see the [generator contract](docs/generated-validation-design.md)
 and [migration recipe](docs/examples/generated-validation.md). No blanket package
 NativeAOT compatibility or retained UI-platform support is implied.
 
@@ -97,8 +97,12 @@ initial-failure cleanup, source replacement, strict matching, complete custom
 states and subscription ownership. The realistic GeneratedValidation consumers
 must use actual packed packages and execute under managed/full-trim/native modes
 with warnings as errors; record exact source/package/host identities separately
-from earlier released runtime consumers. The generator split remains unreleased
-until its current revision passes the required Linux/Windows integration gates.
+from earlier released runtime consumers. The generator split is verified at
+`cf2cd2d3812706141a3157bf9a230027e7404b22`, with all four Linux/Windows core
+and consumer CI jobs passing. It remains unreleased until publication; the
+[verification record](docs/upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
+identifies exact source/packages and preserves historical release evidence.
+Repeat the required gates for subsequent implementation changes.
 
 The safe observable rule/binding files deliberately use traditional `this`
 extensions: the locked C#14 compiler's nullable-generic synthesized static bridge

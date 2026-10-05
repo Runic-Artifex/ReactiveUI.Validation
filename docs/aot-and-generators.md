@@ -1,6 +1,6 @@
 # NativeAOT and ReactiveUI generators
 
-The working branch adds the **UNRELEASED generated/Unsafe API split** described
+The implemented and verified **UNRELEASED generated/Unsafe API split** is described
 in the [generator contract](generated-validation-design.md) and
 [migration recipe](examples/generated-validation.md). Supported inline-lambda
 predicate rules and expression bindings generate direct observation/assignment;
@@ -9,21 +9,30 @@ core package's embedded analyzer and interceptor allowlist props. Runtime
 expressions require explicit annotated Unsafe methods; no hidden reflection
 fallback is provided. Safe observable APIs remain available.
 
-The new [actual-package generated gate](../eng/verify-generated-validation.py)
-requires warning-as-error managed/full-trim/native publication and execution in
-both flavors at the current source. Its integration and host evidence must be
-recorded separately. Focused current-code verification reports 29 passing
-compiler-fixture tests with matched Roslyn 5.9 against both runtime flavors,
-covering all four rule and 14 binding overloads, with zero build/emitted warnings
-or errors. Generated runtime infrastructure passes 14 tests per flavor and strict
-producer analysis with zero warnings. Twenty Python guard checks passed across
-focused runs (eight package, six runtime-native and six generated).
+At tested source `cf2cd2d3812706141a3157bf9a230027e7404b22`, the local strict
+Release gate passes **679 tests** (323 per library flavor and 33 compiler-fixture
+tests), 20 Python guards, two collection examples and both independent package
+consumers, with zero warnings/errors. Local actual-package generated consumers
+pass managed, full trimming and actual Linux x64 NativeAOT: **42 behavioral case
+executions and 12 negative builds**, all 18 normal overloads in every emitted
+stage. The existing runtime corpus separately passes **30 behavioral case
+executions and two historical baseline checks** in local all-mode execution.
 
-These are working-tree checks, not a clean source-pinned final gate. Full core,
-actual-package native execution and Linux/Windows integration CI remain pending.
-Earlier release gates below retain their historical identities and do not verify
-the generated split. No blanket `IsAotCompatible` or whole-library reflection-free
-contract is declared.
+All four jobs in [CI 37384820581](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
+pass at the same source: 679 tests per OS, generated managed/full-trim/native
+execution on both Linux x64 and Windows x64 (42 cases and 12 negative builds per
+RID), and the runtime safe subset in native mode (10 cases and two historical
+checks per RID). Positive paths have zero warnings/errors. Both native hosts
+consume the same verified Ubuntu package pair, version
+`8.1.0-runic.0.790.17.15.8`; its hashes are distinct from the local pair.
+The [review](upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
+and [structured evidence](upstream/evidence/generated-api-implementation.json)
+retain exact package/source/host identities and emitted-source evidence.
+
+The implementation remains **UNRELEASED** until publication. This later
+documentation record is not the tested/package source. Earlier release gates
+below retain their historical identities. No blanket `IsAotCompatible` or
+whole-library reflection-free contract is declared.
 
 ## Released runtime evidence (before the generator split)
 
@@ -407,7 +416,7 @@ before the correction and zero warnings/errors afterward; inferred receiver
 calls already passed before it. The retained proof is
 `artifacts/verification/generator-nullability/results.json`, with before,
 inferred and after logs/source inputs. Focused aligned compiler/runtime checks
-pass as recorded above; final clean-source gates remain pending. Historical proof/release source and package inputs are unchanged.
+pass at the final tested source, with clean-source local/CI gates recorded above. Historical proof/release source and package inputs are unchanged.
 
 The producer audit distinguishes dynamic-code requirements from trimming
 requirements. In the audited .NET 10 cohort, legacy reflection operations
@@ -444,13 +453,19 @@ toolchain and libraries for that platform. Ordinary .NET build/test success on
 Linux and Windows does not stand in for a native publish/run. Keep native consumers standalone from the shipping solution, reuse the locked
 development environment, and record native compiler/runtime inputs with each
 result. Run strict package gates separately from the dated warning-bearing probes.
-The strict five-case safe console paths are verified on **`linux-x64` and
+The released strict five-case safe console paths are verified on **`linux-x64` and
 `win-x64`**, in both flavors at exact `f22d2bb`. Both final native jobs execute
 the same Ubuntu package artifact, with zero candidate warnings/errors.
 Standalone full-trim managed execution is established locally on Linux x64;
 Windows evidence is actual native execution with trimming enabled. The dated
 warning-bearing investigations above establish only Linux x64. Linux Arm64,
 macOS and cross-compilation need matching toolchains and actual host execution.
+
+The new generated split at `cf2cd2d` adds actual managed/full-trim/native
+consumer execution on both Linux x64 and Windows x64, in both flavors. The
+runtime gate at that source independently executes native with trimming on both
+CI hosts; its standalone fully trimmed managed run remains local Linux evidence.
+These are the exact console corpus/cohort/host contracts recorded above.
 
 The retained AndroidX and desktop/mobile samples remain outside core releases.
 This implementation does not add Android, iOS, macOS, Windows desktop UI,

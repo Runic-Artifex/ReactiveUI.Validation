@@ -1,0 +1,246 @@
+{
+  "schemaVersion": 1,
+  "status": {
+    "implementation": "implemented and verified",
+    "publication": "UNRELEASED; no new release/tag/assets published"
+  },
+  "testedSource": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+  "documentationRecord": "This later documentation-only record reuses the exact tested implementation; its own commit is not the tested/package source.",
+  "compiler": {
+    "sdk": "10.0.401",
+    "language": "C#14",
+    "roslyn": "5.9.0-1.26423.113",
+    "analyzerPath": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+    "interceptorNamespaceRoot": "ReactiveUI.Validation.Generated"
+  },
+  "dependencyCohort": {
+    "ReactiveUI": "26.0.1",
+    "ReactiveUI.Reactive": "26.0.1",
+    "Runic.DynamicData": "10.0.0-runic.5",
+    "Runic.DynamicData.Reactive": "10.0.0-runic.5",
+    "dynamicDataSha256": {
+      "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+      "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+    },
+    "siblingSourceAdopted": false
+  },
+  "localCore": {
+    "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+    "passed": true,
+    "warnings": 0,
+    "errors": 0,
+    "tests": 679,
+    "libraryTestsEachFlavor": 323,
+    "compilerFixtureTests": 33,
+    "pythonGuards": 20,
+    "collectionExamples": 2,
+    "independentPackageConsumers": 2,
+    "generatedRuntimeInfrastructureTestsIncludedEachFlavor": 14
+  },
+  "localPackages": {
+    "Primitives": {
+      "id": "Runic.ReactiveUI.Validation",
+      "version": "8.1.0-runic.0.790.17.15.8",
+      "sha256": "dc7ebe680d4c9dd59966defa8de4815952dd14208ffc1328c3722869de4a0ca7",
+      "analyzer": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+      "props": "buildTransitive/Runic.ReactiveUI.Validation.props"
+    },
+    "Reactive": {
+      "id": "Runic.ReactiveUI.Validation.Reactive",
+      "version": "8.1.0-runic.0.790.17.15.8",
+      "sha256": "8beceea545b870d82709298e75f9f8c2efe2bdb65b44ee36759d8bce110ee9dd",
+      "analyzer": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+      "props": "buildTransitive/Runic.ReactiveUI.Validation.Reactive.props"
+    }
+  },
+  "localGenerated": {
+    "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+    "rid": "linux-x64",
+    "mode": "all",
+    "positiveBuildsAndRuns": 6,
+    "applicationCaseExecutions": 42,
+    "negativeDiagnosticBuilds": 12,
+    "typedOverloadsPerStage": 18,
+    "retainedSourceFiles": 6,
+    "positiveWarnings": 0,
+    "report": "artifacts/verification/generated-support/cf2cd2d/generated-gates/results.json",
+    "reportSha256": "a4d6e440fc206e8cecbf636a5b9eb50667d919870c16778d7fe4c070192d16d5"
+  },
+  "localRuntime": {
+    "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+    "rid": "linux-x64",
+    "mode": "all",
+    "positiveBuildsAndRuns": 6,
+    "applicationCaseExecutions": 30,
+    "immutableBaselineDiagnosticBuilds": 2,
+    "positiveWarnings": 0,
+    "report": "artifacts/verification/generated-support/cf2cd2d/native-gates/results.json",
+    "reportSha256": "042e18d0381beef2c73881acc9bbb95e9ee28a46394aae20d24555ac2ee20855"
+  },
+  "ci": {
+    "run": 37384820581,
+    "url": "https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581",
+    "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "build (windows-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "build (ubuntu-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-consumers / native (ubuntu-latest, linux-x64)",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-consumers / native (windows-latest, win-x64)",
+        "conclusion": "success"
+      }
+    ],
+    "coreEachOS": {
+      "tests": 679,
+      "libraryTestsEachFlavor": 323,
+      "compilerFixtureTests": 33,
+      "pythonGuards": 20,
+      "warnings": 0,
+      "errors": 0,
+      "collectionExamples": 2,
+      "independentPackageConsumers": 2
+    },
+    "shippingPackages": {
+      "Primitives": {
+        "id": "Runic.ReactiveUI.Validation",
+        "version": "8.1.0-runic.0.790.17.15.8",
+        "sha256": "243231896aa1b1673a34e53568b7c54fee8ae7906df1ebc7380779d610c59c54",
+        "bytes": 221317,
+        "file": "ci/packages-ubuntu-latest/Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.15.8.nupkg",
+        "analyzer": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+        "props": "buildTransitive/Runic.ReactiveUI.Validation.props",
+        "analyzerSha256": "074aa4af6268f24647370f27c9dff8678c712ece5e16fd50251450fc078a410a"
+      },
+      "Reactive": {
+        "id": "Runic.ReactiveUI.Validation.Reactive",
+        "version": "8.1.0-runic.0.790.17.15.8",
+        "sha256": "fac3baed7bd8b0877afba89f12955285e573b7b4f2264d2e8c9d3db900dcbf85",
+        "bytes": 221961,
+        "file": "ci/packages-ubuntu-latest/Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.15.8.nupkg",
+        "analyzer": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+        "props": "buildTransitive/Runic.ReactiveUI.Validation.Reactive.props",
+        "analyzerSha256": "074aa4af6268f24647370f27c9dff8678c712ece5e16fd50251450fc078a410a"
+      }
+    },
+    "reports": [
+      {
+        "rid": "linux-x64",
+        "kind": "generated",
+        "report": "ci/generated-validation-linux-x64/results.json",
+        "positiveBuildsAndRuns": 6,
+        "applicationCaseExecutions": 42,
+        "typedOverloadsPerStage": 18,
+        "retainedSourceFiles": 6,
+        "negativeDiagnosticBuilds": 12,
+        "positiveWarnings": 0,
+        "shippingPackageHashesMatched": true
+      },
+      {
+        "rid": "linux-x64",
+        "kind": "native-safe-subset",
+        "report": "ci/native-validation-linux-x64/results.json",
+        "positiveBuildsAndRuns": 2,
+        "applicationCaseExecutions": 10,
+        "immutableBaselineDiagnosticBuilds": 2,
+        "positiveWarnings": 0,
+        "shippingPackageHashesMatched": true
+      },
+      {
+        "rid": "win-x64",
+        "kind": "generated",
+        "report": "ci/generated-validation-win-x64/results.json",
+        "positiveBuildsAndRuns": 6,
+        "applicationCaseExecutions": 42,
+        "typedOverloadsPerStage": 18,
+        "retainedSourceFiles": 6,
+        "negativeDiagnosticBuilds": 12,
+        "positiveWarnings": 0,
+        "shippingPackageHashesMatched": true
+      },
+      {
+        "rid": "win-x64",
+        "kind": "native-safe-subset",
+        "report": "ci/native-validation-win-x64/results.json",
+        "positiveBuildsAndRuns": 2,
+        "applicationCaseExecutions": 10,
+        "immutableBaselineDiagnosticBuilds": 2,
+        "positiveWarnings": 0,
+        "shippingPackageHashesMatched": true
+      }
+    ],
+    "sameLinuxShippingArtifactUsedOnBothRIDs": true,
+    "localByteHashesAreSeparate": true,
+    "audit": "artifacts/verification/generated-support/cf2cd2d/ci-audit.json",
+    "auditSha256": "e62ea64b2d01f5497c02cf32b64163ebeab908f4f004d80c8df404c8bceac9f0",
+    "artifactRoot": "artifacts/verification/generated-support/cf2cd2d"
+  },
+  "nullableStaticBridgeProof": {
+    "sdk": "10.0.401",
+    "compiler": "5.9.0-1.26423.113",
+    "sameDirectStaticCallersBeforeErrors": "8 CS8714",
+    "sameDirectStaticCallersAfterWarnings": 0,
+    "sameDirectStaticCallersAfterErrors": 0,
+    "inferredReceiverBeforeWarnings": 0,
+    "inferredReceiverBeforeErrors": 0,
+    "traditionalExtensionsPreserveClrAbi": true,
+    "explicitObservableBindingSourceTypeArguments": "TSource, TOut",
+    "AddObservableRuleSourceTypeArguments": "TValue",
+    "report": "artifacts/verification/generator-nullability/results.json"
+  },
+  "preliminaryEvidence": {
+    "source": "b1f7a14184a10e5d51df4bb5319e466df2106960",
+    "localCoreTests": 675,
+    "supersededBy": [
+      "33e1f28ba93f1539ce7f43921a7d1b8af90a873e",
+      "cf2cd2d3812706141a3157bf9a230027e7404b22"
+    ],
+    "ci": 37384112590,
+    "ciStatus": "cancelled before final/native gates; not final verification"
+  },
+  "historicalRelease": {
+    "version": "8.1.0-runic.0.790.17.15",
+    "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+    "containsValidationGenerator": false,
+    "primitivesSha256": "17be4c3b5f46e9ff237b5f89bf97c4ff1f47b5dfef9abd250516cc454c57e95f",
+    "reactiveSha256": "08d6087dbd86e0ae92f1230275351240d8b2e32b7765e5b6c2b31e8ae47b4fd2",
+    "sourceTagsAssetsUnchanged": true,
+    "immutableUnderForkPolicy": true,
+    "githubEnforcedImmutableReleaseClaim": false
+  },
+  "supportScope": {
+    "generated": [
+      "managed/full-trim/native linux-x64",
+      "managed/full-trim/native win-x64"
+    ],
+    "runtime": [
+      "managed/full-trim/native local linux-x64",
+      "native with trimming CI linux-x64",
+      "native with trimming CI win-x64"
+    ],
+    "blanketIsAotCompatible": false,
+    "allReflectionRemoved": false,
+    "retainedUiPlatformSupportAdded": false,
+    "bridgeBrowserVerificationAdded": false,
+    "unsafeWarningsPreserved": true
+  },
+  "dispatchCorrections": {
+    "defaultRuleContext": {
+      "source": "33e1f28ba93f1539ce7f43921a7d1b8af90a873e",
+      "contract": "Read IValidatableViewModel.ValidationContext, including explicit default implementations and private shadows"
+    },
+    "selectedContextState": {
+      "source": "cf2cd2d3812706141a3157bf9a230027e7404b22",
+      "contract": "Observe through IValidationContext and dispatch IValidationComponent.ValidationStatusChange through its interface, including concrete subtype inaccessible/misleading shadows"
+    }
+  }
+}

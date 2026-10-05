@@ -263,54 +263,76 @@ GitHub-enforced immutable-release claim.
 ## Unreleased generated and Unsafe API split
 
 Decision **2026-10-06**, following immutable runtime release source
-`f22d2bb42c30d66df19a59333ed4fa633b241940`: implement the primary supported
-inline-lambda API with a Validation interceptor generator, replacing the earlier
-partial-method/attribute deferral. This working-branch change is **UNRELEASED**
-until current-source integration CI passes. Historical release/probe evidence
-above remains pinned to its original source and assets.
+`f22d2bb42c30d66df19a59333ed4fa633b241940`: the primary supported inline-lambda
+API is implemented with a Validation interceptor generator, replacing the earlier
+partial-method/attribute deferral. Implementation and verification are complete
+at tested source `cf2cd2d3812706141a3157bf9a230027e7404b22`; the change remains
+**UNRELEASED until publication**. This later documentation record is not the
+tested/package source. Historical release/probe evidence remains pinned to its
+original source and assets.
 
-Normal predicate `ValidationRule`, `BindValidation`, `BindValidationContext` and
-`BindValidationState` calls require generation; their ungenerated bodies throw.
-Matching explicit Unsafe methods retain runtime reflection and trimming warnings.
+API split `822b873bc687763cc9137b9334a967c0d27159c4` and generator
+`16b717822fb4806d99066c6717960c508e8e87b3` make normal predicate
+`ValidationRule`, `BindValidation`, `BindValidationContext` and
+`BindValidationState` calls require generated dispatch. Their ungenerated bodies
+throw. Matching explicit Unsafe methods retain runtime reflection and trimming
+warnings. Both core packages embed the analyzer DLL and matching allowlist props;
+precompiled normal callers must recompile with those assets or deliberately
+migrate to Unsafe. Safe observable/metadata-only overloads retain their contract.
 Generated normal property text bindings expose actual initial rule states without
-the legacy synthetic empty prelude, which Unsafe property callbacks retain.
-Previously compiled normal callers must be rebuilt with the matching core
-package analyzer/configuration assets, or explicitly migrate to Unsafe. Both
-core packages embed the analyzer DLL and their matching allowlist props. Safe
-observable/metadata-only overloads remain supported without new interception.
+the synthetic empty prelude; Unsafe retains the legacy sequence.
 
-The [design](../generated-validation-design.md),
-[migration/corpus recipe](../examples/generated-validation.md),
+Default-rule correction `33e1f28` reads
+`IValidatableViewModel.ValidationContext`, covering explicit implementations and
+private shadows. Selected-context correction `cf2cd2d` observes through
+`IValidationContext` and dispatches `IValidationComponent.ValidationStatusChange`
+through its interface, preserving the contract when a concrete subtype shadows
+that member with an inaccessible or misleading stream. The
+[design](../generated-validation-design.md),
+[migration recipe](../examples/generated-validation.md),
 [maintenance boundary](../maintenance.md#generated-and-unsafe-api-boundary) and
-[RUV-018](../fork-differences.md#unreleased-generated-api-contract) record literal
-selector constraints, diagnostics, null/default policy, contexts, strict paths,
-complete custom states and ownership/disposal. Current-source generated package
-consumer results must be recorded independently of the existing runtime gates;
-focused current-code verification reports 29 passing compiler-fixture tests
-using matched Roslyn 5.9 against both runtime flavors, covering all four rule and
-14 binding overloads, with zero build/emitted warnings or errors. Generated
-runtime infrastructure passes 14 tests per flavor with strict producer analysis
-and zero warnings. Twenty Python guard checks passed across focused runs (eight
-package, six runtime-native and six generated). These are working-tree results;
-full core, final clean-source package/native gates and Linux/Windows integration
-CI remain pending.
+[RUV-018](../fork-differences.md#unreleased-generated-api-contract) preserve
+literal selector diagnostics, full paths/strictness, null/default policies,
+independent contexts, complete custom states, target replay and subscription
+ownership/disposal.
 
-The dependency cohort remains SDK 10.0.401/.NET 10, ReactiveUI 26.0.1 and the
-matching released DynamicData 10.0.0-runic.5 pair. No sibling adoption or blanket
-package `IsAotCompatible`, all-reflection-removed, UI-platform or bridge/browser
-support follows.
+The final clean local Release gate passes **679 tests** (323 per library flavor
+plus 33 compiler-fixture tests), 20 Python guards, two collection examples and
+both independent package consumers, with zero warnings/errors. The 14 focused
+generated-runtime infrastructure tests per flavor are included in the library
+count. Local actual-package generated consumers pass all six flavor/stage runs
+in managed/full-trim/Linux-native modes: **42 behavioral executions**, plus 12
+negative builds; every emitted stage covers all 18 normal overloads. The runtime
+corpus separately passes **30 behavioral executions**, plus two immutable-release
+baseline checks, in local all-mode execution.
 
-The generator/tooling cohort is aligned to the locked SDK's actual Roslyn 5.9.0
-compiler and `analyzers/dotnet/roslyn5.9/cs` package path. A reproduced
-nullable-generic CS8714 in C#14's synthesized static bridge requires the six safe
-observable methods to use traditional `this` extensions. CLR signatures and
-inferred calls remain compatible; explicit observable binding source calls now
-use `<TSource, TOut>`, while `AddObservableRule<TValue>` keeps its arity. The
-narrow SST1703 exception addresses that measured compiler error, without IL
-suppression or tuple-based signatures. The unchanged direct-static nullable
-callers reproduce eight CS8714 errors
-before the correction and zero warnings/errors after it; inferred receiver calls
-passed before it. Retained proof/source/log inputs are under
+[CI 37384820581](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
+passes all four jobs at exact `cf2cd2d`: **679 tests per OS**, generated
+managed/full-trim/native execution on Linux x64 and Windows x64 (42 cases and 12
+negative builds per RID), and runtime native-with-trimming execution (10 cases
+and two historical baseline checks per RID). Positive diagnostics are zero.
+Both native hosts consume the same verified Ubuntu package pair, version
+`8.1.0-runic.0.790.17.15.8`. Its hashes are distinct from the local verification
+pair; the [review](reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
+and [structured evidence](evidence/generated-api-implementation.json) record
+exact identities and retained emitted-source/report hashes. No release was
+published from this pass.
+
+The compiler cohort is SDK 10.0.401/C#14 with actual Roslyn 5.9.0 and the
+`analyzers/dotnet/roslyn5.9/cs` asset path. A reproduced nullable-generic CS8714 in
+the synthesized C#14 static bridge requires the six safe observable methods to
+use traditional `this` extensions. CLR signatures and inferred calls remain
+compatible; explicit observable binding source calls use `<TSource, TOut>`,
+while `AddObservableRule<TValue>` keeps its arity. The narrow SST1703 exception
+addresses that measured compiler error without IL suppression or tuple-based
+signatures. Identical direct-static caller sources change from eight CS8714
+errors before correction to zero warnings/errors afterward; inferred receiver
+calls already passed. Retained proof/source/log inputs are under
 `artifacts/verification/generator-nullability`, including `results.json`.
-Compiler/runtime focused checks pass as recorded above; final clean-source gates
-remain pending. Historical proof/release source and package inputs are unchanged.
+
+The preliminary `b1f7a14` local gate and cancelled CI `37384112590` are historical;
+they do not establish final/native verification. The final source includes both
+context interface-dispatch fixes and their regressions. Released DynamicData
+10.0.0-runic.5 and ReactiveUI 26.0.1 pins/hashes remain unchanged, with no sibling
+source adoption. No blanket `IsAotCompatible`, all-reflection-removed, retained
+UI-platform or bridge/browser support follows.

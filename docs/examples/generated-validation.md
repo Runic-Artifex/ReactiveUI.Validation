@@ -1,9 +1,10 @@
 # Generated validation and explicit Unsafe migration
 
-**UNRELEASED working branch, 2026-10-06.** This recipe describes the generated
-primary surface; the immutable `.790.17.15` release has the earlier runtime
-behavior. New source/package/native verification belongs to the current
-revision's gates, not that release's evidence.
+**Implemented and verified, UNRELEASED until publication; 2026-10-06.** Tested
+source is `cf2cd2d3812706141a3157bf9a230027e7404b22`, distinct from this later
+documentation record. The immutable `.790.17.15` release retains its earlier
+runtime behavior. The [verification record](../upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
+identifies the new local/CI packages and executed hosts separately.
 
 ## Consume the matching core package
 
@@ -204,6 +205,15 @@ native host. The runner verifies actual package identity and current clean
 source, exact flavor/version graphs, emitted code, diagnostics and executed
 output with warnings as errors. Native CI hosts must consume the same verified
 Linux shipping artifact. A CLI option or prior passed release gate does not
-establish execution on a platform. New CI/native evidence remains pending
-until recorded for this revision. No blanket package `IsAotCompatible`,
-retained UI-platform or bridge/browser support follows.
+establish execution on a platform. At tested `cf2cd2d`, local Linux execution
+passes all six flavor/stage runs (42 behavioral cases) and 12 negative builds.
+[CI 37384820581](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
+repeats managed, full-trim managed and actual native generated execution on both
+Linux x64 and Windows x64, with 42 cases and 12 negative builds per RID. Every
+emitted stage covers all 18 normal overloads; positive paths have zero
+warnings/errors. Both RIDs use the same verified Ubuntu package artifact, whose
+hashes differ from the local verification pair. See the
+[structured evidence](../upstream/evidence/generated-api-implementation.json).
+To reproduce those exact identities, use a clean checkout of the tested source;
+a fresh gate at a later HEAD records its own source/package identity. No blanket
+package `IsAotCompatible`, retained UI-platform or bridge/browser support follows.

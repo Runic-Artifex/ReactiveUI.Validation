@@ -32,7 +32,7 @@ For monthly syncs and retained fork adaptations, see the
 
 ## Unreleased generated validation API
 
-The working branch makes inline-lambda predicate `ValidationRule` and expression
+The implemented generated/Unsafe split makes inline-lambda predicate `ValidationRule` and expression
 `BindValidation`, `BindValidationContext` and `BindValidationState` calls the
 primary generated surface. The matching core package embeds the Validation
 analyzer and interceptor allowlist props; consuming projects must retain those
@@ -50,10 +50,15 @@ observable/metadata rule overloads and the explicit observable APIs remain
 available. See the [migration and examples](docs/examples/generated-validation.md)
 and [generator contract](docs/generated-validation-design.md).
 
-This change is **UNRELEASED** until the new revision passes integration CI.
-Published releases and their source/package evidence retain their historical
-behavior. Generated-path NativeAOT claims require the new actual-package gates;
-prior release results do not verify this change.
+This change is implemented and verified at source
+`cf2cd2d3812706141a3157bf9a230027e7404b22`, and remains **UNRELEASED** until
+publication. Local and [Linux/Windows CI](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
+pass 679 tests; actual-package generated consumers pass managed, full trimming
+and NativeAOT on Linux/Windows x64 with zero positive warnings/errors. The
+[verification record](docs/upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
+keeps tested source and local/CI package hashes separate. Published releases and
+their historical behavior remain unchanged; this later documentation record is
+not the tested package source.
 
 ---
 

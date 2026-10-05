@@ -389,7 +389,8 @@ Ignored independent evidence is retained at
 `artifacts/verification/native-published-independent/verification.json`; the
 release matrix summary is
 `artifacts/verification/native-support/final/release/37375833531/summary.json`.
-The canonical `artifacts/packages` feed contains exactly these published bytes;
+At that historical release verification stamp, the canonical `artifacts/packages`
+feed contained exactly those published bytes;
 the useful local `.15` pair is retained under
 `artifacts/retained-packages/8.1.0-runic.0.790.17.15/local-f22d2bb`.
 Local, final CI and published hashes remain distinct in this review and the
@@ -400,52 +401,89 @@ not marked as an enforced immutable release.
 The final review stamp changes documentation and evidence metadata only. It
 reuses exact released code/workflow verification under the maintenance policy;
 its own commit is not the shipping package source. `RUV-016` and `RUV-017` are
-active released contracts. That release makes no generator package/MVP, whole-library
-`IsAotCompatible`, retained UI-platform support, other RID or bridge/browser
-end-to-end result is claimed.
+active released contracts. That release claims no Validation generator,
+whole-library `IsAotCompatible`, retained UI-platform, other RID or bridge/browser
+end-to-end support.
 
 ## Unreleased generated API follow-up
 
-**2026-10-06 working-branch status; integration/verification pending.** The
-approved implementation direction supersedes the earlier generator deferral:
-supported inline-lambda normal calls generate direct Validation operations,
-while explicit Unsafe calls retain reflection and its trimming boundary. Normal
-calls without an interceptor throw, including already compiled call sites;
-consumers must recompile with the embedded analyzer and allowlist props or
-explicitly migrate. Generated normal property text bindings deliver actual
-initial rule text without the legacy synthetic empty-list prelude; Unsafe
-property callbacks retain that intentional migration boundary. Both core package
-IDs, namespace flavors, public API baselines and the released matching
-DynamicData `.5` cohort are preserved.
+**2026-10-06: implementation and verification complete; UNRELEASED until
+publication.** Tested source is `cf2cd2d3812706141a3157bf9a230027e7404b22`.
+This later documentation/evidence record reuses unchanged implementation and CI
+results; its own commit is not the tested/package source. No new release/tag or
+published package assets are claimed.
 
-The [generator contract](../../generated-validation-design.md),
+The supported inline-lambda normal API generates direct Validation operations;
+explicit Unsafe calls retain reflection and trimming warnings. Normal bodies
+without an interceptor throw, including precompiled calls, so consumers must
+recompile with embedded analyzer/props or explicitly migrate. Generated normal
+property text bindings expose actual initial rule text without the synthetic
+empty-list prelude; Unsafe retains its legacy sequence. Both branded package IDs,
+namespace flavors, API baselines and released matching DynamicData `.5` cohort
+are preserved. The [design](../../generated-validation-design.md),
 [recipe](../../examples/generated-validation.md) and
-[RUV-018](../../fork-differences.md#unreleased-generated-api-contract) define
-supported input/diagnostics, full paths/strictness, context independence, null
-policy, complete state projection and subscription ownership. The new generated
-actual-package gate records current-source managed/trim/native outcomes and
-package identities separately from all previous evidence. Current-source
-Linux/Windows CI, final package hashes and executed native hosts must be added
-by the integration owner after the corresponding gates finish. This entry
-records focused current-code results: 29 passing compiler-fixture tests with
-matched Roslyn 5.9 against both runtime flavors, covering all four rule and 14
-binding overloads, and zero build/emitted warnings or errors. Generated runtime
-infrastructure passes 14 tests per flavor with strict producer analysis and zero
-warnings. Twenty Python guards passed across focused runs (eight package, six
-runtime-native and six generated). These working-tree checks are not final
-clean-source full-core, actual-package native or Linux/Windows CI verification.
+[RUV-018](../../fork-differences.md#unreleased-generated-api-contract) define the
+supported selectors/diagnostics, contexts, full paths/strictness, null/default,
+complete custom states, target replay and ownership/disposal.
 
-The generator/tooling cohort is aligned to the locked SDK's actual Roslyn 5.9.0
-compiler and `analyzers/dotnet/roslyn5.9/cs` package path. A reproduced
-nullable-generic CS8714 in C#14's synthesized static bridge requires the six safe
-observable methods to use traditional `this` extensions. CLR signatures and
-inferred calls remain compatible; explicit observable binding source calls now
-use `<TSource, TOut>`, while `AddObservableRule<TValue>` keeps its arity. The
-narrow SST1703 exception addresses that measured compiler error, without IL
-suppression or tuple-based signatures. The same direct-static nullable caller
-sources produced eight CS8714 errors
+| Topic | Adopting source / retained evidence |
+| --- | --- |
+| Generated/Unsafe API split and static observation support | `822b873bc687763cc9137b9334a967c0d27159c4`; 18 normal overloads and explicit Unsafe counterparts, safe observable ABI/source correction and both API baselines. |
+| Generator and final-compilation dispatch analyzer | `16b717822fb4806d99066c6717960c508e8e87b3`; bundled Roslyn 5.9 analyzer/props, direct notification/getter/setter output, seven error diagnostic IDs and indirect-call checks. |
+| Realistic actual-package corpus/gates | `a674a805672676a671aca9392d82aad0cd2a0cac` and assertion correction `b1f7a14`; seven application cases, all 18 overloads, six isolated negative configurations per flavor and exact graphs/source/package identities. |
+| Default-rule context interface dispatch | `33e1f28ba93f1539ce7f43921a7d1b8af90a873e`: read `IValidatableViewModel.ValidationContext`, including explicit default implementations and private shadows; both-flavor compiler regressions. |
+| Selected-context state interface dispatch | Final `cf2cd2d3812706141a3157bf9a230027e7404b22`: observe through `IValidationContext` and dispatch `IValidationComponent.ValidationStatusChange` through its interface, including concrete subtype shadows/inaccessible or misleading streams; both-flavor compiler regressions. |
+
+The locked SDK 10.0.401 compiler is Roslyn `5.9.0-1.26423.113`; analyzer/driver
+references and `analyzers/dotnet/roslyn5.9/cs` match it. The six safe observable
+methods use traditional `this` extensions to avoid its reproduced nullable-generic
+C#14 synthesized static-bridge CS8714 error. CLR signatures/inferred calls remain
+compatible; explicit observable binding calls use `<TSource, TOut>`, while
+`AddObservableRule<TValue>` keeps its arity. The narrow SST1703 exception is
+justified by that measured bug; no IL suppression or tuple-based signatures are
+introduced. The same direct-static nullable callers produce eight CS8714 errors
 before correction and zero warnings/errors afterward; inferred receiver callers
-already passed. The retained proof is
-`artifacts/verification/generator-nullability/results.json`, with before,
-inferred and after logs/source inputs. Aligned focused compiler/runtime checks
-pass as recorded above; final clean-source gates remain pending. Historical proof/release source and package inputs are unchanged.
+already passed. Exact proof inputs/logs are retained under
+`artifacts/verification/generator-nullability`, including `results.json`.
+
+### Final verification at cf2cd2d
+
+| Gate | Result / scope |
+| --- | --- |
+| Clean local Release build and tests | Zero warnings/errors; **679 tests**: 323 per library flavor and 33 compiler-fixture tests. The 14 focused generated-runtime infrastructure tests per flavor are included in the library count. |
+| Local guards/examples/package consumers | 20 Python guards (eight package, six runtime-native, six generated); two collection examples and both independent actual-package consumers pass. |
+| Local generated actual-package gate | `linux-x64`, all mode: six flavor/stage runs, **42 behavioral case executions**, 12 isolated negative builds, all 18 typed overload shapes in every emitted stage, six retained generated-source files; zero positive warnings/errors. |
+| Local existing runtime actual-package gate | `linux-x64`, all mode: six flavor/stage runs, **30 behavioral case executions**, two immutable-release diagnostic baseline checks; zero positive warnings/errors. |
+| CI Linux/Windows core jobs | [Run 37384820581](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581), exact `cf2cd2d`: both OS jobs pass **679 tests each**, zero warnings/errors, 20 guards, both collection examples and both package consumers. |
+| CI generated consumers, each RID | The same run's `linux-x64` and `win-x64` jobs each execute managed, standalone full-trim managed and actual NativeAOT in both flavors: six stage runs, **42 behavioral executions**, 12 negative builds, all 18 overloads per stage and six retained emitted-source files; zero positive warnings/errors. |
+| CI existing runtime consumers, each RID | Both native jobs independently execute two flavor-native runs: **10 behavioral executions**, plus two historical baseline checks; zero positive warnings/errors. Native publishing includes trimming; standalone full-trim managed runtime evidence remains local Linux. |
+| Artifact/source audit | `artifacts/verification/generated-support/cf2cd2d/ci-audit.json`: all four jobs pass, exact source/version/analyzer/props/nuspec and branded/flavor graphs audited; both RIDs' reports match the same verified Ubuntu package pair. Emitted-source and shipping-package hashes independently verified. |
+
+Local and CI package pairs share version **8.1.0-runic.0.790.17.15.8** and tested
+source `cf2cd2d`, with distinct bytes. CI native/generated jobs consume only the
+Ubuntu shipping artifact; Windows core package bytes are not substituted for it.
+
+| Verification artifact / flavor | SHA-256 |
+| --- | --- |
+| Local Primitives | `dc7ebe680d4c9dd59966defa8de4815952dd14208ffc1328c3722869de4a0ca7` |
+| Local Reactive | `8beceea545b870d82709298e75f9f8c2efe2bdb65b44ee36759d8bce110ee9dd` |
+| CI Ubuntu Primitives | `243231896aa1b1673a34e53568b7c54fee8ae7906df1ebc7380779d610c59c54` |
+| CI Ubuntu Reactive | `fac3baed7bd8b0877afba89f12955285e573b7b4f2264d2e8c9d3db900dcbf85` |
+
+The identical analyzer bundled in both CI packages has SHA-256
+`074aa4af6268f24647370f27c9dff8678c712ece5e16fd50251450fc078a410a`.
+The [structured evidence](../evidence/generated-api-implementation.json) records
+local reports, CI RID reports/audit, package hashes, source and the distinct
+historical release. Retained local results are
+`artifacts/verification/generated-support/cf2cd2d/generated-gates/results.json`
+and `artifacts/verification/generated-support/cf2cd2d/native-gates/results.json`;
+CI evidence is retained under that directory's `ci/` child.
+
+The preliminary `b1f7a14` local core/guard/package-consumer gate is superseded by
+the context fixes; cancelled CI `37384112590` establishes no final/native result.
+Final evidence uses exact `cf2cd2d`. Earlier published `.790`, `.790.17` and
+`.790.17.15` tags/assets/source and all warning-bearing proofs remain unchanged.
+No new published asset hash or release identity is inferred from this verification
+version. Released DynamicData 10.0.0-runic.5 and ReactiveUI 26.0.1 remain pinned;
+no sibling source adoption, blanket `IsAotCompatible`, all-reflection-removed,
+retained UI-platform or bridge/browser support follows.

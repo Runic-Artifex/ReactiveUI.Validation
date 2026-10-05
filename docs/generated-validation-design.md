@@ -1,11 +1,14 @@
 # Generated validation and explicit Unsafe APIs
 
-Implementation decision **2026-10-06: UNRELEASED working branch**. This
-replaces the 2026-10-05 recommendation to defer a Validation generator and
-prefer attributes on partial methods. The primary surface preserves supported
-existing inline-lambda calls. Integration CI and current-source package/native
-evidence remain required; [historical released
-evidence](aot-and-generators.md) does not verify the new generator.
+Implementation decision **2026-10-06**, implemented and verified at tested source
+`cf2cd2d3812706141a3157bf9a230027e7404b22`. The change remains **UNRELEASED**
+until publication. This replaces the earlier recommendation to defer a Validation
+generator and prefer attributes on partial methods. The primary surface preserves
+supported inline-lambda calls. Local strict package gates and all four
+[Linux/Windows CI jobs](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37384820581)
+pass; the [verification record](upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
+separates tested source and local/CI package identities from this later
+documentation record and immutable historical releases.
 
 ## Normal calls require generation
 
@@ -59,14 +62,16 @@ argument.
 The narrowly scoped SST1703 exception in those two observable extension files is
 justified by the reproduced compiler bridge error. It does not suppress trimming
 or NativeAOT diagnostics or introduce tuple-based workarounds. Both flavor API
-baselines track this correction. Focused aligned checks pass 29 compiler-fixture tests
-against both runtime flavors and 14 runtime infrastructure tests per flavor,
-with zero build/emitted/producer warnings or errors. Identical direct-static
-nullable caller sources change from eight CS8714 errors before correction to
-zero warnings/errors afterward; inferred calls already passed. Proof/source/log
-inputs are retained under `artifacts/verification/generator-nullability`, with
-`results.json`. These are working-tree results; full core, current clean-source
-package/native gates and Linux/Windows CI remain pending.
+baselines track this correction. The final core gate passes 679 tests (323 per
+library flavor plus 33 compiler-fixture tests); the 14 generated-runtime
+infrastructure tests per flavor are included in that library count. Builds and
+emitted source have zero warnings/errors at the tested source. Identical
+direct-static nullable caller sources change from eight CS8714 errors before
+correction to zero warnings/errors afterward; inferred calls already passed.
+Proof/source/log inputs are retained under
+`artifacts/verification/generator-nullability`, including `results.json`. Final
+clean-source local and Linux/Windows core/package/native CI gates pass as recorded
+in the [structured evidence](upstream/evidence/generated-api-implementation.json).
 
 ## Selector and assignment support
 
@@ -137,6 +142,11 @@ true` additionally includes only a rule exclusively associated with that one
 path. Invalid/empty/whitespace path segments remain rejected by the runtime
 API.
 
+Default context access resolves through `IValidatableViewModel.ValidationContext`,
+including explicit interface implementations and private shadows. Selected
+contexts are observed through `IValidationContext`, with
+`IValidationComponent.ValidationStatusChange` dispatched through its interface,
+so concrete subtype shadows do not alter the selected state contract.
 A helper removes its component from the captured context and disposes that
 component's subscriptions. It owns neither the context nor a supplied
 observable object. Blocking and advisory contexts stay independent. Replacing
