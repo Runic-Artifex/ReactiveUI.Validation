@@ -9,6 +9,11 @@ For subsequent implementation status, use the [live October ledger](implementati
 and [implementation review](reviews/2026-10-implementation.md). The recommendations
 and diagnostic results below describe the original reviewed baseline.
 
+The active DynamicData cohort is recorded separately in the
+[2026-10-06 adoption record](reviews/2026-10-dynamicdata-adoption.md). The
+`.5` references in this dated investigation describe its original review cohort;
+the strict native baseline deliberately retains that immutable pair.
+
 The separate [NativeAOT and generator investigation](../aot-and-generators.md),
 dated 2026-10-05 against the released cohort, follows up on the generator/AOT
 questions below. It records native consumer results and proposed support work;
