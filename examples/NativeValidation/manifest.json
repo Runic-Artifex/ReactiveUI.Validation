@@ -1,0 +1,37 @@
+{
+  "baseline": {
+    "source": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+    "validationVersion": "8.1.0-runic.0.790.17",
+    "dynamicDataVersion": "10.0.0-runic.5",
+    "managedExpected": {
+      "generic-field": true,
+      "nullable-editor-rich-target": false,
+      "blocking-advisory-cross-field": true,
+      "rows-async-uniqueness": true
+    },
+    "strictExpectedDiagnostics": [
+      { "code": "IL2026", "caller": "Program.cs", "callee": "ValidationRule" },
+      { "code": "IL3050", "caller": "Program.cs", "callee": "ValidationRule" },
+      { "code": "IL2026", "caller": "Program.cs", "callee": "BindValidationState" },
+      { "code": "IL3050", "caller": "Program.cs", "callee": "BindValidationState" }
+    ],
+    "nativeEvidence": "Record actual execution separately in the serialized native gate; strict compile failure is not a runtime result."
+  },
+  "candidate": {
+    "route": "SAFE_API paired package consumers, explicit notifying observables and typed callback",
+    "managedExpected": {
+      "generic-field": true,
+      "nullable-editor-rich-target": true,
+      "blocking-advisory-cross-field": true,
+      "rows-async-uniqueness": true,
+      "existing-observable-foundation": true
+    },
+    "strictExpectedDiagnostics": []
+  },
+  "deferred": [
+    "No validation source generator is implemented or required by these counterparts.",
+    "Stored generic selectors migrate to supplied observations and explicit property paths; no reflection fallback is inferred.",
+    "Missing-address invalidity is this application's policy, not a blanket validation library null contract.",
+    "Server result delivery is deterministic; no networking, cancellation transport, UI platform, or concurrency guarantee is tested."
+  ]
+}

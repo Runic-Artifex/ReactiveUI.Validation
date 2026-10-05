@@ -17,12 +17,15 @@ HASHES = {
     "Runic.DynamicData.10.0.0-runic.5.nupkg": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
     "Runic.DynamicData.Reactive.10.0.0-runic.5.nupkg": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268",
 }
-CASES = ["generic-field", "nullable-editor-rich-target", "blocking-advisory-cross-field", "rows-async-uniqueness"]
 
 
 def run(command, log):
     result = subprocess.run(command, cwd=REPO, text=True, capture_output=True)
-    log.write_text(result.stdout + result.stderr)
+    if log.suffix == ".jsonl":
+        log.write_text(result.stdout)
+        log.with_suffix(".stderr.log").write_text(result.stderr)
+    else:
+        log.write_text(result.stdout + result.stderr)
     return result
 
 
@@ -46,6 +49,7 @@ def main():
     parser.add_argument("--version", default=BASELINE)
     args = parser.parse_args()
     candidate = args.mode.startswith("candidate")
+    expectations = json.loads((ROOT / "manifest.json").read_text())["candidate" if candidate else "baseline"]
     if not candidate and args.version != BASELINE:
         parser.error("baseline uses immutable released .790.17")
     if candidate and args.version == BASELINE:
@@ -80,9 +84,10 @@ def main():
         if strict and not candidate:
             assert result.returncode != 0, "baseline unexpectedly became strict-compatible"
             # Assert genuine Validation API annotation provenance, not an unrelated failed restore.
-            for code in ("IL2026", "IL3050"):
-                for method in ("ValidationRule", "BindValidationState"):
-                    assert re.search(rf"Program\.cs\(\d+,\d+\): error {code}: Using member 'ReactiveUI\.Validation.*{method}", result.stdout), (flavor, code, method)
+            for diagnostic in expectations["strictExpectedDiagnostics"]:
+                code, method = diagnostic["code"], diagnostic["callee"]
+                caller = re.escape(diagnostic["caller"])
+                assert re.search(rf"{caller}\(\d+,\d+\): error {code}: Using member 'ReactiveUI\.Validation.*{method}", result.stdout), (flavor, code, method)
             unexpected = re.findall(r"error ((?!IL2026|IL3050)[A-Z]+\d+):", result.stdout)
             assert not unexpected, unexpected
         else:
@@ -91,9 +96,9 @@ def main():
                 assembly = project.parent / f"bin/Release/net10.0/NativeValidation.{flavor}.dll"
                 runtime = run(["dotnet", str(assembly)], output / f"{flavor}.runtime.jsonl")
                 records = [json.loads(line) for line in runtime.stdout.splitlines()]
-                assert [record["case"] for record in records] == CASES
-                expected = [True, candidate, True, True]
-                assert [record["passed"] for record in records] == expected, records
+                expected = expectations["managedExpected"]
+                assert [record["case"] for record in records] == list(expected)
+                assert [record["passed"] for record in records] == list(expected.values()), records
                 assert runtime.returncode == (0 if candidate else 1), runtime.stderr
         verify_graph(project, flavor, args.version)
         print(f"{args.mode} {flavor}: verified")
