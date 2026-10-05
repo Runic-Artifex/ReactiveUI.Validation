@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);REACTIVE_SHIM</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/ReactiveUI.Validation.Reactive/ReactiveUI.Validation.Reactive.csproj" />
+  </ItemGroup>
+</Project>

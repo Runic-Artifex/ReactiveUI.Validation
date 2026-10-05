@@ -1,0 +1,6 @@
+<Project>
+  <!-- Benchmarks own their tooling pin; core projects retain src's central dependency cohort. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>
