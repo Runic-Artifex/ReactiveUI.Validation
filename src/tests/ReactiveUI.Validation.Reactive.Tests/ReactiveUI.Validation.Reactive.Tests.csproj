@@ -26,4 +26,8 @@
     <Using Include="System.Reactive.Concurrency.ImmediateScheduler" Alias="ImmediateSequencer" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="../../../examples/CollectionValidation/CollectionValidationRecipe.cs;../../../examples/CollectionValidation/RecipeChild.cs" Link="Examples/%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>
