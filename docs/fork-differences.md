@@ -75,8 +75,23 @@ collection examples and source-level SDK adapter probes. The
 records the shipping pin, API parity approval and completed verification. No broad
 Native AOT support or ReactiveUI 25 compatibility follows from this release.
 
-The separate [NativeAOT and generator investigation](aot-and-generators.md)
-dated **2026-10-05** records the released cohort's native consumer evidence and
-additive migration options. It leaves the released API annotations and support
-scope unchanged; proposed native APIs and broader compatibility remain future
-work rather than adopted differences in this register.
+The [NativeAOT status](aot-and-generators.md) keeps the dated released-package
+investigation separate from the runtime/examples-first candidate below. The
+immutable release and its warning-bearing probes retain their identity.
+
+## Native runtime candidate contracts
+
+These changes are **candidate implementation**, based on `e653e52`, pending the
+integration owner's exact final source and strict actual-package evidence. They
+are not part of published `8.1.0-runic.0.790.17`. The
+[follow-up review](upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
+and [structured evidence](upstream/evidence/native-runtime-implementation.json)
+record topic verification independently of integration/publication.
+
+| ID / status | Source and contract | Verification to preserve | Retirement condition |
+| --- | --- | --- | --- |
+| RUV-016 / active candidate | API adoption `67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195`; [Observable rules](../src/ReactiveUI.Validation/Extensions/ObservableValidationRuleExtensions.cs) and [observable callbacks](../src/ReactiveUI.Validation/Extensions/ObservableValidationBindingExtensions.cs): explicit value/state streams, full property metadata and outer selection streams avoid discovered observation/assignment; captured rule ownership and latest-source binding disposal. | Both flavor API baselines, [runtime recipe](examples/native-validation.md) and [runtime regressions](../src/tests/ReactiveUI.Validation.Tests/ObservableRuntimeApiTests.cs); initial values, null/empty, full ordinal paths, strict matching, custom state identity, replacement/stale-source detachment, repeated/reentrant disposal, registration-failure rollback/original exception preservation and source-owner scheduling. | Equivalent supported runtime surface preserves semantics and consumer migration; retain regressions. |
+| RUV-017 / active candidate | Producer audit `4cdf89ab1d2de08dc3b85c48db2aee7418aa85c1`: enable AOT/trim analysis for shipped core producers; remove false RDC and blanket RUC from generated OAPH/supplied-stream paths, retain RUC on reflection. Strict actual-package gates distinguish supported safe paths from dated diagnostic probes. | Audited generated source/DLL dispatch; reviewed annotation changes in both API baselines; zero-warning producer and safe-path publishes, exact branded/flavor/version graphs and actual trimmed/native executions at recorded source/host. No blanket `IsAotCompatible`. | Equivalent producer and package consumer workflow preserves accurate unsafe boundaries, warning policy, package identities and actual host-specific native proof. |
+
+A Validation generator is a [deferred design](generated-validation-design.md).
+No generator package/MVP or additional platform support is an adopted contract.

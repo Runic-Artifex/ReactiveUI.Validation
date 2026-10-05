@@ -218,3 +218,45 @@ both historical pack-time paths and current retained paths. The previous `.790`
 pair remains retained. `artifacts/verification/canonical-published-feed.json`
 records the canonical copy. The release description was updated from the reviewed
 notes without changing the tag or assets.
+
+
+## Native runtime and examples follow-up
+
+Started **2026-10-05** from `e653e52eb6abba95d3a5787771df01c4e570e309`.
+Status: **candidate implementation**, separate from the immutable `.790.17`
+release above. The selected scope is runtime APIs and realistic examples first;
+a [Validation generator design](../../generated-validation-design.md) is deferred.
+No generator package, generator-only runtime surface, dependency upgrade,
+platform UI support or SDK/DynamicData source change is part of this pass.
+
+| Topic | Exact source and contract | Evidence and status |
+| --- | --- | --- |
+| Producer analysis and annotations | `4cdf89ab1d2de08dc3b85c48db2aee7418aa85c1`: enables AOT/trim analyzers for both shipped core producers; removes overly broad RDC and RUC declarations without changing method signatures. | Both producers build with warnings as errors and zero warnings/errors. 48 focused tests per flavor pass. Independently reviewed and merged into the integration owner's candidate; not yet released. |
+| Explicit observable runtime | `67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195`: six methods (`AddObservableRule` in four forms and two typed observable bindings); [runtime contract](../../examples/native-validation.md). | Independently reviewed and merged into the integration owner's candidate; +21 baseline lines per flavor. Producer-analysis warnings-as-errors build passes with zero warnings/errors. 12 new [runtime regressions](../../../src/tests/ReactiveUI.Validation.Tests/ObservableRuntimeApiTests.cs) per flavor pass; final integrated core/native gates remain separate. |
+| Realistic application examples | Baseline `4c55026`, safe counterpart `95ca295`; [package corpus](../../../examples/NativeValidation/README.md): generic fields, nullable nested editor/rich typed target, blocking/advisory cross-field rules, row-owned asynchronous state and existing observable foundation. | Both baseline flavors record three managed case passes and the expected required-null-policy gap, plus strict IL2026/IL3050 with Validation call provenance. Safe counterpart remains a candidate pending actual-package verification. |
+| Native package gates | `ee7d0db` and `ba30d02`; [strict runner](../../../eng/verify-native-validation.py): producer/package analysis, exact graphs, trimmed and native publish/run, and CI artifact/source identity. | Candidate workflow/gate. Final integration source, asset identities, host/toolchain and executions are recorded only after the integration owner completes verification. |
+| Future generator | `b2043da`, `ebb726d`, `eba235a`; [deferred design](../../generated-validation-design.md). | Reviewed design and managed compiler proof only. The synthetic annotated call still produces IL2026/IL3050 despite interception. No native or shipping generator claim. |
+
+The [structured evidence](../evidence/native-runtime-implementation.json) records
+the audited annotation counts and preserves historical release-probe identity.
+Source declarations change from **45 RDC to zero** and **62 RUC to 41**. Each
+flavor's existing public API loses **41 RDC and 19 RUC annotations**, preserving
+its method signatures. The 41 remaining source RUC declarations protect actual
+reflection observation and target assignment. Generated context/helper OAPH
+source and current DLL calls were inspected; this narrows those constructor
+contracts without replacing their runtime behavior.
+
+The audit first reproduced three constructor-chain IL3050 locations per flavor
+from the old internal RDC annotation. Temporarily reopening annotated bodies
+exposed **16 distinct IL2026 locations per flavor and zero IL3050 locations**.
+Correct boundaries were then restored. Final producer analysis reports zero
+warnings/errors; it does not advertise blanket `IsAotCompatible` metadata.
+
+Dated `.790.17` base probes still record **60 successful scenario executions**
+across managed/trimmed/native modes and two flavors, with **49 native warning
+occurrences per flavor**. The generated consumer still records **ten native
+warning occurrences per flavor**. Their diagnostic severity was lowered to
+capture behavior and emitted warnings. Neither runner satisfies the new strict
+zero-warning gate. Only explicitly recorded safe paths and actual native host
+executions establish the new support claim; Linux/Windows managed core gates do
+not substitute for native execution on either platform.

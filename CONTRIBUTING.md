@@ -7,10 +7,12 @@ retiring an adaptation. The [upstream investigation](docs/upstream/README.md) is
 dated research; the [implementation ledger](docs/upstream/implementation-2026-10.md),
 review records and the register track actual adoption.
 
-The [NativeAOT and generator investigation](docs/aot-and-generators.md) records
-the separately scoped native consumer evidence and proposed migration path.
-Its opt-in investigations do not expand core CI, platform support or the
-production package's NativeAOT contract.
+The [NativeAOT status](docs/aot-and-generators.md) distinguishes the runtime and
+examples first candidate from dated warning-bearing investigations. The strict
+[actual-package gate](eng/verify-native-validation.py) publishes and runs the
+explicit safe subset; it retains warning-as-error analysis and exact flavor,
+version and source checks. A Validation generator remains deferred. No blanket
+package NativeAOT compatibility or retained UI-platform support is implied.
 
 Use .NET SDK 10.0.401, pinned in the root `global.json`, and Python 3 for the
 dependency bootstrap. On the Runic desktop, reuse the locked development shell
@@ -52,7 +54,19 @@ outside this fork's core CI and release scope. AndroidX package IDs are branded
 `Runic.*`, but AndroidX binaries are not included in the release workflow.
 The old UWP sample and non-.NET-10 API baselines are retained as upstream history.
 
-CI verifies both flavors and independent package consumers on Linux and Windows. The manual release workflow
+CI verifies both flavors and independent package consumers on Linux and Windows,
+and runs strict safe-subset trimmed/native consumers against the same Linux
+shipping package artifact on matching Linux x64 and Windows x64 hosts. After
+bootstrapping, the local native gate is:
+
+```sh
+direnv exec "$RUNIC_SDK" python3 eng/verify-native-validation.py --rid linux-x64 --mode all
+```
+
+Reuse the locked native toolchain and run on the matching host. The dated opt-in
+investigative runner is not the strict gate. Recorded results identify the exact
+source/packages and executed platforms; CLI support alone proves no platform.
+The manual release workflow
 attaches the two core `.nupkg` assets to a prerelease on this fork. It does not
 publish under upstream package IDs or push to NuGet.org. MinVer uses an 8.1
 floor, `runic-v` tag prefix and `runic.0` prerelease identifiers. Preserve upstream MIT licensing and

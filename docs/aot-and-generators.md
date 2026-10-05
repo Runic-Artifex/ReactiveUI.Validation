@@ -1,21 +1,89 @@
 # NativeAOT and ReactiveUI generators
 
+The current NativeAOT implementation follows the runtime and examples first
+approach: explicit observable rules, explicit replacement streams and typed
+callbacks. A Validation generator remains a [future design](generated-validation-design.md).
+No generator package or generator MVP is part of this implementation.
+
+This work is a **candidate**, based on `e653e52`, until the integration owner
+records its exact source, strict packaged-consumer results and integration.
+The existing release `8.1.0-runic.0.790.17` identifies immutable source
+`c9fa501c4d2e9442d85693dae77bb6f727e9eb7a`; it does not contain the additive
+observable APIs. The [implementation review](upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
+keeps candidate and published evidence separate.
+
+## Runtime and examples first implementation
+
+[`AddObservableRule`](../src/ReactiveUI.Validation/Extensions/ObservableValidationRuleExtensions.cs)
+registers complete state streams or projects caller-created values into complete
+states. Explicit full property paths supply error and matching metadata without
+reflecting over properties. The returned helper captures its destination context
+and removes only its own rule when disposed.
+
+[`BindObservableValidationState` and `BindObservablePropertyValidationState`](../src/ReactiveUI.Validation/Extensions/ObservableValidationBindingExtensions.cs)
+follow caller-created model, helper or context selection streams. Typed delegates
+select validation state and assign the result; the library does not discover a
+view-model getter or target setter on this route. The [runtime recipe](examples/native-validation.md)
+defines initial-state, null, matching, replacement and disposal behavior for both
+flavors. Consumers own property observation, asynchronous cancellation and UI
+dispatch.
+
+The producer audit enables `EnableAotAnalyzer` and `EnableTrimAnalyzer` for both
+shipped core projects. It removes annotations only where generated OAPH calls,
+metadata-only expressions or explicit streams avoid the claimed operation.
+Reflection-based legacy observation and target assignment retain
+`RequiresUnreferencedCode`. No blanket `IsAotCompatible` declaration is made.
+A successful safe-path publish and run establishes that tested path and host;
+it does not certify all overloads or all reachable dependency APIs.
+
+The [realistic package corpus](../examples/NativeValidation/README.md) preserves
+released-package expected failures and explicit safe counterparts. Its nullable
+address case requires missing data to be invalid; the baseline managed run
+retains the last valid nested value. The migration explicitly supplies null
+notifications and combines two single-field rules into one multi-property rule.
+These are application-policy and metadata adaptations, not blanket legacy fixes.
+
+The [strict package gate](../eng/verify-native-validation.py) must consume actual packed assets, retain
+warning-as-error diagnostics, check exact package graphs and run the emitted
+trimmed and native executables. The older opt-in investigative runner below
+lowers IL2026/IL3050 severity to capture warnings and behavior. It is not the
+strict gate and cannot satisfy the new zero-warning requirement.
+
+After bootstrapping the released DynamicData feed, run from the repository root
+in the locked SDK/native environment:
+
+```sh
+direnv exec "$RUNIC_SDK" python3 eng/verify-native-validation.py --rid linux-x64 --mode all
+```
+
+The default gate freshly packs current source into an isolated feed.
+`--package-feed FEED` instead verifies a prepacked pair against clean HEAD and
+its nuspec source; CI native jobs consume the exact Linux shipping package
+artifact. `--output OUTPUT` selects retained evidence (default
+`artifacts/verification/native-gates`). Managed, trimmed and native phases can
+be selected independently with `--mode`. `win-x64` is another accepted RID;
+its support requires execution on the matching configured Windows host, not
+merely acceptance by the CLI. The release workflow requires the reused complete
+core/native matrix and publishes the same verified package artifact.
+
+## Dated released cohort investigation
+
 Investigation dated **2026-10-05** for the released Runic ReactiveUI.Validation
-.NET 10 cohort. The released packages passed the ten investigated native
-scenarios in each flavor on Linux x64, including expression rules and reflected
-view setters. Publish warnings remain visible, and this result establishes those
-consumer paths rather than whole-package NativeAOT support.
+.NET 10 cohort. All ten base scenarios passed managed, fully trimmed and native
+execution in both flavors: **60 scenario executions**. Each base native publish
+retained **49 warning occurrences per flavor**. The separate generated consumer
+passed native execution with **ten warning occurrences per flavor**. These
+results cover the exact tested Linux x64 consumers, including expression rules
+and reflected scalar view setters; they do not establish warning-free or
+whole-package NativeAOT support.
 
-Keep the current dependency cohort. Binding runtime and interceptors are already
-part of that graph; view-model SourceGenerators are optional consumer tooling.
-Neither generator rewrites `ValidationRule` or `BindValidationState` inside the
-compiled Validation package. For a maintainable native contract, first document
-and verify the observable/delegate subset, then add explicit stream APIs only
-where a consumer needs them. A Validation-specific generator is a later
-convenience option. No production APIs, dependencies, support metadata or release
-scope change in this investigation.
+Keep the existing dependency cohort. Binding runtime and interceptors are
+already part of that graph; view-model SourceGenerators are optional consumer
+tooling. Neither generator rewrites `ValidationRule` or `BindValidationState`
+inside the compiled Validation package. The historical results below describe
+the immutable `.790.17` assets, not the candidate implementation.
 
-## Cohort and support status
+## Investigated release cohort and support status
 
 | Input | Investigated pin |
 | --- | --- |
@@ -87,7 +155,7 @@ the other. A future Validation generator should emit direct runtime operations,
 for example the appropriate `ObservedProperty` API, rather than emit fresh
 `WhenAnyValue` calls and assume another generator will rewrite them.
 
-## API and warning boundaries
+## Released API and warning boundaries
 
 The following source boundaries apply to both released flavors. Primitives uses
 `ReactiveUI.Validation.*` and `DynamicData`; Reactive uses
@@ -161,7 +229,7 @@ lookup. An application's custom dependency injection registrations or assembly
 scanning have their own native requirements; the Validation formatter resolver
 does not make those registrations safe.
 
-## Generated consumer results
+## Dated generated consumer results
 
 The [Binding generator investigation](../investigations/BindingGenerators/README.md)
 uses the same released package pair and inspects emitted files as well as
@@ -208,7 +276,7 @@ establish that every historical anonymous/private selector is fixed. Reproduce a
 specific failing selector and inspect its diagnostic/output before adding a
 Validation workaround.
 
-## Native consumer results
+## Dated native consumer results
 
 Both standalone package consumers target `net10.0` and restore the exact released
 Validation/ReactiveUI/DynamicData cohort. They reference no source library
@@ -270,87 +338,55 @@ defects. No separately attributed Binding or DynamicData warning appears in
 these consumers; annotation boundaries prevent treating that as a full library
 audit.
 
-## Incremental migration design
+## Migration and annotation boundaries
 
-The smallest existing route is to construct `ValidationContext`, supply an
-`IObservable<IValidationState>` to `ObservableValidation<TViewModel,TValue>`,
-register that component with `Add`, and subscribe to `ValidationStatusChange`
-with a direct callback. Remove the rule and dispose its observation when its
-owner ends. This preserves standard aggregation while avoiding library property
-observation and target reflection. The supplied-observable rule/helper path is
-another tested route, with the release's caller annotations still present.
+Use the [explicit observable runtime recipe](examples/native-validation.md) for
+new native consumers. It retains standard context aggregation, captured rule
+ownership, synchronous domain state and matching-flavor imports. Keep existing
+expression APIs available for existing consumers; moving to typed callbacks
+alone does not replace their reflective source selection.
 
-The minimal native design should accept caller-created `IObservable<T>` inputs,
-ordinary delegates and explicit property names or generated metadata. It should
-subscribe directly to `IValidationState` streams and invoke typed callbacks at
-the presentation boundary. Avoid discovering setters, observing `ViewModel`
-through an expression, or resolving arbitrary properties by reflection on this
-path. For model/helper/context replacement, accept an explicit outer observable
-and switch to the selected inner stream, including null selections and disposal.
-Preserve the existing captured rule ownership and synchronous domain-state
-contracts.
-Property metadata must retain full paths and exclusive/strict rule matching.
-New typed observations should seed actual active rule state, while legacy
-callback overloads keep their documented empty prelude. Domain validity remains
-synchronous on its owner; dispatch UI presentation at the adapter boundary.
-
-The existing
-[observable validation component](../src/ReactiveUI.Validation/Components/ObservableValidation%7BTViewModel,TValue%7D.cs)
-is a useful foundation. The
-[context](../src/ReactiveUI.Validation/Contexts/ValidationContext.cs) constructs
-observable-as-property helpers, and the
-[helper](../src/ReactiveUI.Validation/Helpers/ValidationHelper.cs) retains a
-trimming annotation. The native consumers exercise these objects, but removing
-their annotations needs analysis of generated implementation and supported
-inputs beyond those executions. A custom context implementation is not required
-merely to avoid the warning message; it would introduce a separate aggregation
-contract.
-
-Introduce the native route additively. Keep existing expression overloads,
-annotations, namespaces, schedulers, null behavior and formatter contracts.
-Share rule-state and ownership logic where possible without routing the native
-overloads back through expression observation. Review both public API baselines;
-removing an annotation is an observable contract change, not a cosmetic cleanup.
-Run a producer audit with `EnableAotAnalyzer` and `EnableTrimAnalyzer` enabled,
-including unannotated exposed paths and emitted code otherwise hidden behind
-RDC/RUC boundaries. Narrow overly broad annotations only after that analysis and
-the matching package consumers verify the exact generated constructor or
-observable path. Add native/trim consumer gates for the safe subset and retain
-the correct annotations on unsafe legacy surfaces.
+The producer audit distinguishes dynamic-code requirements from trimming
+requirements. In the audited .NET 10 cohort, legacy reflection operations
+require RUC, while the old blanket RDC messages overstated the need for runtime
+code generation. Explicit supplied-observable rule overloads and metadata-only
+selectors do not perform that reflected observation. Context, helper and
+`ReactiveValidationObject` constructors use generated OAPH dispatch, as released
+IL inspection above already established. Annotation removal is an intentional
+public-contract change reviewed in both flavor API baselines.
 
 `IsAotCompatible` enables analyzer/trimmability settings and advertises a library
-compatibility contract; it does not mean every API is unconditionally safe.
-A compatible library may retain correctly annotated RDC/RUC APIs for consumers
-that deliberately use them. Keep the flag unset in this investigation because
-the complete exposed unannotated surface has not received that producer audit,
-not because every legacy expression overload must first be removed. The
-[official property guidance](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
-describes the settings it enables.
+compatibility contract. It may coexist with correctly annotated unsafe APIs;
+it is not a promise that every legacy API is safe. This implementation enables
+producer analyzers explicitly without declaring blanket package compatibility.
+The [official property guidance](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+describes the settings it enables. Native support remains limited to the safe
+paths, dependency cohort and actual host executions recorded in the review.
 
 ## Implementation options
 
 | Option | Role | Benefit | Cost and limit |
 | --- | --- | --- | --- |
-| Keep corresponding Binding runtime dependencies | Required by the current cohort | Preserves existing rule and view binding behavior | Existing dynamic observation remains subject to its annotations and native runtime constraints. |
-| Explicit observables, delegates and state subscriptions | First support target | Makes ownership and native reachability explicit; existing low-level route needs no new generator | Document and verify the context/helper subset; additive convenience APIs require both-flavor API and native consumer gates. |
+| Keep corresponding Binding runtime dependencies | Required by the current cohort | Preserves existing rule and view binding behavior | Existing reflective observation remains subject to its annotations and native runtime constraints. |
+| Explicit observables, delegates and state subscriptions | Candidate implementation | Explicit rules and replacement streams expose ownership and direct callbacks | Both-flavor API review, producer analysis and strict actual-package consumer gates for the recorded host scope. |
 | Binding interceptors in the application | Optional | Generates recognized application observation/binding calls | Compiler/interceptor configuration and generated-output verification; does not replace package-internal calls. |
 | SourceGenerators in the application | Optional | Reduces reactive property, command and notification boilerplate | Select compatible flavor/output, inspect generated code; OAPH/view generation belongs to Binding in the current split. |
-| Validation-specific source generator | Future convenience layer | Could preserve familiar selector syntax while producing explicit observations and metadata | New generator package, analyzer diagnostics, selector coverage, compilation/flavor tests and versioning. Build it only after the native runtime contract is stable. |
+| Validation-specific source generator | [Future convenience design](generated-validation-design.md) | Could preserve selector syntax while producing explicit observations and metadata | No generator shipped in this pass. A later package needs selector diagnostics, compilation/flavor tests and versioning after the runtime contract is stable. |
 | Library `IsAotCompatible` contract | Future support decision | Enables producer analyzers and communicates the compatibility contract | Audit exposed unannotated paths and dependencies, retain warnings on unsafe APIs, verify safe-subset native gates and define platform scope. |
 
 ## Native platform scope
 
 NativeAOT binaries target a specific runtime identifier and require the native
 toolchain and libraries for that platform. Ordinary .NET build/test success on
-Linux and Windows does not stand in for a native publish/run. Keep the probes
-opt-in and standalone from the shipping solution, reuse the locked development
-environment, and record native compiler/runtime inputs with each result.
+Linux and Windows does not stand in for a native publish/run. Keep native consumers standalone from the shipping solution, reuse the locked
+development environment, and record native compiler/runtime inputs with each
+result. Run strict package gates separately from the dated warning-bearing probes.
 Only `linux-x64` native execution is established here. A runner accepting another
 RID does not verify `win-x64`, Linux Arm64, macOS or cross-compilation; those need
 matching toolchains and actual execution on the corresponding hosts.
 
 The retained AndroidX and desktop/mobile samples remain outside core releases.
-This investigation does not add Android, iOS, macOS, Windows desktop UI,
+This implementation does not add Android, iOS, macOS, Windows desktop UI,
 NativeAOT cross-compilation or Runic bridge/browser support. A future platform
 expansion must define its RID, UI/framework cohort and native consumer behavior
 under the [maintenance policy](maintenance.md#validation-and-development-environment).
