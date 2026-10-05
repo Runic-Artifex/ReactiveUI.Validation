@@ -194,7 +194,9 @@ def main():
             raise ValueError(f"DynamicData release bytes differ from bootstrap SHA-256: {package}")
     report = {"source": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
               "dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip()),
-              "sdk": sdk, "rid": args.rid, "mode": args.mode, "packages": {}, "checks": []}
+              "sdk": sdk, "rid": args.rid, "mode": args.mode,
+              "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+              "dynamicDataSha256": DEPENDENCIES.DIGESTS, "packages": {}, "checks": []}
     # Each invocation packs current source into its own feed. Consumers have no
     # production ProjectReference and restore Validation in a fresh local cache.
     with tempfile.TemporaryDirectory(prefix="work-", dir=output) as temporary:
@@ -254,6 +256,8 @@ def main():
                     assets = json.loads((project.parent / "obj/project.assets.json").read_text())
                     verify_native_graph(assets, reactive, pins, version, rid)
                     verify_restored_bytes(assets, package_id, version, package_hash)
+                    dynamic_data = PACKAGES.flavor_ids(reactive)[1]
+                    verify_restored_bytes(assets, dynamic_data, pins[dynamic_data.casefold()], DEPENDENCIES.DIGESTS[dynamic_data])
                     (output / f"{stem}.graph.json").write_text(json.dumps(assets, indent=2))
                     if kind == "baseline":
                         verify_expected_failure(code, content)
