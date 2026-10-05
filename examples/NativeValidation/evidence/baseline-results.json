@@ -6,7 +6,7 @@
   "dynamicDataVersion": "10.0.0-runic.5",
   "fixtureSources": {
     "ApplicationModels.cs": "d32d349758e29b95dad1c417dfe8b05d109a5227499b7f9cc305597007894da6",
-    "Program.cs": "5739a94b7ba89038adccd636630d5d7d5c32cd3a8150db92827e1f4cbc78c559",
+    "Program.cs": "059e4ba7e128c714cd0d88cce6770b100b9aa995616f7ef4393a22cf622e55b9",
     "Imports.cs": "7fb57c5468cd5415c9e7f3b6ace4217b4dd9bd78a0a9640f93f5a6fb409ec832"
   },
   "flavors": {
@@ -19,7 +19,8 @@
         {
           "case": "nullable-editor-rich-target",
           "passed": false,
-          "exception": "InvalidOperationException"
+          "exception": "InvalidOperationException",
+          "failureId": "required-address-policy"
         },
         {
           "case": "blocking-advisory-cross-field",
@@ -92,7 +93,8 @@
         {
           "case": "nullable-editor-rich-target",
           "passed": false,
-          "exception": "InvalidOperationException"
+          "exception": "InvalidOperationException",
+          "failureId": "required-address-policy"
         },
         {
           "case": "blocking-advisory-cross-field",

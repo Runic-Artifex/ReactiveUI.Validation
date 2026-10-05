@@ -99,6 +99,10 @@ def main():
                 expected = expectations["managedExpected"]
                 assert [record["case"] for record in records] == list(expected)
                 assert [record["passed"] for record in records] == list(expected.values()), records
+                for record in records:
+                    if not record["passed"]:
+                        failure = expectations["managedExpectedFailures"][record["case"]]
+                        assert record["exception"] == failure["exception"] and record["failureId"] == failure["failureId"], record
                 assert runtime.returncode == (0 if candidate else 1), runtime.stderr
         verify_graph(project, flavor, args.version)
         print(f"{args.mode} {flavor}: verified")

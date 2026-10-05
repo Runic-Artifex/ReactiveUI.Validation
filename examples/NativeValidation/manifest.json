@@ -9,6 +9,9 @@
       "blocking-advisory-cross-field": true,
       "rows-async-uniqueness": true
     },
+    "managedExpectedFailures": {
+      "nullable-editor-rich-target": { "exception": "InvalidOperationException", "failureId": "required-address-policy" }
+    },
     "strictExpectedDiagnostics": [
       { "code": "IL2026", "caller": "Program.cs", "callee": "ValidationRule" },
       { "code": "IL3050", "caller": "Program.cs", "callee": "ValidationRule" },
