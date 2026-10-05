@@ -5,8 +5,13 @@ approach: explicit observable rules, explicit replacement streams and typed
 callbacks. A Validation generator remains a [future design](generated-validation-design.md).
 No generator package or generator MVP is part of this implementation.
 
-This work is a **candidate**, based on `e653e52`, until the integration owner
-records its exact source, strict packaged-consumer results and integration.
+The **verified preliminary candidate** is exact clean source
+`eae498422aaf55ef9fea765eaff5027fb9d1a289`, based on `e653e52`. Both flavors
+passed all five safe cases in managed, fully trimmed and actual Linux x64
+NativeAOT execution: **30 scenario executions**, with zero positive-path
+warnings/errors. The preliminary four-job CI also passed, including actual Windows x64 native
+execution. Application-adapter fixes supersede this source; the final fresh
+package pair and its CI/publication remain pending.
 The existing release `8.1.0-runic.0.790.17` identifies immutable source
 `c9fa501c4d2e9442d85693dae77bb6f727e9eb7a`; it does not contain the additive
 observable APIs. The [implementation review](upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
@@ -32,7 +37,9 @@ The producer audit enables `EnableAotAnalyzer` and `EnableTrimAnalyzer` for both
 shipped core projects. It removes annotations only where generated OAPH calls,
 metadata-only expressions or explicit streams avoid the claimed operation.
 Reflection-based legacy observation and target assignment retain
-`RequiresUnreferencedCode`. No blanket `IsAotCompatible` declaration is made.
+`RequiresUnreferencedCode`. No blanket `IsAotCompatible` declaration is made. The final local core gate
+passes **618 tests (309 per flavor)**, zero failed/skipped, and **14 Python
+guard checks (six native and eight existing package checks)**.
 A successful safe-path publish and run establishes that tested path and host;
 it does not certify all overloads or all reachable dependency APIs.
 
@@ -62,8 +69,8 @@ its nuspec source; CI native jobs consume the exact Linux shipping package
 artifact. `--output OUTPUT` selects retained evidence (default
 `artifacts/verification/native-gates`). Managed, trimmed and native phases can
 be selected independently with `--mode`. `win-x64` is another accepted RID;
-its support requires execution on the matching configured Windows host, not
-merely acceptance by the CLI. The release workflow requires the reused complete
+its support requires execution on the matching configured Windows host; that
+execution is pending, and acceptance by the CLI does not establish it. The release workflow requires the reused complete
 core/native matrix and publishes the same verified package artifact.
 
 ## Dated released cohort investigation

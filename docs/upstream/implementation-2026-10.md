@@ -202,7 +202,8 @@ remain immutable. No upstream message or contribution is part of this work.
 
 The follow-up starts at `e653e52eb6abba95d3a5787771df01c4e570e309` on
 **2026-10-05**, after the immutable release recorded above. Status is
-**candidate implementation**. It adds explicit observable rule registration and
+**verified preliminary candidate** at exact clean
+`eae498422aaf55ef9fea765eaff5027fb9d1a289`. It adds explicit observable rule registration and
 outer-selection typed callbacks, enables producer AOT/trim analysis and uses
 realistic released-package strict failures with safe runtime counterparts.
 The [runtime recipe](../examples/native-validation.md),
@@ -218,8 +219,12 @@ adds six methods and 21 baseline lines per flavor, with 12 new runtime regressio
 per flavor passing and a clean producer-analysis build. Registration rollback,
 original exception preservation and reentrant initial membership/source selection
 have focused coverage. These topics are independently reviewed and merged into
-the integration owner's candidate; their evidence does not substitute for final
-integrated core/native gates. The [structured follow-up evidence](evidence/native-runtime-implementation.json)
+the integration owner's candidate; their focused evidence is separate from the final local gate: 618 passing core
+tests, 14 Python guards (six native plus eight existing package checks), zero
+build warnings/errors, and 30 safe managed/full-trim/Linux-native scenario
+executions with zero positive-path warnings/errors. The preliminary four-job CI also passed, including Windows native; adapter
+fixes supersede this source. Final fresh-package verification and publication
+remain pending. The [structured follow-up evidence](evidence/native-runtime-implementation.json)
 records exact audit counts and historical probe identities.
 
 No Validation generator package or MVP ships in this pass. The

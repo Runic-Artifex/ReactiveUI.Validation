@@ -81,8 +81,13 @@ immutable release and its warning-bearing probes retain their identity.
 
 ## Native runtime candidate contracts
 
-These changes are **candidate implementation**, based on `e653e52`, pending the
-integration owner's exact final source and strict actual-package evidence. They
+These changes are a **verified preliminary candidate** at exact clean
+`eae498422aaf55ef9fea765eaff5027fb9d1a289`, based on `e653e52`. Strict local
+actual-package consumers pass all five safe cases in both flavors across managed,
+fully trimmed and Linux native execution with zero positive warnings/errors.
+The preliminary four-job CI also passed, including Windows native. Application
+adapter fixes supersede this source; final fresh-package verification and new
+publication remain pending. They
 are not part of published `8.1.0-runic.0.790.17`. The
 [follow-up review](upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
 and [structured evidence](upstream/evidence/native-runtime-implementation.json)

@@ -2,8 +2,11 @@
 
 Use caller-created streams and ordinary delegates to register rules and present
 validation without discovering model properties or target setters at runtime.
-The runtime implementation is a candidate until its exact integrated source and
-strict actual-package evidence appear in the [implementation review](../upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up).
+The verified preliminary candidate at exact
+`eae498422aaf55ef9fea765eaff5027fb9d1a289` passes the five safe cases in both
+flavors under managed, fully trimmed and Linux x64 NativeAOT execution with zero
+positive-path warnings/errors. This preliminary source is superseded by application-adapter fixes; final
+fresh-package CI and publication remain pending in the [implementation review](../upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up).
 The immutable `8.1.0-runic.0.790.17` release does not contain these new APIs.
 
 ## Register rules and retain property metadata
