@@ -16,6 +16,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.x'
+      - name: Test package dependency guards
+        run: python -B -m unittest discover -s eng -p test_verify_packages.py -v
       - run: python eng/restore-fork-dependencies.py
       - working-directory: src
         run: dotnet build ReactiveUI.Validation.slnx -c Release -warnaserror
