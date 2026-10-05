@@ -14,17 +14,24 @@ Runic.DynamicData **10.0.0-runic.5**, without touching `src` pins. Package hashe
 and exact restored closures are in [evidence/pins.json](evidence/pins.json) and the
 two `*-graph.json` files.
 
-Run the dependency bootstrap in the locked shell, and supply a repository holding
-the verified published pair, rather than a new local pack with another version:
+From the repository root, set `RUNIC_SDK` to your checkout providing the locked
+Runic SDK development shell. Bootstrap DynamicData and use the shared
+[release-feed helper](../NativeAot/restore-validation-feed.py) to download the
+immutable published Validation pair into this repository's package feed, verifying
+both SHA-256 hashes before use:
 
 ```sh
-direnv exec /home/viktor/Development/RunicArtifex/runic-sdk python3 eng/restore-fork-dependencies.py
-direnv exec /home/viktor/Development/RunicArtifex/runic-sdk python3 investigations/BindingGenerators/verify.py \
-  --feed-root /home/viktor/Development/RunicArtifex/ReactiveUI.Validation
+: "${RUNIC_SDK:?Set RUNIC_SDK to your locked Runic SDK checkout}"
+direnv exec "$RUNIC_SDK" python3 eng/restore-fork-dependencies.py
+direnv exec "$RUNIC_SDK" python3 investigations/NativeAot/restore-validation-feed.py \
+  "$PWD/artifacts/packages"
+direnv exec "$RUNIC_SDK" python3 investigations/BindingGenerators/verify.py \
+  --feed-root "$PWD"
 ```
 
 On other machines, run Python and dotnet from the locked project shell. The
-wrapper accepts any `--feed-root` holding `artifacts/packages` and
+release-feed helper can reuse an existing verified feed with `--reuse FEED`.
+The wrapper also accepts any `--feed-root` holding `artifacts/packages` and
 `artifacts/dependencies`; it creates a temporary mapped NuGet config, restores
 exact versions, runs bounded sequential `-m:2` managed builds, and checks graph
 identity. Logs/graphs/generated-source snapshots remain under
