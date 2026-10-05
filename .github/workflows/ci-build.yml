@@ -33,6 +33,10 @@ jobs:
       - name: Test both flavors
         working-directory: src
         run: dotnet test --solution ReactiveUI.Validation.slnx -c Release -- --maximum-parallel-tests 4 --report-trx
+      - name: Run Primitives collection example
+        run: dotnet run --project examples/CollectionValidation/Primitives/CollectionValidation.Primitives.csproj -c Release
+      - name: Run Reactive collection example
+        run: dotnet run --project examples/CollectionValidation/Reactive/CollectionValidation.Reactive.csproj -c Release
       - name: Pack Runic libraries
         working-directory: src
         run: dotnet pack ReactiveUI.Validation.slnx -c Release --no-build -o ../artifacts/packages
