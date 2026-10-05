@@ -1,7 +1,7 @@
 # Runic ReactiveUI.Validation (.NET 10)
 
 This Runic-Artifex fork starts from upstream `cde3062` (2026-10-04) and uses
-ReactiveUI **26.0.1** with the released **10.0.0-runic.5** DynamicData fork.
+ReactiveUI **26.0.1** with the released **10.0.0-runic.30** DynamicData fork.
 It ships two core NuGet packages:
 
 | Package ID | Namespace root | Dependencies |

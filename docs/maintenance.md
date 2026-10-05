@@ -35,9 +35,9 @@ Replace the month and choose the upstream SHA after review. If it is already an 
 
 ## Coupled dependency updates
 
-Validation consumes **released packages**, not the adjacent DynamicData checkout. The current cohort is ReactiveUI/ReactiveUI.Reactive 26.0.1 with Runic.DynamicData/Runic.DynamicData.Reactive 10.0.0-runic.5, on .NET 10. Pins live in [src/Directory.Packages.props](../src/Directory.Packages.props).
+Validation consumes **released packages**, not the adjacent DynamicData checkout. The current cohort is ReactiveUI/ReactiveUI.Reactive 26.0.1 with Runic.DynamicData/Runic.DynamicData.Reactive [10.0.0-runic.30](https://github.com/Runic-Artifex/DynamicData/releases/tag/v10.0.0-runic.30), built from `9e3039a597f912c6ddc2628e38bb1162ad9c4563`, on .NET 10. Pins live in [src/Directory.Packages.props](../src/Directory.Packages.props).
 
-When DynamicData changes, complete and publish its tested pair first. Record its release tag, source SHA, versions and both asset hashes. Then update both Validation package pins and the allowed version/checksums in [eng/restore-fork-dependencies.py](../eng/restore-fork-dependencies.py) together. Validate the restored cohort and packaged consumers before adoption. Do not replace hashes merely to silence a checksum failure; verify the intended immutable release assets.
+When DynamicData changes, complete and publish its tested pair first. Record its release tag, source SHA, versions and both asset hashes. Then update both Validation package pins and the allowed version/checksums in [eng/restore-fork-dependencies.py](../eng/restore-fork-dependencies.py) together. Validate the restored cohort and packaged consumers before adoption. Do not replace hashes merely to silence a checksum failure; verify the intended immutable release assets. The strict native gate also restores the immutable `.5` DynamicData pair solely for the released `.790.17` validation baseline, verifies it independently, and reports that legacy cohort separately from the active pair.
 
 Keep ReactiveUI flavors on a compatible generation and preserve their corresponding DynamicData namespaces and scheduler types. No upstream `DynamicData` package may re-enter either restored consumer graph; the Primitives consumer must remain free of System.Reactive. Review inherited Renovate proposals as inputs to this process: NuGet-only automation does not update the GitHub-release bootstrap or prove cohort compatibility.
 
@@ -115,8 +115,8 @@ analysis and execution on each claimed host. Earlier green release gates prove
 their pinned revision only. Keep accurate RUC warnings on Unsafe/reflection
 operations; do not infer whole-package `IsAotCompatible` or platform support.
 
-This boundary does not authorize a dependency update: retain released matching
-DynamicData 10.0.0-runic.5 packages, their hashes and ReactiveUI 26.0.1 pins.
+This boundary does not authorize a dependency update: retain the authorized matching
+DynamicData 10.0.0-runic.30 packages, their hashes and ReactiveUI 26.0.1 pins.
 Never adopt sibling SDK/DynamicData source as an implicit generator dependency.
 
 ## Releases and retirement

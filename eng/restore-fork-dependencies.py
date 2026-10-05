@@ -2,6 +2,7 @@
 # Copyright (c) 2026 Runic Artifex. Licensed under the MIT license.
 """Download the pinned Runic DynamicData release into the local NuGet feed."""
 
+import argparse
 import hashlib
 from pathlib import Path
 import urllib.request
@@ -39,7 +40,13 @@ def restore_cohort(version, digests):
 
 
 def main():
-    """Restore the current central pair; native gates request their immutable legacy pair separately."""
+    """Restore the current central pair or the explicit immutable legacy baseline."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--legacy", action="store_true", help="Restore the immutable .5 pair used by dated baseline investigations")
+    args = parser.parse_args()
+    if args.legacy:
+        restore_cohort(LEGACY_VERSION, LEGACY_DIGESTS)
+        return
     versions = {
         node.attrib["Include"]: node.attrib["Version"]
         for node in ET.parse(ROOT / "src" / "Directory.Packages.props").iter("PackageVersion")

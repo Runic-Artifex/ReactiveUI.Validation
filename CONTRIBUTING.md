@@ -32,7 +32,7 @@ cd ..
 python3 eng/verify-packages.py
 ```
 
-The bootstrap downloads both `Runic.DynamicData` 10.0.0-runic.5 flavors from
+The bootstrap downloads both `Runic.DynamicData` 10.0.0-runic.30 flavors from
 their GitHub release, verifies SHA-256 hashes, and reuses valid downloads in
 `artifacts/dependencies`. This local NuGet feed is configured in `nuget.config`.
 Update the central package versions and bootstrap checksums together when

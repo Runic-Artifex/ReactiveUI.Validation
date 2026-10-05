@@ -18,7 +18,7 @@ release (or reuse an existing verified feed with `--reuse FEED`). Run inside the
 
 ```sh
 # From the repository root, materialize pinned immutable feeds.
-direnv exec "$RUNIC_SDK" python3 eng/restore-fork-dependencies.py
+direnv exec "$RUNIC_SDK" python3 eng/restore-fork-dependencies.py --legacy
 direnv exec "$RUNIC_SDK" python3 investigations/NativeAot/restore-validation-feed.py \
   investigations/NativeAot/artifacts/released-validation
 VALIDATION_FEED="$PWD/investigations/NativeAot/artifacts/released-validation"

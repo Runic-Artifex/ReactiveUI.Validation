@@ -2,7 +2,7 @@
 
 The executable [.NET 10 recipe](../../examples/CollectionValidation/CollectionValidationRecipe.cs)
 uses ReactiveUI 26.0.1 and the matching **released** Runic.DynamicData
-10.0.0-runic.5 flavor. It covers the collection goals from the dated review of
+10.0.0-runic.30 flavor. It covers the collection goals from the dated review of
 [#173](https://github.com/reactiveui/ReactiveUI.Validation/issues/173) and
 [#450](https://github.com/reactiveui/ReactiveUI.Validation/issues/450).
 Neither example participates in the core solution or normal package output.
