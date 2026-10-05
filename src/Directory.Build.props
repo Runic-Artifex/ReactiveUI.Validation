@@ -33,6 +33,7 @@
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
     <NoWarn>$(NoWarn);IDE1006;IDE0130</NoWarn>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);ReactiveUI.Validation.Generated</InterceptorsNamespaces>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
@@ -107,7 +108,7 @@
 	<!-- Shipped libraries keep their public API in PublicAPI/<tfm>/PublicAPI.txt; a build fails when the API drifts from it. -->
 	<PropertyGroup>
 		<TrackPublicApi Condition="'$(TrackPublicApi)' == ''">true</TrackPublicApi>
-		<TrackPublicApi Condition="'$(IsTestProject)' == 'true' or '$(IsSampleProject)' == 'true'">false</TrackPublicApi>
+		<TrackPublicApi Condition="'$(IsTestProject)' == 'true' or '$(IsSampleProject)' == 'true' or '$(MSBuildProjectName)' == 'ReactiveUI.Validation.SourceGenerators'">false</TrackPublicApi>
 		<EnablePublicApiBaseline>$(TrackPublicApi)</EnablePublicApiBaseline>
 	</PropertyGroup>
 	<ItemGroup Condition="'$(TrackPublicApi)' == 'true'">

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../ReactiveUI.Validation.SourceGenerators/ReactiveUI.Validation.SourceGenerators.csproj" />
+    <ProjectReference Include="../../ReactiveUI.Validation/ReactiveUI.Validation.csproj" />
+    <ProjectReference Include="../../ReactiveUI.Validation.Reactive/ReactiveUI.Validation.Reactive.csproj" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+  </ItemGroup>
+  <!-- This project exercises our analyzer with an explicit Roslyn driver. Both
+       runtime flavors bring differently compiled Binding analyzers with the same
+       generated attribute name; neither analyzer belongs in the test host. -->
+  <Target Name="RemoveRuntimeGeneratorsFromCompilerDriverHost" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'ReactiveUI.Binding.SourceGenerators' or '%(Analyzer.Filename)' == 'ReactiveUI.SourceGenerators.Roslyn'" />
+    </ItemGroup>
+  </Target>
+</Project>

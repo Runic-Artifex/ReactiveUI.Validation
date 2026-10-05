@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="ReactiveUI.Validation.SourceGenerators/ReactiveUI.Validation.SourceGenerators.csproj" />
+  <Project Path="tests/ReactiveUI.Validation.SourceGenerators.Tests/ReactiveUI.Validation.SourceGenerators.Tests.csproj" />
   <Project Path="ReactiveUI.Validation/ReactiveUI.Validation.csproj" />
   <Project Path="ReactiveUI.Validation.Reactive/ReactiveUI.Validation.Reactive.csproj" />
   <Project Path="tests/ReactiveUI.Validation.Tests/ReactiveUI.Validation.Tests.csproj" />
