@@ -4,9 +4,13 @@ on:
     branches: [main, 'runic/**']
   pull_request:
   workflow_dispatch:
+  workflow_call:
 permissions:
   contents: read
 jobs:
+  native-consumers:
+    needs: build
+    uses: ./.github/workflows/native-validation.yml
   build:
     strategy:
       fail-fast: false
@@ -42,10 +46,14 @@ jobs:
         run: dotnet pack ReactiveUI.Validation.slnx -c Release --no-build -o ../artifacts/packages
       - name: Verify package consumers
         run: python eng/verify-packages.py
+      - name: Upload the exact verified package pair
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: packages-${{ matrix.os }}
+          path: artifacts/packages/*.nupkg
       - uses: actions/upload-artifact@v4.6.2
         if: always()
         with:
           name: validation-${{ matrix.os }}
           path: |
-            artifacts/packages
             src/TestResults

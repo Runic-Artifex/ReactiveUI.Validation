@@ -1,0 +1,59 @@
+name: Strict native package consumers
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  native:
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: windows-latest
+            rid: win-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v5.3.0
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+      - name: Native toolchain and space
+        shell: bash
+        run: |
+          df -h . "${TMPDIR:-/tmp}"
+          dotnet --info
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            clang --version
+            pkg-config --modversion zlib
+          else
+            vswhere="/c/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+            "$vswhere" -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          fi
+      - name: Test strict verifier guards
+        run: python -B -m unittest discover -s eng -p test_verify_native_validation.py -v
+      - name: Restore SHA-verified DynamicData pair
+        run: python eng/restore-fork-dependencies.py
+      - name: Download the same-SHA core package pair
+        uses: actions/download-artifact@v4
+        with:
+          name: packages-${{ matrix.os }}
+          path: artifacts/packages
+      - name: Publish and execute strict consumers of the verified package bytes
+        run: python eng/verify-native-validation.py --rid ${{ matrix.rid }} --mode native --package-feed artifacts/packages
+      - uses: actions/upload-artifact@v4.6.2
+        if: always()
+        with:
+          name: native-validation-${{ matrix.rid }}
+          path: |
+            artifacts/verification/native-gates/*.log
+            artifacts/verification/native-gates/*.json
+          retention-days: 14
