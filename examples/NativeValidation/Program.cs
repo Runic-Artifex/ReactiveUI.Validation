@@ -60,6 +60,9 @@ internal static class Program
         Check(field.IsValid && !customer.HasErrors, "notifying reusable field");
         field.Dispose();
         Check(customer.ValidationContext.Validations.Count == 0, "field owner removes registration");
+#if SAFE_API
+        ApplicationAdapterChecks.Run();
+#endif
     }
 
 #if SAFE_API

@@ -5,8 +5,8 @@
   "validationVersion": "8.1.0-runic.0.790.17",
   "dynamicDataVersion": "10.0.0-runic.5",
   "fixtureSources": {
-    "ApplicationModels.cs": "d32d349758e29b95dad1c417dfe8b05d109a5227499b7f9cc305597007894da6",
-    "Program.cs": "059e4ba7e128c714cd0d88cce6770b100b9aa995616f7ef4393a22cf622e55b9",
+    "ApplicationModels.cs": "232bae4d8241593284d2835f46d6ad67b8179b6ef79a79e859613c1317ce9cfb",
+    "Program.cs": "26ce4144c44abe093b62cb6d0484c55ee68f4ad267d6e129b4e28e33a5beaf1a",
     "Imports.cs": "7fb57c5468cd5415c9e7f3b6ace4217b4dd9bd78a0a9640f93f5a6fb409ec832"
   },
   "flavors": {
