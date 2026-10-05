@@ -71,6 +71,9 @@ reports, and preserve useful reports and shared NuGet caches.
 | `RuleBenchmarks.ConstructActivateDispose` | Create a fresh model/context, register `Count` public property rules, activate the aggregate, dispose every helper, then dispose the context. Includes teardown and allocation; not isolated constructor latency. |
 | `RuleBenchmarks.PropertyValidityRoundTrip` | Change one property valid → invalid → valid, updating all `Count` rules observing it and the aggregate. |
 | `RuleBenchmarks.InvalidMessageRoundTrip` | Change one property between two invalid values and back, updating every rule's message while aggregate validity remains false. |
+| `BindingBenchmarks.ConstructDispose` | Create one plain CLR view and property binding on existing models/rules, publish initial errors, then dispose the binding. Includes view and expression construction and teardown; rules/model construction stays outside timing. |
+| `BindingBenchmarks.ReplaceModelRoundTrip` | Switch one existing binding from its first model to its second and back. Each model owns `Count` property rules. |
+| `BindingBenchmarks.NullModelRoundTrip` | Set one existing binding's model to null, clearing its error, then restore the first model. |
 
 Context workloads use small controlled components to isolate aggregate handling
 from ReactiveUI property observation and rule creation. Public rule workloads
@@ -92,9 +95,21 @@ frame times, asynchronous application response, native rendering, or Native AOT.
 Different methods perform different work and have no cross-method ratio baseline.
 Compare the same method, size, runtime, and host when investigating changes.
 
-Binding replacement and repeated binding disposal are intentionally deferred:
-the starting revision has reproduced lifetime bugs in both flavors. Add those
-benchmarks after integrating their correctness fix and permanent regressions;
-a faster incorrect binding is not a useful baseline. No core algorithm is changed
-by this benchmark project. [Initial measurements](results/2026-10-05.md) record
-what was actually run and the limits on interpreting it.
+Binding workloads were added after integrating the lifetime fix and its permanent
+regressions. They use one plain CLR view, two existing models, and `Count` rules
+per model. Setup verifies initial publication, replacement, null clearing,
+current-model updates, zero assignments from replaced models, repeated disposal,
+and zero assignments after disposal. Cleanup disposes the binding before every
+rule helper and model context. Replacement and null round trips always restore
+the first model; constructing bindings repeatedly retains no subscriptions on
+the existing source models. The view counts assignments to detect transient
+stale writes as well as incorrect final text; this small counter is part of the
+measured assignment cost.
+
+Use `--smoke --job Dry --filter '*BindingBenchmarks*'` with either project to
+check just these three workloads. All eleven workloads remain available through
+the separate solution. These binding measurements exercise library subscription,
+projection, and ordinary CLR property assignment; they do not measure a native
+UI toolkit, dispatcher, rendering, or end-to-end latency. No core algorithm is
+changed by this benchmark project. [Recorded measurements](results/2026-10-05.md)
+identify the core revision for each run and the limits on interpreting it.
