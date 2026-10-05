@@ -228,13 +228,13 @@ public static class ValidationRuleContextExtensions
     /// <param name="context">The destination context.</param>
     /// <param name="validation">The rule to add.</param>
     /// <returns>A helper that removes and disposes this rule, without disposing the context.</returns>
+    /// <exception cref="AggregateException">Registration and subsequent rollback both fail; the original failure is the first inner exception.</exception>
     internal static ValidationHelper RegisterValidation<TValidationComponent>(
         IValidationContext context,
         TValidationComponent validation)
         where TValidationComponent : IValidationComponent, IDisposable
     {
-        context.Add(validation);
-        return new(validation, Disposable.Create(
+        var cleanup = Disposable.Create(
             (context, validation),
             static state =>
             {
@@ -249,6 +249,24 @@ public static class ValidationRuleContextExtensions
                 {
                     state.validation.Dispose();
                 }
-            }));
+            });
+        try
+        {
+            context.Add(validation);
+            return new(validation, cleanup);
+        }
+        catch (Exception registrationError)
+        {
+            try
+            {
+                cleanup.Dispose();
+            }
+            catch (Exception cleanupError)
+            {
+                throw new AggregateException("Validation registration and rollback both failed.", registrationError, cleanupError);
+            }
+
+            throw;
+        }
     }
 }
