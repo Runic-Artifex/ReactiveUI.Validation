@@ -39,7 +39,9 @@ internal static class RuleEmitter
         var model = $"@{site.Method.Parameters[0].Name}";
         var predicate = site.Method.Parameters.Single(static parameter => parameter.Name == "isPropertyValid");
         var valueType = ((INamedTypeSymbol)predicate.Type).TypeArguments[0];
-        var context = site.Method.Parameters.Any(static parameter => parameter.Name == "context") ? "@context" : $"{model}.ValidationContext";
+        var context = site.Method.Parameters.Any(static parameter => parameter.Name == "context")
+            ? "@context"
+            : $"((global::{site.NamespaceRoot}.Abstractions.IValidatableViewModel){model}).ValidationContext";
         var dynamicMessage = site.Method.Parameters.Single(static parameter => parameter.Name == "message").Type.SpecialType != SpecialType.System_String;
         var descriptorList = new List<string>();
         for (var index = 0; index < selector!.Properties.Length; index++)

@@ -17,6 +17,9 @@ public sealed class CompilerTests
     /// <summary>The original caller fixture path.</summary>
     private const string CallerPath = "Caller.cs";
 
+    /// <summary>The emitted model fixture type name.</summary>
+    private const string ModelTypeName = "Model";
+
     /// <summary>The final dispatch diagnostic identifier.</summary>
     private const string MissingDispatchId = "RUVG005";
 
@@ -70,7 +73,60 @@ public sealed class CompilerTests
         var emit = result.Compilation.Emit(stream);
         await Assert.That(string.Join("\n", emit.Diagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))).IsEmpty();
         var assembly = System.Reflection.Assembly.Load(stream.ToArray());
-        await Assert.That((bool)assembly.GetType("Model")!.GetMethod("Check")!.Invoke(null, null)!).IsTrue();
+        await Assert.That((bool)assembly.GetType(ModelTypeName)!.GetMethod("Check")!.Invoke(null, null)!).IsTrue();
+    }
+
+    /// <summary>Uses the constrained interface context even when the model shadows its name.</summary>
+    /// <param name="reactive">Whether to use the System.Reactive flavor.</param>
+    /// <returns>The asynchronous test.</returns>
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    [SuppressMessage("Security", "SES1402", Justification = "Only hard-coded compiler test sources and trusted runtime references are emitted into this in-memory test assembly.")]
+    public async Task ExplicitInterfaceContextAndPrivateShadowAreSupported(bool reactive)
+    {
+        var root = reactive ? "ReactiveUI.Validation.Reactive" : "ReactiveUI.Validation";
+        var ui = reactive ? "ReactiveUI.Reactive" : "ReactiveUI";
+        var source = $$"""
+            using System;
+            using {{ui}};
+            using {{root}}.Abstractions;
+            using {{root}}.Contexts;
+            using {{root}}.Extensions;
+            public sealed class Model : ReactiveObject, IValidatableViewModel
+            {
+                private readonly IValidationContext _context;
+                public Model(IValidationContext context) => _context = context;
+                public string? Name { get; set; }
+                public int ContextReads { get; private set; }
+                private IValidationContext ValidationContext => throw new InvalidOperationException("private shadow");
+                IValidationContext IValidatableViewModel.ValidationContext
+                {
+                    get
+                    {
+                        ContextReads++;
+                        return _context;
+                    }
+                }
+                public static bool Check()
+                {
+                    using var context = new ValidationContext();
+                    var model = new Model(context);
+                    using var one = model.ValidationRule(x => x.Name, x => x == "ok", "bad");
+                    using var two = model.ValidationRule(x => x.Name, x => x == "ok", x => "bad:" + x);
+                    return !one.IsValid && !two.IsValid && model.ContextReads == 2;
+                }
+            }
+            """;
+        var result = Generate(source);
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(await result.Compilation.WithAnalyzers([new ValidationDispatchAnalyzer()]).GetAnalyzerDiagnosticsAsync()).IsEmpty();
+        await Assert.That(result.Compilation.GetDiagnostics().Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Warning)).IsEmpty();
+        await using var stream = new MemoryStream();
+        var emit = result.Compilation.Emit(stream);
+        await Assert.That(string.Join("\n", emit.Diagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))).IsEmpty();
+        var assembly = System.Reflection.Assembly.Load(stream.ToArray());
+        await Assert.That((bool)assembly.GetType(ModelTypeName)!.GetMethod("Check")!.Invoke(null, null)!).IsTrue();
     }
 
     /// <summary>Rejects unsupported selectors at their source call sites.</summary>
@@ -166,7 +222,7 @@ public sealed class CompilerTests
         Exception? failure = null;
         try
         {
-            _ = assembly.GetType("Model")!.GetMethod("Attach")!.Invoke(null, null);
+            _ = assembly.GetType(ModelTypeName)!.GetMethod("Attach")!.Invoke(null, null);
         }
         catch (System.Reflection.TargetInvocationException exception)
         {
