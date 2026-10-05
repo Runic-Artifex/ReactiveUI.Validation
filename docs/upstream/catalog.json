@@ -8563,9 +8563,9 @@
         "wontfix"
       ],
       "category": "Runtime and API",
-      "summary": "BindValidation fails while parsing an expression with a nonconstant index.",
-      "assessment": "Investigate on demand",
-      "runic_decision": "Expression-limit concern; use supported paths and add a regression before broadening index support.",
+      "summary": "BindValidation rejects an Avalonia view selector that calls FindControl<TextBlock>(\"UsernameError\").Text; a property-only selector was confirmed to work.",
+      "assessment": "Document supported selectors",
+      "runic_decision": "Use a control property such as view.UsernameError.Text instead of calling FindControl inside the selector. The reporter confirmed the property-only fix; this is not evidence of a variable-index defect. See https://github.com/reactiveui/ReactiveUI.Validation/issues/378#issuecomment-957330539 and https://github.com/reactiveui/ReactiveUI.Validation/issues/378#issuecomment-960270058.",
       "review_depth": "Issue body and discussion; relevance assessed against the fork",
       "assessment_section": null,
       "merge_commit": null,
