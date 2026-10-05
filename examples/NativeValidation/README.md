@@ -63,9 +63,17 @@ flavor boundaries, complete case output, and diagnostic codes with Validation
 method provenance. It rejects unrelated compile failures. Logs remain under
 `artifacts/`; generated binaries can be removed after verification.
 
-`manifest.json` is the runner's assertion contract. The safe fixtures are a
-provisional implementation until the serialized gate records managed, full-trim
-and native execution against an exact fresh package pair. The baseline report in
-`evidence/baseline-results.json` records actual focused managed and strict-build
-evidence, including source hashes. Native runtime results belong to the gate's
-separate report.
+`manifest.json` is the runner's assertion contract. The safe fixtures are verified
+at released source `f22d2bb42c30d66df19a59333ed4fa633b241940`, version
+[`8.1.0-runic.0.790.17.15`](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15).
+Local Linux execution passes all five cases in both flavors across managed,
+standalone full-trim and NativeAOT modes; final CI and the release matrix pass
+actual Linux x64 and Windows x64 NativeAOT against the exact published package
+pair, with zero positive warnings/errors. The handoff/initial-failure adapter
+checks execute within `generic-field`. The [implementation review](../../docs/upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
+records distinct local/CI/published hashes and the strict baseline failures.
+The baseline report in `evidence/baseline-results.json` records actual focused
+managed and strict-build evidence, including source hashes. The focused `.14`
+package report and adapter `.12` before/after report remain
+historical managed evidence; the final `.15` native results belong to the gate's
+separate exact-source report.

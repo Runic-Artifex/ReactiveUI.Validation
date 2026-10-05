@@ -7,8 +7,9 @@ retiring an adaptation. The [upstream investigation](docs/upstream/README.md) is
 dated research; the [implementation ledger](docs/upstream/implementation-2026-10.md),
 review records and the register track actual adoption.
 
-The [NativeAOT status](docs/aot-and-generators.md) distinguishes the runtime and
-examples first candidate from dated warning-bearing investigations. The strict
+The [NativeAOT status](docs/aot-and-generators.md) distinguishes the released
+runtime and examples first implementation from dated warning-bearing
+investigations. The strict
 [actual-package gate](eng/verify-native-validation.py) publishes and runs the
 explicit safe subset; it retains warning-as-error analysis and exact flavor,
 version and source checks. A Validation generator remains deferred. No blanket
@@ -55,9 +56,9 @@ outside this fork's core CI and release scope. AndroidX package IDs are branded
 The old UWP sample and non-.NET-10 API baselines are retained as upstream history.
 
 CI verifies both flavors and independent package consumers on Linux and Windows,
-and runs strict safe-subset trimmed/native consumers against the same Linux
-shipping package artifact on matching Linux x64 and Windows x64 hosts. After
-bootstrapping, the local native gate is:
+and runs strict safe-subset NativeAOT consumers, with trimming enabled, against
+the same Linux shipping package artifact on matching Linux x64 and Windows x64
+hosts. After bootstrapping, the local native gate is:
 
 ```sh
 direnv exec "$RUNIC_SDK" python3 eng/verify-native-validation.py --rid linux-x64 --mode all

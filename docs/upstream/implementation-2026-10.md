@@ -6,7 +6,7 @@ by the [dated assessment](README.md). The [implementation review](reviews/2026-1
 records integrated inputs and verification. The [original October review](reviews/2026-10.md)
 and [diagnostic evidence](evidence/README.md) remain historical records.
 
-Status is **implemented, integrated and released; tag and both assets verified** at released source
+The initial implementation is **implemented, integrated and released; tag and both assets verified** at source
 `c9fa501c4d2e9442d85693dae77bb6f727e9eb7a`. Shipping code is pinned at
 `5d433128e0692af112f43a7e09409a43b7210edc`; workflow follow-up `667978c` adds
 negative-graph checks and ordinary collection example smoke. The integration
@@ -109,7 +109,7 @@ regression preservation, rather than a second historical patch import. The
 
 NativeAOT/generator follow-up dated **2026-10-05** is recorded in the
 [separate investigation](../aot-and-generators.md). Its dated released-package executions and generated consumer output retain
-the historical warnings. The subsequent runtime/examples-first candidate below
+the historical warnings. The subsequent released runtime/examples-first follow-up below
 adds explicit streams and narrows audited annotations; it does not relabel the
 immutable release or establish broader platform/cohort support.
 
@@ -121,7 +121,7 @@ immutable release or establish broader platform/cohort support.
 | #66 / #67 legacy scheduler default | Do not restore platform-conditioned task-pool defaults; use explicit serialized model scheduling. | A supported consumer demonstrates a scheduler contract that needs a scoped adapter. |
 | #833, #992 / .NET 11, #4/#9/#135/#414 and other native platform proposals | AndroidX, desktop/mobile samples, obsolete UWP/Xamarin and .NET 11 remain outside current .NET 10 core CI/release support. | Explicit platform support decision, workload/cohort and consumer/API/release gates. |
 | #990 binding source-generator caveat | Anonymous/private selector issue is unreproduced against the resolved 9.1 generator generation; no speculative workaround. | Exact selectors reproduce the generator diagnostic/output issue. |
-| Native AOT | The immutable release retains its historical annotations. Runtime/examples-first candidate uses explicit streams and audited annotation boundaries; a Validation generator remains deferred. | Record strict actual-package safe-path publish/run evidence at the exact integrated source and host before claiming support. |
+| Broader NativeAOT support | The immutable `.790.17` release retains historical annotations. The `.15` native follow-up supports the verified explicit-stream console paths on Linux/Windows x64; whole-library and untested-platform support remain deferred, as does a Validation generator. | A concrete additional path/cohort/host passes accurate producer analysis and strict actual-package publish/run gates. |
 | Remaining abandoned repository/platform proposals and routine updates | Preserve dated disposition; no historical badge, coverage uploader, version bump, analyzer cleanup, platform downgrade or dependency-update queue is replayed. | Current supported scenario or intentional tested dependency cohort requires it. |
 
 ## Dependency decision
@@ -198,37 +198,63 @@ its own commit is not the released shipping source. Published tags and assets
 remain immutable. No upstream message or contribution is part of this work.
 
 
-## Native runtime and examples first candidate
+## Released native runtime and examples first implementation
 
 The follow-up starts at `e653e52eb6abba95d3a5787771df01c4e570e309` on
-**2026-10-05**, after the immutable release recorded above. Status is
-**verified preliminary candidate** at exact clean
-`eae498422aaf55ef9fea765eaff5027fb9d1a289`. It adds explicit observable rule registration and
-outer-selection typed callbacks, enables producer AOT/trim analysis and uses
-realistic released-package strict failures with safe runtime counterparts.
-The [runtime recipe](../examples/native-validation.md),
+**2026-10-05**, after the immutable release recorded above. The released [8.1.0-runic.0.790.17.15](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15) uses source
+`f22d2bb42c30d66df19a59333ed4fa633b241940`. It adds explicit observable rule
+registration and outer-selection typed callbacks, enables producer AOT/trim
+analysis and uses realistic released-package strict failures with safe runtime
+counterparts. The [runtime recipe](../examples/native-validation.md),
 [NativeAOT status](../aot-and-generators.md) and
 [follow-up review](reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
-define the contract and keep topic, integration and publication evidence separate.
+define the contract and separate preliminary, final, integrated and published
+identities.
 
 Audit `4cdf89ab1d2de08dc3b85c48db2aee7418aa85c1` removes false RDC requirements,
 narrows blanket RUC on generated OAPH and supplied-observable paths, and preserves
 RUC on legacy reflection. Both producers pass warnings-as-errors analysis and
 48 focused tests per flavor. API `67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195`
 adds six methods and 21 baseline lines per flavor, with 12 new runtime regressions
-per flavor passing and a clean producer-analysis build. Registration rollback,
-original exception preservation and reentrant initial membership/source selection
-have focused coverage. These topics are independently reviewed and merged into
-the integration owner's candidate; their focused evidence is separate from the final local gate: 618 passing core
-tests, 14 Python guards (six native plus eight existing package checks), zero
-build warnings/errors, and 30 safe managed/full-trim/Linux-native scenario
-executions with zero positive-path warnings/errors. The preliminary four-job CI also passed, including Windows native; adapter
-fixes supersede this source. Final fresh-package verification and publication
-remain pending. The [structured follow-up evidence](evidence/native-runtime-implementation.json)
-records exact audit counts and historical probe identities.
+per flavor passing. Registration rollback, original exception preservation and
+reentrant initial membership/source selection have focused coverage.
+
+Preliminary `eae4984` passed 618 core tests (309 per flavor), 14 Python guards
+(six native plus eight existing package checks), zero build warnings/errors and
+30 strict managed/full-trim/Linux-native scenario executions. Its four-job CI
+passed both core OS jobs and actual Linux/Windows native consumers. It remains
+historical after the application-adapter correction; those bytes do not verify
+the final fresh package pair. Library and library-test trees are byte-identical
+at final `f22d2bb`, so the local core result is explicitly reused.
+
+The final application adapters install pending subscription ownership before
+initial delivery and clean up attached handlers on initial getter/callback
+failure. Their bounded handoff/null/disposal/snapshot assertions execute within
+`generic-field`. Fresh final actual-package verification passes all five cases
+in both flavors across managed/full-trim/actual Linux-native modes: **30 scenario
+executions**, zero positive warnings/errors. The release workflow targets this
+fork explicitly. Final four-job CI 37375282317 passes at the same source: 618 core tests per OS
+and 20 actual native case checks across Linux x64/Windows x64, both flavors,
+zero candidate warnings/errors. Native jobs use the same exact Ubuntu artifact;
+standalone full-trim managed execution remains local Linux evidence. Release run 37375833531 repeats all four verification jobs, then publishes the
+exact Ubuntu artifact pair validated by both native RID reports. The new tag,
+nuspec source and independently downloaded assets are verified; the [structured evidence](evidence/native-runtime-implementation.json)
+records exact local versions/hashes and the separately retained preliminary
+package identities.
 
 No Validation generator package or MVP ships in this pass. The
 [future generator design](../generated-validation-design.md) maps the realistic
 cases to direct runtime operations and retains a managed synthetic interceptor
-proof. No dependency SDK/DynamicData update, blanket `IsAotCompatible`, additional
-UI platform or bridge/browser end-to-end support follows from this candidate.
+proof. Equivalent generated-adapter handoff/error-cleanup tests remain deferred.
+No dependency SDK/DynamicData update, blanket `IsAotCompatible`, retained UI
+platform or bridge/browser end-to-end support follows from this implementation.
+
+
+The final published Primitives SHA-256 is
+`17be4c3b5f46e9ff237b5f89bf97c4ff1f47b5dfef9abd250516cc454c57e95f`; Reactive is
+`08d6087dbd86e0ae92f1230275351240d8b2e32b7765e5b6c2b31e8ae47b4fd2`.
+These differ from local and CI verification package hashes. The `.790` and
+`.790.17` tags/assets remain unchanged. A later documentation-only review stamp
+reuses unchanged released code/workflow evidence; its own commit is not the
+shipping package source. Version/tag/asset immutability is fork policy, not a
+GitHub-enforced immutable-release claim.

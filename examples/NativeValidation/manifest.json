@@ -29,7 +29,23 @@
       "rows-async-uniqueness": true,
       "existing-observable-foundation": true
     },
-    "strictExpectedDiagnostics": []
+    "strictExpectedDiagnostics": [],
+    "verifiedRelease": {
+      "version": "8.1.0-runic.0.790.17.15",
+      "source": "f22d2bb42c30d66df19a59333ed4fa633b241940",
+      "releaseUrl": "https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15",
+      "nativeRids": [
+        "linux-x64",
+        "win-x64"
+      ],
+      "standaloneFullTrimRids": [
+        "linux-x64"
+      ],
+      "positiveWarnings": 0,
+      "positiveErrors": 0,
+      "casesPerFlavor": 5,
+      "generatorShipped": false
+    }
   },
   "deferred": [
     "No validation source generator is implemented or required by these counterparts.",

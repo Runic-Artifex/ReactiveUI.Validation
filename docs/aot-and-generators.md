@@ -5,17 +5,24 @@ approach: explicit observable rules, explicit replacement streams and typed
 callbacks. A Validation generator remains a [future design](generated-validation-design.md).
 No generator package or generator MVP is part of this implementation.
 
-The **verified preliminary candidate** is exact clean source
-`eae498422aaf55ef9fea765eaff5027fb9d1a289`, based on `e653e52`. Both flavors
-passed all five safe cases in managed, fully trimmed and actual Linux x64
-NativeAOT execution: **30 scenario executions**, with zero positive-path
-warnings/errors. The preliminary four-job CI also passed, including actual Windows x64 native
-execution. Application-adapter fixes supersede this source; the final fresh
-package pair and its CI/publication remain pending.
+The released [**8.1.0-runic.0.790.17.15**](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15) is exact source
+`f22d2bb42c30d66df19a59333ed4fa633b241940`, based on `e653e52`. Both flavors
+passed all five safe cases, including application-adapter handoff and failure
+cleanup checks, in managed, fully trimmed and actual Linux x64 NativeAOT
+execution: **30 scenario executions**, with zero positive-path warnings/errors.
+[Four-job CI 37375282317](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37375282317)
+passes at this source: **618 core tests per OS** and **20 actual native case
+checks** across Linux x64/Windows x64, both flavors. Candidate publish paths have
+zero warnings/errors. The [release workflow 37375833531](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37375833531)
+repeats the complete matrix and publishes the exact Ubuntu artifact verified by
+both native RID jobs. The tag, nuspec source and both downloaded asset hashes
+are independently verified.
+The preliminary `eae4984` candidate also passed its four-job CI, including
+Windows native; those earlier package bytes are retained as historical evidence.
 The existing release `8.1.0-runic.0.790.17` identifies immutable source
 `c9fa501c4d2e9442d85693dae77bb6f727e9eb7a`; it does not contain the additive
 observable APIs. The [implementation review](upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
-keeps candidate and published evidence separate.
+keeps preliminary, local, CI and published evidence separate.
 
 ## Runtime and examples first implementation
 
@@ -37,9 +44,10 @@ The producer audit enables `EnableAotAnalyzer` and `EnableTrimAnalyzer` for both
 shipped core projects. It removes annotations only where generated OAPH calls,
 metadata-only expressions or explicit streams avoid the claimed operation.
 Reflection-based legacy observation and target assignment retain
-`RequiresUnreferencedCode`. No blanket `IsAotCompatible` declaration is made. The final local core gate
-passes **618 tests (309 per flavor)**, zero failed/skipped, and **14 Python
-guard checks (six native and eight existing package checks)**.
+`RequiresUnreferencedCode`. No blanket `IsAotCompatible` declaration is made.
+The final CI core gate passes **618 tests (309 per flavor) per OS**, zero
+failed/skipped. Guard coverage comprises **14 Python checks: six native and
+eight existing package checks**.
 A successful safe-path publish and run establishes that tested path and host;
 it does not certify all overloads or all reachable dependency APIs.
 
@@ -49,8 +57,13 @@ address case requires missing data to be invalid; the baseline managed run
 retains the last valid nested value. The migration explicitly supplies null
 notifications and combines two single-field rules into one multi-property rule.
 These are application-policy and metadata adaptations, not blanket legacy fixes.
+The final fixture installs pending subscription slots before initial callbacks;
+it checks synchronous parent replacement/null, disposal, and initial getter or
+callback failure cleanup. These are application-observation contracts, separate
+from the already audited library APIs and deferred generated-adapter acceptance.
 
-The [strict package gate](../eng/verify-native-validation.py) must consume actual packed assets, retain
+The [strict package gate](../eng/verify-native-validation.py) must consume actual
+packed assets, retain
 warning-as-error diagnostics, check exact package graphs and run the emitted
 trimmed and native executables. The older opt-in investigative runner below
 lowers IL2026/IL3050 severity to capture warnings and behavior. It is not the
@@ -69,8 +82,10 @@ its nuspec source; CI native jobs consume the exact Linux shipping package
 artifact. `--output OUTPUT` selects retained evidence (default
 `artifacts/verification/native-gates`). Managed, trimmed and native phases can
 be selected independently with `--mode`. `win-x64` is another accepted RID;
-its support requires execution on the matching configured Windows host; that
-execution is pending, and acceptance by the CLI does not establish it. The release workflow requires the reused complete
+its safe-path native execution is verified by the final Windows job. Standalone
+fully trimmed managed execution is established locally on Linux x64; the Windows
+native job publishes with trimming enabled. The
+release workflow requires the reused complete
 core/native matrix and publishes the same verified package artifact.
 
 ## Dated released cohort investigation
@@ -88,7 +103,7 @@ Keep the existing dependency cohort. Binding runtime and interceptors are
 already part of that graph; view-model SourceGenerators are optional consumer
 tooling. Neither generator rewrites `ValidationRule` or `BindValidationState`
 inside the compiled Validation package. The historical results below describe
-the immutable `.790.17` assets, not the candidate implementation.
+the immutable `.790.17` assets, not the released native implementation.
 
 ## Investigated release cohort and support status
 
@@ -375,7 +390,7 @@ paths, dependency cohort and actual host executions recorded in the review.
 | Option | Role | Benefit | Cost and limit |
 | --- | --- | --- | --- |
 | Keep corresponding Binding runtime dependencies | Required by the current cohort | Preserves existing rule and view binding behavior | Existing reflective observation remains subject to its annotations and native runtime constraints. |
-| Explicit observables, delegates and state subscriptions | Candidate implementation | Explicit rules and replacement streams expose ownership and direct callbacks | Both-flavor API review, producer analysis and strict actual-package consumer gates for the recorded host scope. |
+| Explicit observables, delegates and state subscriptions | Released safe console contract | Explicit rules and replacement streams expose ownership and direct callbacks | Both-flavor API review, producer analysis and strict actual-package consumer gates for the recorded host scope. |
 | Binding interceptors in the application | Optional | Generates recognized application observation/binding calls | Compiler/interceptor configuration and generated-output verification; does not replace package-internal calls. |
 | SourceGenerators in the application | Optional | Reduces reactive property, command and notification boilerplate | Select compatible flavor/output, inspect generated code; OAPH/view generation belongs to Binding in the current split. |
 | Validation-specific source generator | [Future convenience design](generated-validation-design.md) | Could preserve selector syntax while producing explicit observations and metadata | No generator shipped in this pass. A later package needs selector diagnostics, compilation/flavor tests and versioning after the runtime contract is stable. |
@@ -388,9 +403,13 @@ toolchain and libraries for that platform. Ordinary .NET build/test success on
 Linux and Windows does not stand in for a native publish/run. Keep native consumers standalone from the shipping solution, reuse the locked
 development environment, and record native compiler/runtime inputs with each
 result. Run strict package gates separately from the dated warning-bearing probes.
-Only `linux-x64` native execution is established here. A runner accepting another
-RID does not verify `win-x64`, Linux Arm64, macOS or cross-compilation; those need
-matching toolchains and actual execution on the corresponding hosts.
+The strict five-case safe console paths are verified on **`linux-x64` and
+`win-x64`**, in both flavors at exact `f22d2bb`. Both final native jobs execute
+the same Ubuntu package artifact, with zero candidate warnings/errors.
+Standalone full-trim managed execution is established locally on Linux x64;
+Windows evidence is actual native execution with trimming enabled. The dated
+warning-bearing investigations above establish only Linux x64. Linux Arm64,
+macOS and cross-compilation need matching toolchains and actual host execution.
 
 The retained AndroidX and desktop/mobile samples remain outside core releases.
 This implementation does not add Android, iOS, macOS, Windows desktop UI,

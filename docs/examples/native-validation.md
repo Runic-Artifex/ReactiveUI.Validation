@@ -2,11 +2,13 @@
 
 Use caller-created streams and ordinary delegates to register rules and present
 validation without discovering model properties or target setters at runtime.
-The verified preliminary candidate at exact
-`eae498422aaf55ef9fea765eaff5027fb9d1a289` passes the five safe cases in both
+The released [8.1.0-runic.0.790.17.15](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15) at exact
+`f22d2bb42c30d66df19a59333ed4fa633b241940` passes the five safe cases in both
 flavors under managed, fully trimmed and Linux x64 NativeAOT execution with zero
-positive-path warnings/errors. This preliminary source is superseded by application-adapter fixes; final
-fresh-package CI and publication remain pending in the [implementation review](../upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up).
+positive-path warnings/errors. The preliminary `eae4984` CI is historical;
+final cross-platform CI and the release matrix pass actual Linux x64 and Windows
+x64 native cases using the verified published package pair, recorded
+in the [implementation review](../upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up).
 The immutable `8.1.0-runic.0.790.17` release does not contain these new APIs.
 
 ## Register rules and retain property metadata
@@ -119,6 +121,16 @@ failure. The safe counterpart explicitly emits null and intentionally replaces
 two single-property registrations with one multi-property rule; the metadata
 and membership change is visible. Row results use deterministic delivery, not a
 network or timing test.
+
+The bounded [application adapter checks](../../examples/NativeValidation/ApplicationAdapterChecks.cs)
+run inside `generic-field`. They assert synchronous initial parent replacement
+and null, old/latest/outer subscription detachment, owner disposal rejecting a
+returned handle, disposed listeners skipped in notification snapshots, and
+initial getter/callback failure propagating the original exception with handlers
+detached. The application adapters install pending ownership before subscribing,
+so an obsolete returning handle cannot replace the latest selection. A supplied
+source that throws before returning its handle must clean up its own handlers.
+Equivalent generated-observer tests remain deferred with the future generator.
 
 ## Package and support boundary
 

@@ -4,7 +4,7 @@ Baseline **2026-10-05**: Runic `origin/main` at [`a4cfecf`](https://github.com/R
 
 Keep stable IDs and update the source/adoption commits, dependencies, regression evidence and retirement conditions when behavior changes. `active` means intentional fork policy/adaptation; `retained` means inherited behavior to protect; `retired` means verified replacement/removal. Keep retired entries as history. The dated research catalogs do not update this register automatically.
 
-Integrated/released source **2026-10-05**: `c9fa501c4d2e9442d85693dae77bb6f727e9eb7a`
+Earlier integrated/released source **2026-10-05**: `c9fa501c4d2e9442d85693dae77bb6f727e9eb7a`
 (shipping pin `5d433128e0692af112f43a7e09409a43b7210edc`).
 The integration owner adopted the topic commits below into Runic main and
 released [`8.1.0-runic.0.790.17`](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17) from this source. The local Release build, 594 shipping tests, eight negative-graph
@@ -76,27 +76,27 @@ records the shipping pin, API parity approval and completed verification. No bro
 Native AOT support or ReactiveUI 25 compatibility follows from this release.
 
 The [NativeAOT status](aot-and-generators.md) keeps the dated released-package
-investigation separate from the runtime/examples-first candidate below. The
+investigation separate from the released runtime/examples-first follow-up below. The
 immutable release and its warning-bearing probes retain their identity.
 
-## Native runtime candidate contracts
+## Released native runtime contracts
 
-These changes are a **verified preliminary candidate** at exact clean
-`eae498422aaf55ef9fea765eaff5027fb9d1a289`, based on `e653e52`. Strict local
-actual-package consumers pass all five safe cases in both flavors across managed,
-fully trimmed and Linux native execution with zero positive warnings/errors.
-The preliminary four-job CI also passed, including Windows native. Application
-adapter fixes supersede this source; final fresh-package verification and new
-publication remain pending. They
-are not part of published `8.1.0-runic.0.790.17`. The
+These changes are **released in [8.1.0-runic.0.790.17.15](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15)** at exact source
+`f22d2bb42c30d66df19a59333ed4fa633b241940`, based on `e653e52`. Strict local
+actual-package consumers pass all five safe cases, including application-adapter
+handoff/failure cleanup checks, in both flavors across managed, fully trimmed
+and Linux native execution with zero positive warnings/errors. Final four-job CI passes both OS core gates and actual Linux/Windows native
+consumers using the same verified Ubuntu package artifact. The release matrix repeats those gates and publishes the same verified
+artifact pair; tag, source and downloaded assets are independently verified.
+They are not part of published `8.1.0-runic.0.790.17`. The
 [follow-up review](upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
 and [structured evidence](upstream/evidence/native-runtime-implementation.json)
 record topic verification independently of integration/publication.
 
 | ID / status | Source and contract | Verification to preserve | Retirement condition |
 | --- | --- | --- | --- |
-| RUV-016 / active candidate | API adoption `67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195`; [Observable rules](../src/ReactiveUI.Validation/Extensions/ObservableValidationRuleExtensions.cs) and [observable callbacks](../src/ReactiveUI.Validation/Extensions/ObservableValidationBindingExtensions.cs): explicit value/state streams, full property metadata and outer selection streams avoid discovered observation/assignment; captured rule ownership and latest-source binding disposal. | Both flavor API baselines, [runtime recipe](examples/native-validation.md) and [runtime regressions](../src/tests/ReactiveUI.Validation.Tests/ObservableRuntimeApiTests.cs); initial values, null/empty, full ordinal paths, strict matching, custom state identity, replacement/stale-source detachment, repeated/reentrant disposal, registration-failure rollback/original exception preservation and source-owner scheduling. | Equivalent supported runtime surface preserves semantics and consumer migration; retain regressions. |
-| RUV-017 / active candidate | Producer audit `4cdf89ab1d2de08dc3b85c48db2aee7418aa85c1`: enable AOT/trim analysis for shipped core producers; remove false RDC and blanket RUC from generated OAPH/supplied-stream paths, retain RUC on reflection. Strict actual-package gates distinguish supported safe paths from dated diagnostic probes. | Audited generated source/DLL dispatch; reviewed annotation changes in both API baselines; zero-warning producer and safe-path publishes, exact branded/flavor/version graphs and actual trimmed/native executions at recorded source/host. No blanket `IsAotCompatible`. | Equivalent producer and package consumer workflow preserves accurate unsafe boundaries, warning policy, package identities and actual host-specific native proof. |
+| RUV-016 / active | API adoption `67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195`; [Observable rules](../src/ReactiveUI.Validation/Extensions/ObservableValidationRuleExtensions.cs) and [observable callbacks](../src/ReactiveUI.Validation/Extensions/ObservableValidationBindingExtensions.cs): explicit value/state streams, full property metadata and outer selection streams avoid discovered observation/assignment; captured rule ownership and latest-source binding disposal. | Both flavor API baselines, [runtime recipe](examples/native-validation.md) and [runtime regressions](../src/tests/ReactiveUI.Validation.Tests/ObservableRuntimeApiTests.cs); initial values, null/empty, full ordinal paths, strict matching, custom state identity, replacement/stale-source detachment, repeated/reentrant disposal, registration-failure rollback/original exception preservation and source-owner scheduling. | Equivalent supported runtime surface preserves semantics and consumer migration; retain regressions. |
+| RUV-017 / active | Producer audit `4cdf89ab1d2de08dc3b85c48db2aee7418aa85c1`: enable AOT/trim analysis for shipped core producers; remove false RDC and blanket RUC from generated OAPH/supplied-stream paths, retain RUC on reflection. Strict actual-package gates distinguish supported safe paths from dated diagnostic probes. | Audited generated source/DLL dispatch; reviewed annotation changes in both API baselines; zero-warning producer and safe-path publishes, exact branded/flavor/version graphs and actual trimmed/native executions at recorded source/host. No blanket `IsAotCompatible`. | Equivalent producer and package consumer workflow preserves accurate unsafe boundaries, warning policy, package identities and actual host-specific native proof. |
 
 A Validation generator is a [deferred design](generated-validation-design.md).
-No generator package/MVP or additional platform support is an adopted contract.
+No generator package/MVP or retained UI-platform support is an adopted contract.

@@ -223,7 +223,7 @@ notes without changing the tag or assets.
 ## Native runtime and examples follow-up
 
 Started **2026-10-05** from `e653e52eb6abba95d3a5787771df01c4e570e309`.
-Status: **verified preliminary candidate**, separate from the immutable `.790.17`
+Status: **released; tag and both assets independently verified**, separate from the immutable `.790.17`
 release above. The selected scope is runtime APIs and realistic examples first;
 a [Validation generator design](../../generated-validation-design.md) is deferred.
 No generator package, generator-only runtime surface, dependency upgrade,
@@ -231,11 +231,11 @@ platform UI support or SDK/DynamicData source change is part of this pass.
 
 | Topic | Exact source and contract | Evidence and status |
 | --- | --- | --- |
-| Producer analysis and annotations | `4cdf89ab1d2de08dc3b85c48db2aee7418aa85c1`: enables AOT/trim analyzers for both shipped core producers; removes overly broad RDC and RUC declarations without changing method signatures. | Both producers build with warnings as errors and zero warnings/errors. 48 focused tests per flavor pass. Independently reviewed and merged into the integration owner's candidate; not yet released. |
-| Explicit observable runtime | `67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195`: six methods (`AddObservableRule` in four forms and two typed observable bindings); [runtime contract](../../examples/native-validation.md). | Independently reviewed and merged into the integration owner's candidate; +21 baseline lines per flavor. Producer-analysis warnings-as-errors build passes with zero warnings/errors. 12 new [runtime regressions](../../../src/tests/ReactiveUI.Validation.Tests/ObservableRuntimeApiTests.cs) per flavor pass; final integrated core/native gates remain separate. |
-| Realistic application examples | Baseline `4c55026`, safe counterpart `85c63a8`; [package corpus](../../../examples/NativeValidation/README.md): generic fields, nullable nested editor/rich typed target, blocking/advisory cross-field rules, row-owned asynchronous state and existing observable foundation. | Both baseline flavors record three managed case passes and the expected required-null-policy gap, plus strict IL2026/IL3050 with Validation call provenance. Both safe flavors pass five cases in all three local modes at exact clean `eae4984`; remote CI and Windows native remain pending. |
-| Native package gates | `ee7d0db`, `ba30d02` and strengthening `c026ec0`, integrated at `eae4984`; [strict runner](../../../eng/verify-native-validation.py): producer/package analysis, exact graphs, trimmed and native publish/run, and CI artifact/source identity. | Locally verified actual-package gate at exact clean `eae4984`, with warning-as-error analysis and actual Linux native execution. Cross-platform CI/Windows native/publication remain pending. |
-| Future generator | `b2043da`, `ebb726d`, `eba235a`; [deferred design](../../generated-validation-design.md). | Reviewed design and managed compiler proof only. The synthetic annotated call still produces IL2026/IL3050 despite interception. No native or shipping generator claim. |
+| Producer analysis and annotations | `4cdf89ab1d2de08dc3b85c48db2aee7418aa85c1`: enables AOT/trim analyzers for both shipped core producers; removes overly broad RDC and RUC declarations without changing method signatures. | Both producers build with warnings as errors and zero warnings/errors. 48 focused tests per flavor pass. Independently reviewed and adopted in released `f22d2bb`; the full final CI/release gates pass. |
+| Explicit observable runtime | `67fdd937cc1aef85bb6b42ca9cd3a31d0e06f195`: six methods (`AddObservableRule` in four forms and two typed observable bindings); [runtime contract](../../examples/native-validation.md). | Independently reviewed and adopted in released `f22d2bb`; +21 baseline lines per flavor. Producer-analysis warnings-as-errors build passes with zero warnings/errors. 12 new [runtime regressions](../../../src/tests/ReactiveUI.Validation.Tests/ObservableRuntimeApiTests.cs) per flavor pass; final integrated core/native gates remain separate. |
+| Realistic application examples | Baseline `4c55026`, safe counterpart `85c63a8`; [package corpus](../../../examples/NativeValidation/README.md): generic fields, nullable nested editor/rich typed target, blocking/advisory cross-field rules, row-owned asynchronous state and existing observable foundation. | Both baseline flavors record three managed case passes and the expected required-null-policy gap, plus strict IL2026/IL3050 with Validation call provenance. The final safe fixtures, including adapter correction `07ab9ca`, pass five cases in all three local modes at exact clean `f22d2bb`; final CI and both actual native RIDs pass; published tag/source/assets are independently verified. |
+| Native package gates | `ee7d0db`, `ba30d02` and strengthening `c026ec0`, integrated at `eae4984`; [strict runner](../../../eng/verify-native-validation.py): producer/package analysis, exact graphs, trimmed and native publish/run, and CI artifact/source identity. | Final local actual-package gate at exact clean `f22d2bb` passes all three modes with warning-as-error analysis and actual Linux native execution. Final CI and both actual native RIDs pass; published tag/source/assets are independently verified. |
+| Future generator | `b2043da`, `ebb726d`, `eba235a`, handoff follow-up `9fb933f` / `ef69fa0`; [deferred design](../../generated-validation-design.md). | Reviewed design and managed compiler proof only. The synthetic annotated call still produces IL2026/IL3050 despite interception. No native or shipping generator claim. |
 
 The [structured evidence](../evidence/native-runtime-implementation.json) records
 the audited annotation counts and preserves historical release-probe identity.
@@ -296,3 +296,109 @@ Windows x64 native execution against the same CI Linux package artifact. The
 later application-adapter fix supersedes this candidate. These results do not
 verify the final fresh package pair or its release. The prior `.790.17` published
 source, tag and assets remain immutable.
+
+
+### Final candidate after application adapter correction
+
+The final frozen source is **`f22d2bb42c30d66df19a59333ed4fa633b241940`**.
+The library and library-test trees are byte-identical to preliminary `eae4984`;
+application-adapter cleanup/handoff corrections and their assertions are new.
+The [adapter source/evidence](../../../examples/NativeValidation/evidence/adapter-lifecycle-results.json)
+keeps the earlier focused managed before/after proof separate from final package
+execution. New [adapter checks](../../../examples/NativeValidation/ApplicationAdapterChecks.cs)
+run within `generic-field` under every final consumer mode: initial parent
+replacement/null, old/latest/outer detachment, owner disposal rejecting returning
+handles, disposed snapshot listeners, and initial getter/callback original-error
+cleanup. Equivalent generated-adapter acceptance remains deferred. The release
+workflow also targets this fork explicitly; dependency pins remain unchanged.
+
+Fresh local strict verification at clean `f22d2bb` passes all five safe cases in
+each flavor under managed, fully trimmed and actual Linux x64 NativeAOT:
+**30 scenario executions**, zero positive-path warnings/errors. The native
+false-dynamic-code guard and single-threaded warning-as-error ILC response-file
+checks pass again. Both immutable baseline strict failures retain the required
+Validation diagnostic provenance; no new baseline native execution is claimed.
+
+| Final local candidate package | Version / SHA-256 |
+| --- | --- |
+| `Runic.ReactiveUI.Validation` | `8.1.0-runic.0.790.17.15` / `78c7b65b9f60d5e316cad708f9ebc5545764ed0a3ea98f4917ac412d474c4f1f` |
+| `Runic.ReactiveUI.Validation.Reactive` | `8.1.0-runic.0.790.17.15` / `b6f2530fb5b56c256ff29568f7fe8374a5c6d0ce68d9d359c4394f79adbc5a58` |
+
+These final local hashes are separate from preliminary, CI and published bytes.
+Final same-head cross-platform CI passes; actual native Windows and Linux
+execution is established. Published tag/source/assets are independently verified. The later documentation-only review stamp may reuse verified
+unchanged code/workflow evidence under the maintenance policy; its own source
+commit will not be presented as the shipping package source.
+
+
+### Final cross platform verification
+
+[Build run 37375282317](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37375282317)
+passes all four jobs in attempt 1 at exact
+`f22d2bb42c30d66df19a59333ed4fa633b241940`. Each core OS job passes **618 tests
+(309 per flavor), zero failed/skipped**: 1,236 test executions across two hosts,
+not 1,236 distinct tests. Both native jobs publish with trimming enabled and
+execute five cases per flavor: **20 actual native case checks** across Linux x64
+and Windows x64, zero candidate warnings/errors. Each platform pipeline retains
+eight existing package guard tests and six native guard tests. Both ordinary
+collection examples and independent package consumers pass.
+
+The two native RID reports verify the exact same Ubuntu shipping package bytes:
+
+| CI Ubuntu package | Version / SHA-256 |
+| --- | --- |
+| `Runic.ReactiveUI.Validation` | `8.1.0-runic.0.790.17.15` / `f0c0a60577c3636d07946a5c69fb00092e553275fc9b026e2fd2a8c6c1b7847a` |
+| `Runic.ReactiveUI.Validation.Reactive` | `8.1.0-runic.0.790.17.15` / `ce1ff84059e7167a1e786f323efc9329ff4bbab307a63afb1bfa4ded409d3462` |
+
+These CI hashes differ from the local `.15` pair above and are not published
+release hashes. The retained root summary is
+`artifacts/verification/native-support/final/ci/37375282317/summary.json`;
+the structured record preserves source/package identity, actual RID reports and
+artifact digests. Standalone full-trim managed execution is local Linux evidence;
+the Windows job establishes actual native execution with trimming enabled.
+[Release run 37375833531](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37375833531)
+passes the complete matrix plus the publishing job at `f22d2bb`. Published tag,
+nuspec source and independently downloaded assets are verified below.
+
+
+### Native follow up release and documentation stamp
+
+[Release run 37375833531](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37375833531)
+passes all five jobs in attempt 1 at exact
+`f22d2bb42c30d66df19a59333ed4fa633b241940`. The reused matrix again passes
+**618 tests per OS (309 per flavor), zero failed/skipped**, both ordinary
+examples and independent consumers, eight core package guards plus six native
+guards per platform pipeline, and **20 actual native case checks** across Linux
+x64/Windows x64, both flavors, zero positive warnings/errors. The publishing job
+uses the same Ubuntu artifact consumed by both successful native RID jobs.
+
+Published [8.1.0-runic.0.790.17.15](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15)
+uses tag `runic-v8.1.0-runic.0.790.17.15`, resolving to exact `f22d2bb`. Both
+nuspecs record that source, .NET 10, ReactiveUI 26.0.1 and matching released
+Runic.DynamicData `10.0.0-runic.5`. Release API hashes match an independent
+download, and both published assets match the release matrix's Ubuntu artifact
+and native RID reports:
+
+| Published asset | Bytes / independently verified SHA-256 |
+| --- | --- |
+| `Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.15.nupkg` | 184,532 / `17be4c3b5f46e9ff237b5f89bf97c4ff1f47b5dfef9abd250516cc454c57e95f` |
+| `Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.15.nupkg` | 185,104 / `08d6087dbd86e0ae92f1230275351240d8b2e32b7765e5b6c2b31e8ae47b4fd2` |
+
+Ignored independent evidence is retained at
+`artifacts/verification/native-published-independent/verification.json`; the
+release matrix summary is
+`artifacts/verification/native-support/final/release/37375833531/summary.json`.
+The canonical `artifacts/packages` feed contains exactly these published bytes;
+the useful local `.15` pair is retained under
+`artifacts/retained-packages/8.1.0-runic.0.790.17.15/local-f22d2bb`.
+Local, final CI and published hashes remain distinct in this review and the
+structured evidence. Earlier `.790`/`.790.17` tags and assets are unchanged.
+Versions, tags and assets are immutable under fork policy; the GitHub release is
+not marked as an enforced immutable release.
+
+The final review stamp changes documentation and evidence metadata only. It
+reuses exact released code/workflow verification under the maintenance policy;
+its own commit is not the shipping package source. `RUV-016` and `RUV-017` are
+active released contracts. No generator package/MVP, whole-library
+`IsAotCompatible`, retained UI-platform support, other RID or bridge/browser
+end-to-end result is claimed.
