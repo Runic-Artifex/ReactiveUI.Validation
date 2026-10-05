@@ -155,6 +155,27 @@ namespace ReactiveUI.Validation.Reactive.Contexts
 }
 namespace ReactiveUI.Validation.Reactive.Extensions
 {
+    public static class ObservableValidationBindingExtensions
+    {
+        extension<TSource>(System.IObservable<TSource?> sources) where TSource : class
+        {
+            public ReactiveUI.Validation.Reactive.ValidationBindings.Abstractions.IValidationBinding BindObservablePropertyValidationState<TOut>(System.Func<TSource, ReactiveUI.Validation.Reactive.Contexts.IValidationContext?> selectContext, string propertyPath, System.Func<System.Collections.Generic.IList<ReactiveUI.Validation.Reactive.States.IValidationState>, TOut> converter, System.Action<TOut> onNext, bool strict) { }
+            public ReactiveUI.Validation.Reactive.ValidationBindings.Abstractions.IValidationBinding BindObservableValidationState<TOut>(System.Func<TSource, System.IObservable<ReactiveUI.Validation.Reactive.States.IValidationState>?> selectStates, System.Func<ReactiveUI.Validation.Reactive.States.IValidationState, TOut> converter, System.Action<TOut> onNext) { }
+        }
+    }
+    public static class ObservableValidationRuleExtensions
+    {
+        extension(ReactiveUI.Validation.Reactive.Abstractions.IValidatableViewModel viewModel)
+        {
+            public ReactiveUI.Validation.Reactive.Helpers.ValidationHelper AddObservableRule(System.IObservable<ReactiveUI.Validation.Reactive.States.IValidationState> states, System.Collections.Generic.IEnumerable<string> propertyPaths) { }
+            public ReactiveUI.Validation.Reactive.Helpers.ValidationHelper AddObservableRule<TValue>(System.IObservable<TValue> values, System.Func<TValue, ReactiveUI.Validation.Reactive.States.IValidationState> validate, System.Collections.Generic.IEnumerable<string> propertyPaths) { }
+        }
+        extension(ReactiveUI.Validation.Reactive.Contexts.IValidationContext context)
+        {
+            public ReactiveUI.Validation.Reactive.Helpers.ValidationHelper AddObservableRule(System.IObservable<ReactiveUI.Validation.Reactive.States.IValidationState> states, System.Collections.Generic.IEnumerable<string> propertyPaths) { }
+            public ReactiveUI.Validation.Reactive.Helpers.ValidationHelper AddObservableRule<TValue>(System.IObservable<TValue> values, System.Func<TValue, ReactiveUI.Validation.Reactive.States.IValidationState> validate, System.Collections.Generic.IEnumerable<string> propertyPaths) { }
+        }
+    }
     public static class ValidatableViewModelExtensions
     {
         extension<TViewModel>(TViewModel viewModel) where TViewModel : class, ReactiveUI.IReactiveObject, ReactiveUI.Validation.Reactive.Abstractions.IValidatableViewModel
