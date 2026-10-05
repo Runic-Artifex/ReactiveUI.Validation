@@ -147,6 +147,8 @@ def packed_versions(feed, pins, source=None):
             metadata = ET.fromstring(archive.read(f"{package_id}.nuspec"))
         version = PACKAGES.verify_metadata(metadata, reactive, pins)
         if source is not None:
+            if version == RELEASE.VERSION:
+                raise ValueError("Candidate must not reuse the immutable released Validation version")
             repository = metadata.find("n:metadata/n:repository", PACKAGES.NS)
             if repository is None or repository.get("commit") != source:
                 raise ValueError(f"Candidate package must record current source SHA {source}: {paths[0]}")

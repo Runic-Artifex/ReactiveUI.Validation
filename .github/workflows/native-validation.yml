@@ -45,7 +45,7 @@ jobs:
       - name: Download the same-SHA core package pair
         uses: actions/download-artifact@v4
         with:
-          name: packages-${{ matrix.os }}
+          name: packages-ubuntu-latest
           path: artifacts/packages
       - name: Publish and execute strict consumers of the verified package bytes
         run: python eng/verify-native-validation.py --rid ${{ matrix.rid }} --mode native --package-feed artifacts/packages
