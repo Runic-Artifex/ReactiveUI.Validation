@@ -264,7 +264,9 @@ internal static class BindingEmitter
             }
 
             sourceGetter = getter.ToString();
-            sourceType = GeneratorHelpers.TypeName(properties[properties.Count - 1].Type.WithNullableAnnotation(NullableAnnotation.NotAnnotated));
+            sourceType = shape.SelectedContext
+                ? $"{shape.NamespaceRoot}.Contexts.IValidationContext"
+                : GeneratorHelpers.TypeName(properties[properties.Count - 1].Type.WithNullableAnnotation(NullableAnnotation.NotAnnotated));
         }
         else
         {

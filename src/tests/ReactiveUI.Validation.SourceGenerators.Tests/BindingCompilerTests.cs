@@ -70,6 +70,7 @@ public sealed class BindingCompilerTests
         using {{binding}};
         using {{root}}.Abstractions;
         using {{root}}.Collections;
+        using {{root}}.Components.Abstractions;
         using {{root}}.Contexts;
         using {{root}}.Extensions;
         using {{root}}.Helpers;
@@ -85,6 +86,8 @@ public sealed class BindingCompilerTests
             public ValidationHelper? Rule { get; set => this.RaiseAndSetIfChanged(ref field, value); }
             public IValidationContext ValidationContext { get; } = new ValidationContext();
             public IValidationContext? Selected { get; set => this.RaiseAndSetIfChanged(ref field, value); }
+            public PrivateContext? HiddenContext { get; set => this.RaiseAndSetIfChanged(ref field, value); }
+            public ExplicitContext? ExplicitContext { get; set => this.RaiseAndSetIfChanged(ref field, value); }
         }
         public sealed class View : ReactiveObject, IViewFor<Model>
         {
@@ -129,6 +132,15 @@ public sealed class BindingCompilerTests
                 _current = value;
                 foreach (var observer in _observers.ToArray()) observer.OnNext(value);
             }
+        }
+        public sealed class PrivateContext : ValidationContext
+        {
+            private new IObservable<IValidationState> ValidationStatusChange => throw new InvalidOperationException("private shadow");
+        }
+        public sealed class ExplicitContext : ValidationContext, IValidationContext, IValidationComponent
+        {
+            public new IObservable<IValidationState> ValidationStatusChange { get; } = new Current(new RichState(false, "wrong", 99));
+            IObservable<IValidationState> IValidationComponent.ValidationStatusChange => base.ValidationStatusChange;
         }
         public sealed class Cleanup(Action dispose) : IDisposable { public void Dispose() => dispose(); }
         public static class Fixture
@@ -210,6 +222,56 @@ public sealed class BindingCompilerTests
         var assembly = System.Reflection.Assembly.Load(stream.ToArray());
         var actual = (bool)assembly.GetType("Fixture")!.GetMethod("Check")!.Invoke(null, null)!;
         await Assert.That(actual).IsTrue();
+    }
+
+    /// <summary>Uses the selector's context interface contract despite private shadows and misleading concrete streams.</summary>
+    /// <param name="reactive">Whether the fixture uses the System.Reactive flavor.</param>
+    /// <returns>The asynchronous assertion work.</returns>
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    [SuppressMessage(
+        "Security",
+        "SES1402",
+        Justification = "The test loads only a consumer compiled in memory from this repository's fixed trusted fixture to exercise generated dispatch.")]
+    public async Task SelectedContextsUseInterfaceDispatch(bool reactive)
+    {
+        const string body = """
+            RxAppBuilder.CreateReactiveUIBuilder().WithCoreServices().BuildApp();
+            var model = new Model();
+            var view = new View { ViewModel = model };
+            using var hidden = new PrivateContext();
+            using var hiddenRule = hidden.AddObservableRule(new Current(new RichState(false, "hidden", 1)), new[] { "Name" });
+            model.HiddenContext = hidden;
+            IValidationState? aggregate = null;
+            using var hiddenText = view.BindValidationContext(model, x => x.HiddenContext, x => x.Message);
+            using var hiddenAction = view.BindValidationContext(model, x => x.HiddenContext, state => aggregate = state);
+            Require(view.Message == "hidden" && aggregate?.IsValid == false, "private shadow does not affect interface aggregate");
+            hiddenText.Dispose();
+            hiddenAction.Dispose();
+            using var selected = new ExplicitContext();
+            using var selectedRule = selected.AddObservableRule(new Current(new RichState(false, "correct", 2)), new[] { "Name" });
+            model.ExplicitContext = selected;
+            using var selectedText = view.BindValidationContext(model, x => x.ExplicitContext, x => x.Message);
+            using var selectedAction = view.BindValidationContext(model, x => x.ExplicitContext, state => aggregate = state);
+            Require(view.Message == "correct" && aggregate?.Text.ToSingleLine() == "correct", "explicit interface wins over misleading concrete stream");
+            model.ExplicitContext = null;
+            Require(view.Message == "" && aggregate!.IsValid, "null concrete context clears interface bindings");
+            model.ExplicitContext = selected;
+            Require(view.Message == "correct", "concrete context reattachment follows interface contract");
+            return true;
+            """;
+        var result = Generate(Source(reactive, body));
+        await Assert.That(result.Diagnostics).IsEmpty();
+        await Assert.That(Errors(result.Compilation)).IsEmpty();
+        await Assert.That(Warnings(result.Compilation)).IsEmpty();
+        await Assert.That(await DispatchErrors(result.Compilation)).IsEmpty();
+        await Assert.That(result.Generated).Contains($"ObserveReference<global::{(reactive ? "ReactiveUI.Validation.Reactive" : "ReactiveUI.Validation")}.Contexts.IValidationContext>");
+        await using var stream = new MemoryStream();
+        var emitted = result.Compilation.Emit(stream);
+        await Assert.That(string.Join("\n", emitted.Diagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))).IsEmpty();
+        var assembly = System.Reflection.Assembly.Load(stream.ToArray());
+        await Assert.That((bool)assembly.GetType("Fixture")!.GetMethod("Check")!.Invoke(null, null)!).IsTrue();
     }
 
     /// <summary>Reports unsupported binding inputs at the selector instead of emitting invalid C#.</summary>
