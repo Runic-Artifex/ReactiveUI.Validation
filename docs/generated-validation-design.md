@@ -30,7 +30,7 @@ second generator is not a prerequisite for the safe observable APIs.
 
 A small [managed compiler proof](../investigations/BindingGenerators/evidence/interceptor-annotation-proof.txt)
 uses SDK **10.0.401**, C#14 and ILLink analyzers **10.0.12**. An unannotated
-interceptor replaces an RDC/RUC-annotated original call and executes the distinct
+interceptor replaces a synthetic RDC/RUC-annotated `UnsafeApi.Read` call and executes the distinct
 `safe-interceptor` result. The original call still produces **IL2026 and IL3050**.
 This rules out promising zero warnings merely by intercepting existing annotated
 Validation methods. Both diagnostics remain visible; the isolated proof records
@@ -42,7 +42,8 @@ defines compile-time call substitution and a dedicated allowed namespace. Its
 [current API](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp.csharpextensions.getinterceptablelocation?view=roslyn-dotnet-5.0.0)
 provides encoded locations rather than manually maintained source line numbers.
 The managed proof tests the annotation behavior on the pinned toolchain instead
-of inferring it from runtime reachability. Correct legacy annotations remain;
+of inferring it from runtime reachability. Annotations justified by the producer audit remain; narrowing an overly broad
+annotation is a separate runtime change.
 [Microsoft's trimming guidance](https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/fixing-warnings)
 treats warnings as evidence about supported inputs and recommends resolving the
 underlying unsupported behavior.
@@ -228,7 +229,10 @@ reflection or Unsafe fallback:
 Runtime-configured names, plugin-discovered models, arbitrary reflection-only
 members and request lifetimes are not compile-time inputs. Supplying explicit
 observables remains the supported escape route. Intentionally using a legacy
-Unsafe/expression path retains its legitimate RDC/RUC warnings.
+Unsafe/expression path retains its legitimate RUC/trimming warnings. The current
+producer audit removes overly broad RDC annotations; the synthetic proof above
+tests both annotation kinds independently, and the released-cohort evidence is
+dated historical behavior.
 
 ## Alternative costs and acceptance criteria
 
