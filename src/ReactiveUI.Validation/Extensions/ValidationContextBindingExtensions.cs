@@ -34,8 +34,110 @@ public static class ValidationContextBindingExtensions
     /// <param name="formatter">The text formatter, or null for the registered default.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view or an expression is null.</exception>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+    /// <remarks>Requires the Runic Validation generator. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
     public static IValidationBinding BindValidationContext<TView, TViewModel>(
+        this TView view,
+        TViewModel? viewModel,
+        Expression<Func<TViewModel, IValidationContext?>> contextProperty,
+        Expression<Func<TView, string>> viewProperty,
+        IValidationTextFormatter<string>? formatter = null)
+        where TView : IViewFor<TViewModel>
+        where TViewModel : class, IReactiveObject, IValidatableViewModel
+    {
+        _ = view;
+        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationContext));
+    }
+
+    /// <summary>Binds the selected context's validation text for a property to a string view property.</summary>
+    /// <typeparam name="TView">The view type.</typeparam>
+    /// <typeparam name="TViewModel">The view model type.</typeparam>
+    /// <typeparam name="TProperty">The view model property type.</typeparam>
+    /// <param name="view">The view whose current view model is observed.</param>
+    /// <param name="viewModel">Used only for type inference.</param>
+    /// <param name="contextProperty">The observable context property to select.</param>
+    /// <param name="viewModelProperty">The property whose validation text is displayed.</param>
+    /// <param name="viewProperty">The string view property to update.</param>
+    /// <param name="formatter">The text formatter, or null for the registered default.</param>
+    /// <param name="strict">Whether to include only rules validating this property exclusively.</param>
+    /// <returns>A binding that detaches its subscriptions when disposed.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when view or an expression is null.</exception>
+    /// <remarks>Requires the Runic Validation generator. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
+    public static IValidationBinding BindValidationContext<TView, TViewModel, TProperty>(
+        this TView view,
+        TViewModel? viewModel,
+        Expression<Func<TViewModel, IValidationContext?>> contextProperty,
+        Expression<Func<TViewModel, TProperty>> viewModelProperty,
+        Expression<Func<TView, string>> viewProperty,
+        IValidationTextFormatter<string>? formatter = null,
+        bool strict = true)
+        where TView : IViewFor<TViewModel>
+        where TViewModel : class, IReactiveObject, IValidatableViewModel
+    {
+        _ = view;
+        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationContext));
+    }
+
+    /// <summary>Sends the selected context's aggregate state to an action.</summary>
+    /// <typeparam name="TView">The view type.</typeparam>
+    /// <typeparam name="TViewModel">The view model type.</typeparam>
+    /// <param name="view">The view whose current view model is observed.</param>
+    /// <param name="viewModel">Used only for type inference.</param>
+    /// <param name="contextProperty">The observable context property to select.</param>
+    /// <param name="action">Receives aggregate validity and text, including a valid state while the selection is null.</param>
+    /// <returns>A binding that detaches its subscriptions when disposed.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when view, contextProperty or action is null.</exception>
+    /// <remarks>Requires the Runic Validation generator. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
+    public static IValidationBinding BindValidationContext<TView, TViewModel>(
+        this TView view,
+        TViewModel? viewModel,
+        Expression<Func<TViewModel, IValidationContext?>> contextProperty,
+        Action<IValidationState> action)
+        where TView : IViewFor<TViewModel>
+        where TViewModel : class, IReactiveObject, IValidatableViewModel
+    {
+        _ = view;
+        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationContext));
+    }
+
+    /// <summary>Sends the selected context's states for a property to an action.</summary>
+    /// <typeparam name="TView">The view type.</typeparam>
+    /// <typeparam name="TViewModel">The view model type.</typeparam>
+    /// <typeparam name="TProperty">The view model property type.</typeparam>
+    /// <param name="view">The view whose current view model is observed.</param>
+    /// <param name="viewModel">Used only for type inference.</param>
+    /// <param name="contextProperty">The observable context property to select.</param>
+    /// <param name="viewModelProperty">The property whose rules are observed.</param>
+    /// <param name="action">Receives actual matching rule states; a null context or no matching rules emits an empty list.</param>
+    /// <param name="strict">Whether to include only rules validating this property exclusively.</param>
+    /// <returns>A binding that detaches its subscriptions when disposed.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when view, an expression or action is null.</exception>
+    /// <remarks>Requires the Runic Validation generator. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
+    public static IValidationBinding BindValidationContext<TView, TViewModel, TProperty>(
+        this TView view,
+        TViewModel? viewModel,
+        Expression<Func<TViewModel, IValidationContext?>> contextProperty,
+        Expression<Func<TViewModel, TProperty>> viewModelProperty,
+        Action<IList<IValidationState>> action,
+        bool strict = true)
+        where TView : IViewFor<TViewModel>
+        where TViewModel : class, IReactiveObject, IValidatableViewModel
+    {
+        _ = view;
+        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationContext));
+    }
+
+    /// <summary>Binds the selected context's aggregate validation text to a string view property.</summary>
+    /// <typeparam name="TView">The view type.</typeparam>
+    /// <typeparam name="TViewModel">The view model type.</typeparam>
+    /// <param name="view">The view whose current view model is observed.</param>
+    /// <param name="viewModel">Used only for type inference.</param>
+    /// <param name="contextProperty">The observable context property to select.</param>
+    /// <param name="viewProperty">The string view property to update.</param>
+    /// <param name="formatter">The text formatter, or null for the registered default.</param>
+    /// <returns>A binding that detaches its subscriptions when disposed.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when view or an expression is null.</exception>
+    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+    public static IValidationBinding BindValidationContextUnsafe<TView, TViewModel>(
         this TView view,
         TViewModel? viewModel,
         Expression<Func<TViewModel, IValidationContext?>> contextProperty,
@@ -64,7 +166,7 @@ public static class ValidationContextBindingExtensions
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view or an expression is null.</exception>
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
-    public static IValidationBinding BindValidationContext<TView, TViewModel, TProperty>(
+    public static IValidationBinding BindValidationContextUnsafe<TView, TViewModel, TProperty>(
         this TView view,
         TViewModel? viewModel,
         Expression<Func<TViewModel, IValidationContext?>> contextProperty,
@@ -93,7 +195,7 @@ public static class ValidationContextBindingExtensions
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view, contextProperty or action is null.</exception>
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
-    public static IValidationBinding BindValidationContext<TView, TViewModel>(
+    public static IValidationBinding BindValidationContextUnsafe<TView, TViewModel>(
         this TView view,
         TViewModel? viewModel,
         Expression<Func<TViewModel, IValidationContext?>> contextProperty,
@@ -118,7 +220,7 @@ public static class ValidationContextBindingExtensions
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view, an expression or action is null.</exception>
     [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
-    public static IValidationBinding BindValidationContext<TView, TViewModel, TProperty>(
+    public static IValidationBinding BindValidationContextUnsafe<TView, TViewModel, TProperty>(
         this TView view,
         TViewModel? viewModel,
         Expression<Func<TViewModel, IValidationContext?>> contextProperty,

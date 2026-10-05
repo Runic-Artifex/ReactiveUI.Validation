@@ -58,7 +58,7 @@ public class NotifyDataErrorInfoTests
 
         viewModel.ValidationContext.Add(firstValidation);
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
-        _ = view.BindValidation(view.ViewModel, vm => vm.Name, v => v.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, vm => vm.Name, v => v.NameErrorLabel);
 
         // Verify validation context behavior.
         using (Assert.Multiple())
@@ -92,7 +92,7 @@ public class NotifyDataErrorInfoTests
 
         viewModel.ValidationContext.Add(firstValidation);
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
-        _ = view.BindValidation(view.ViewModel, vm => vm.Name, v => v.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, vm => vm.Name, v => v.NameErrorLabel);
 
         // Verify the initial state.
         using (Assert.Multiple())
@@ -215,12 +215,12 @@ public class NotifyDataErrorInfoTests
     public async Task ValidationRulesOfTheSamePropertyShouldNotDuplicate()
     {
         var viewModel = new IndeiTestViewModel();
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.Name,
             static m => m is not null,
             NameShouldNotBeNullMessage);
 
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.Name,
             static m => !string.IsNullOrWhiteSpace(m),
             "Name shouldn't be white space.");
@@ -238,12 +238,12 @@ public class NotifyDataErrorInfoTests
     public async Task ShouldSendPropertyChangeNotificationsForCorrectProperties()
     {
         var viewModel = new IndeiTestViewModel();
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.Name,
             static m => m is not null,
             NameShouldNotBeNullMessage);
 
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.OtherName,
             static m => m is not null,
             OtherNameShouldNotBeNullMessage);
@@ -295,7 +295,7 @@ public class NotifyDataErrorInfoTests
 
         var helper = view
             .ViewModel!
-            .ValidationRule(
+            .ValidationRuleUnsafe(
                 viewModel => viewModel.Name,
                 static name => !string.IsNullOrWhiteSpace(name),
                 NameShouldNotBeEmptyMessage);
@@ -332,7 +332,7 @@ public class NotifyDataErrorInfoTests
 
         await Assert.That(view.ViewModel).IsNotNull();
         view.ViewModel!.ErrorsChanged += (_, args) => arguments.Add(args);
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             viewModel => viewModel.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             NameShouldNotBeEmptyMessage);
@@ -362,12 +362,12 @@ public class NotifyDataErrorInfoTests
     public async Task GetErrorsWithNullPropertyNameReturnsAllErrors()
     {
         var viewModel = new IndeiTestViewModel();
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.Name,
             static m => m is not null,
             NameShouldNotBeNullMessage);
 
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.OtherName,
             static m => m is not null,
             OtherNameShouldNotBeNullMessage);
@@ -387,12 +387,12 @@ public class NotifyDataErrorInfoTests
     public async Task GetErrorsWithEmptyPropertyNameReturnsAllErrors()
     {
         var viewModel = new IndeiTestViewModel();
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.Name,
             static m => m is not null,
             NameShouldNotBeNullMessage);
 
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.OtherName,
             static m => m is not null,
             OtherNameShouldNotBeNullMessage);
@@ -412,7 +412,7 @@ public class NotifyDataErrorInfoTests
     public async Task DisposeShouldCleanUpResources()
     {
         var viewModel = new IndeiTestViewModel();
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.Name,
             static m => m is not null,
             NameShouldNotBeNullMessage);
@@ -431,7 +431,7 @@ public class NotifyDataErrorInfoTests
     public async Task DoubleDisposeShouldBeSafe()
     {
         var viewModel = new IndeiTestViewModel();
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.Name,
             static m => m is not null,
             NameShouldNotBeNullMessage);
@@ -451,7 +451,7 @@ public class NotifyDataErrorInfoTests
         var arguments = new List<DataErrorsChangedEventArgs>();
 
         // First add a property-based validation to populate _mentionedPropertyNames
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.Name,
             static m => m is not null,
             NameShouldNotBeNullMessage);
@@ -473,12 +473,12 @@ public class NotifyDataErrorInfoTests
     public async Task SelectInvalidPropertyValidationsReturnsOnlyInvalidComponents()
     {
         var viewModel = new IndeiTestViewModel { Name = ValidName };
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.Name,
             static m => !string.IsNullOrEmpty(m),
             NameShouldNotBeEmptyMessage);
 
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.OtherName,
             static m => m is not null,
             OtherNameShouldNotBeNullMessage);
@@ -499,12 +499,12 @@ public class NotifyDataErrorInfoTests
     public async Task SelectInvalidPropertyValidationsReturnsEmptyWhenAllValid()
     {
         var viewModel = new IndeiTestViewModel { Name = ValidName, OtherName = "also valid" };
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.Name,
             static m => !string.IsNullOrEmpty(m),
             NameShouldNotBeEmptyMessage);
 
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             m => m.OtherName,
             static m => m is not null,
             OtherNameShouldNotBeNullMessage);
@@ -584,13 +584,13 @@ public class NotifyDataErrorInfoTests
         var viewModel = new IndeiTestViewModel();
         var view = new IndeiTestView(viewModel);
 
-        var helper = viewModel.ValidationRule(
+        var helper = viewModel.ValidationRuleUnsafe(
             vm => vm.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             NameShouldNotBeEmptyMessage);
 
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
-        _ = view.BindValidation(view.ViewModel, vm => vm.Name, v => v.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, vm => vm.Name, v => v.NameErrorLabel);
 
         // Verify initial invalid state.
         using (Assert.Multiple())
@@ -632,12 +632,12 @@ public class NotifyDataErrorInfoTests
         var errorsChangedCount = 0;
         viewModel.ErrorsChanged += (_, _) => errorsChangedCount++;
 
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             vm => vm.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             NameShouldNotBeEmptyMessage);
 
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             vm => vm.OtherName,
             static other => !string.IsNullOrWhiteSpace(other),
             "Other name shouldn't be empty.");
@@ -667,7 +667,7 @@ public class NotifyDataErrorInfoTests
     {
         var viewModel = new IndeiTestViewModel();
 
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             vm => vm.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             NameShouldNotBeEmptyMessage);
@@ -696,7 +696,7 @@ public class NotifyDataErrorInfoTests
     {
         var viewModel = new IndeiTestViewModel();
 
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             vm => vm.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             NameShouldNotBeEmptyMessage);

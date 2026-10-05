@@ -27,8 +27,8 @@ public class ValidationStateBindingTests
         using var helper = new ValidationHelper(new ObservableValidation<TestViewModel, IValidationState>(states));
         model.NameRule = helper;
         var view = new TestView(model);
-        using var binding = view.BindValidationState(model, vm => vm.NameRule, v => v.IsNameValid, static state => state.IsValid);
-        using var textBinding = view.BindValidation(model, vm => vm!.NameRule, v => v.NameErrorLabel);
+        using var binding = view.BindValidationStateUnsafe(model, vm => vm.NameRule, v => v.IsNameValid, static state => state.IsValid);
+        using var textBinding = view.BindValidationUnsafe(model, vm => vm!.NameRule, v => v.NameErrorLabel);
         await Assert.That(view.IsNameValid).IsFalse();
         await Assert.That(view.NameErrorLabel).IsEmpty();
         states.OnNext(ValidationState.Valid);
@@ -46,7 +46,7 @@ public class ValidationStateBindingTests
         using var firstRule = model.ValidationRule(vm => vm.Name, first);
         using var secondRule = model.ValidationRule(vm => vm.Name, second);
         var view = new StateView { ViewModel = model };
-        using var binding = view.BindValidationState(
+        using var binding = view.BindValidationStateUnsafe(
             model,
             vm => vm.Name,
             v => v.State,
@@ -67,9 +67,9 @@ public class ValidationStateBindingTests
         using var model = new TestViewModel();
         var view = new TestView(model);
         var counts = new List<int>();
-        using var binding = view.BindValidationState(model, vm => vm.Name, static states => states.Count, counts.Add, true);
+        using var binding = view.BindValidationStateUnsafe(model, vm => vm.Name, static states => states.Count, counts.Add, true);
         await Assert.That(counts[^1]).IsEqualTo(0);
-        var rule = model.ValidationRule(vm => vm.Name, static _ => false, ErrorMessage);
+        var rule = model.ValidationRuleUnsafe(vm => vm.Name, static _ => false, ErrorMessage);
         await Assert.That(counts[^1]).IsEqualTo(1);
         rule.Dispose();
         await Assert.That(counts[^1]).IsEqualTo(0);
@@ -84,11 +84,11 @@ public class ValidationStateBindingTests
     {
         using var first = new TestViewModel { Name = "first" };
         using var second = new TestViewModel { Name = "second" };
-        using var firstRule = first.ValidationRule(vm => vm.Name, static value => value == "ok", ErrorMessage);
-        using var secondRule = second.ValidationRule(vm => vm.Name, static value => value == "ok", ErrorMessage);
+        using var firstRule = first.ValidationRuleUnsafe(vm => vm.Name, static value => value == "ok", ErrorMessage);
+        using var secondRule = second.ValidationRuleUnsafe(vm => vm.Name, static value => value == "ok", ErrorMessage);
         var view = new TestView(first);
         var values = new List<bool>();
-        var binding = view.BindValidationState(first, vm => vm.Name, static states => states.All(static state => state.IsValid), values.Add, true);
+        var binding = view.BindValidationStateUnsafe(first, vm => vm.Name, static states => states.All(static state => state.IsValid), values.Add, true);
         view.ViewModel = second;
         var count = values.Count;
         first.Name = "ok";
@@ -123,7 +123,7 @@ public class ValidationStateBindingTests
         second.NameRule = newHelper;
         var view = new TestView(first);
         var values = new List<bool>();
-        var binding = view.BindValidationState(first, vm => vm.NameRule, static state => state.IsValid, values.Add);
+        var binding = view.BindValidationStateUnsafe(first, vm => vm.NameRule, static state => state.IsValid, values.Add);
         await Assert.That(values[^1]).IsFalse();
         first.NameRule = newHelper;
         await Assert.That(values[^1]).IsTrue();
@@ -162,8 +162,8 @@ public class ValidationStateBindingTests
         model.NameRule = helper;
         var view = new TestView(model);
         IValidationState? observed = null;
-        using var identity = view.BindValidationState(model, vm => vm.NameRule, static state => state, state => observed = state);
-        using var nullable = view.BindValidationState(
+        using var identity = view.BindValidationStateUnsafe(model, vm => vm.NameRule, static state => state, state => observed = state);
+        using var nullable = view.BindValidationStateUnsafe(
             model,
             vm => vm.NameRule,
             v => v.NameErrorLabel,
@@ -187,12 +187,12 @@ public class ValidationStateBindingTests
         var view = new TestView(model);
         var helperValues = new List<int>();
         var propertyValues = new List<int>();
-        using var helperBinding = view.BindValidationState(
+        using var helperBinding = view.BindValidationStateUnsafe(
             model,
             vm => vm.NameRule,
             static state => ((SeverityValidationState)state).Severity,
             helperValues.Add);
-        using var propertyBinding = view.BindValidationState(
+        using var propertyBinding = view.BindValidationStateUnsafe(
             model,
             vm => vm.Name,
             static values => ((SeverityValidationState)values[0]).Severity,
@@ -209,10 +209,10 @@ public class ValidationStateBindingTests
     public async Task PropertyDoesNotInventValidStateForActiveRules()
     {
         using var model = new TestViewModel();
-        using var rule = model.ValidationRule(vm => vm.Name, static _ => false, ErrorMessage);
+        using var rule = model.ValidationRuleUnsafe(vm => vm.Name, static _ => false, ErrorMessage);
         var view = new TestView(model);
         var values = new List<bool>();
-        using var binding = view.BindValidationState(model, vm => vm.Name, static states => states.All(static state => state.IsValid), values.Add, true);
+        using var binding = view.BindValidationStateUnsafe(model, vm => vm.Name, static states => states.All(static state => state.IsValid), values.Add, true);
         await Assert.That(values).IsNotEmpty();
         await Assert.That(values.TrueForAll(static value => !value)).IsTrue();
     }
@@ -223,9 +223,9 @@ public class ValidationStateBindingTests
     public async Task TypedAssignmentFollowsNestedHostReplacement()
     {
         using var model = new TestViewModel();
-        var rule = model.ValidationRule(vm => vm.Name, static _ => false, ErrorMessage);
+        var rule = model.ValidationRuleUnsafe(vm => vm.Name, static _ => false, ErrorMessage);
         var view = new StateView { ViewModel = model };
-        using var binding = view.BindValidationState(
+        using var binding = view.BindValidationStateUnsafe(
             model,
             vm => vm.Name,
             v => v.Target!.IsValid,
@@ -248,11 +248,11 @@ public class ValidationStateBindingTests
     {
         using var model = new TestViewModel();
         var view = new TestView(model);
-        await Assert.That(() => view.BindValidationState(model, vm => vm.NameRule, (Func<IValidationState, bool>)null!, static _ => { }))
+        await Assert.That(() => view.BindValidationStateUnsafe(model, vm => vm.NameRule, (Func<IValidationState, bool>)null!, static _ => { }))
             .Throws<ArgumentNullException>();
-        await Assert.That(() => view.BindValidationState(model, vm => vm.Name, static states => states.Count, (Action<int>)null!, true))
+        await Assert.That(() => view.BindValidationStateUnsafe(model, vm => vm.Name, static states => states.Count, (Action<int>)null!, true))
             .Throws<ArgumentNullException>();
-        await Assert.That(() => view.BindValidationState(
+        await Assert.That(() => view.BindValidationStateUnsafe(
             model,
             (Expression<Func<TestViewModel, string?>>)null!,
             v => v.IsNameValid,

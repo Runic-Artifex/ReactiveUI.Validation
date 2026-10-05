@@ -43,7 +43,7 @@ public class DisposalAndOverloadTests
     {
         var viewModel = new TestViewModel { Name = "valid" };
         var view = new TestView(viewModel);
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             static vm => vm.Name,
             static name => !string.IsNullOrEmpty(name),
             NameRequiredMessage);
@@ -84,7 +84,7 @@ public class DisposalAndOverloadTests
     public async Task ObserveForWithoutStrictReportsPropertyStates()
     {
         using var viewModel = new TestViewModel { Name = string.Empty };
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             static vm => vm.Name,
             static name => !string.IsNullOrEmpty(name),
             NameRequiredMessage);
@@ -112,11 +112,11 @@ public class DisposalAndOverloadTests
         // An empty DynamicData list has no change set to publish until the first rule is added.
         await Assert.That(latest).IsNull();
 
-        var requiredRule = viewModel.ValidationRule(
+        var requiredRule = viewModel.ValidationRuleUnsafe(
             static vm => vm.Name,
             static name => !string.IsNullOrEmpty(name),
             NameRequiredMessage);
-        var secondRule = viewModel.ValidationRule(
+        var secondRule = viewModel.ValidationRuleUnsafe(
             static vm => vm.Name,
             static name => name == "accepted",
             SecondMessage);
@@ -142,7 +142,7 @@ public class DisposalAndOverloadTests
     public async Task ObserveForDisposalStopsNotifications()
     {
         using var viewModel = new TestViewModel { Name = string.Empty };
-        var rule = viewModel.ValidationRule(
+        var rule = viewModel.ValidationRuleUnsafe(
             static vm => vm.Name,
             static name => !string.IsNullOrEmpty(name),
             NameRequiredMessage);

@@ -30,32 +30,15 @@ public static class ValidationRuleContextExtensions
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="message"/> is empty.</exception>
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+        /// <remarks>Requires the Runic Validation generator. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
         public ValidationHelper ValidationRule<TViewModelProp>(
             IValidationContext context,
             Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
             Func<TViewModelProp?, bool> isPropertyValid,
             string message)
         {
-            ArgumentExceptionHelper.ThrowIfNull(viewModel);
-
-            ArgumentExceptionHelper.ThrowIfNull(context);
-
-            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
-
-            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
-
-            ArgumentExceptionHelper.ThrowIfNullOrEmpty(message);
-
-            // We need to associate the ViewModel property with
-            // something that can be easily looked up and bound to.
-            return RegisterValidation(
-                context,
-                new BasePropertyValidation<TViewModel, TViewModelProp>(
-                    viewModel,
-                    viewModelProperty,
-                    isPropertyValid,
-                    message));
+            _ = viewModel;
+            throw GeneratedValidationObservation.RequiresGenerator(nameof(ValidationRule));
         }
 
         /// <summary>Setup a validation rule for a specified ViewModel property with dynamic error message.</summary>
@@ -66,30 +49,15 @@ public static class ValidationRuleContextExtensions
         /// <param name="message">Func to define the validation error message based on the viewModelProperty value.</param>
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+        /// <remarks>Requires the Runic Validation generator. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
         public ValidationHelper ValidationRule<TViewModelProp>(
             IValidationContext context,
             Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
             Func<TViewModelProp?, bool> isPropertyValid,
             Func<TViewModelProp?, string> message)
         {
-            ArgumentExceptionHelper.ThrowIfNull(viewModel);
-
-            ArgumentExceptionHelper.ThrowIfNull(context);
-
-            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
-
-            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
-
-            ArgumentExceptionHelper.ThrowIfNull(message);
-
-            return RegisterValidation(
-                context,
-                new BasePropertyValidation<TViewModel, TViewModelProp>(
-                    viewModel,
-                    viewModelProperty,
-                    isPropertyValid,
-                    message));
+            _ = viewModel;
+            throw GeneratedValidationObservation.RequiresGenerator(nameof(ValidationRule));
         }
 
         /// <summary>Setup a validation rule with a general observable indicating validity and a static error message.</summary>
@@ -219,6 +187,77 @@ public static class ValidationRuleContextExtensions
                 new ObservableValidation<TViewModel, bool, TViewModelProp>(
                     viewModelProperty,
                     validationObservable));
+        }
+
+        /// <summary>Setup a validation rule for a specified ViewModel property with static error message.</summary>
+        /// <typeparam name="TViewModelProp">ViewModel property type.</typeparam>
+        /// <param name="context">The destination context, captured until the helper is disposed.</param>
+        /// <param name="viewModelProperty">ViewModel property.</param>
+        /// <param name="isPropertyValid">Func to define if the viewModelProperty is valid or not.</param>
+        /// <param name="message">Validation error message.</param>
+        /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="message"/> is empty.</exception>
+        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+        public ValidationHelper ValidationRuleUnsafe<TViewModelProp>(
+            IValidationContext context,
+            Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
+            Func<TViewModelProp?, bool> isPropertyValid,
+            string message)
+        {
+            ArgumentExceptionHelper.ThrowIfNull(viewModel);
+
+            ArgumentExceptionHelper.ThrowIfNull(context);
+
+            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
+
+            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
+
+            ArgumentExceptionHelper.ThrowIfNullOrEmpty(message);
+
+            // We need to associate the ViewModel property with
+            // something that can be easily looked up and bound to.
+            return RegisterValidation(
+                context,
+                new BasePropertyValidation<TViewModel, TViewModelProp>(
+                    viewModel,
+                    viewModelProperty,
+                    isPropertyValid,
+                    message));
+        }
+
+        /// <summary>Setup a validation rule for a specified ViewModel property with dynamic error message.</summary>
+        /// <typeparam name="TViewModelProp">ViewModel property type.</typeparam>
+        /// <param name="context">The destination context, captured until the helper is disposed.</param>
+        /// <param name="viewModelProperty">ViewModel property.</param>
+        /// <param name="isPropertyValid">Func to define if the viewModelProperty is valid or not.</param>
+        /// <param name="message">Func to define the validation error message based on the viewModelProperty value.</param>
+        /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+        public ValidationHelper ValidationRuleUnsafe<TViewModelProp>(
+            IValidationContext context,
+            Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
+            Func<TViewModelProp?, bool> isPropertyValid,
+            Func<TViewModelProp?, string> message)
+        {
+            ArgumentExceptionHelper.ThrowIfNull(viewModel);
+
+            ArgumentExceptionHelper.ThrowIfNull(context);
+
+            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
+
+            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
+
+            ArgumentExceptionHelper.ThrowIfNull(message);
+
+            return RegisterValidation(
+                context,
+                new BasePropertyValidation<TViewModel, TViewModelProp>(
+                    viewModel,
+                    viewModelProperty,
+                    isPropertyValid,
+                    message));
         }
 
     }

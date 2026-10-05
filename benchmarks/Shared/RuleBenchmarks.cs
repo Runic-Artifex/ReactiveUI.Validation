@@ -93,6 +93,6 @@ public class RuleBenchmarks
     }
 
     private ValidationHelper[] CreateRules(BenchmarkViewModel model) => Enumerable.Range(0, Count)
-        .Select(_ => model.ValidationRule(static vm => vm.Name, static name => name == "valid", static name => name!))
+        .Select(_ => model.ValidationRuleUnsafe(static vm => vm.Name, static name => name == "valid", static name => name!))
         .ToArray();
 }

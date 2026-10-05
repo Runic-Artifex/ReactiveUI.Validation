@@ -123,7 +123,7 @@ public class ValidationOrderingTests
                 observedHasErrors = model.HasErrors;
             }
         };
-        using var rule = model.ValidationRule(value => value.Name, static name => !string.IsNullOrWhiteSpace(name), "Name required");
+        using var rule = model.ValidationRuleUnsafe(value => value.Name, static name => !string.IsNullOrWhiteSpace(name), "Name required");
         model.Name = string.Empty;
         await Assert.That(observedHasErrors).IsFalse();
         await Assert.That(model.HasErrors).IsTrue();

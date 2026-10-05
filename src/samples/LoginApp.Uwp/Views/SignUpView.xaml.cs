@@ -45,19 +45,19 @@ public sealed partial class SignUpView : Page, IViewFor<SignUpViewModel>
                 .DisposeWith(disposables);
 
             // ReactiveUI.Validation: Bindings for error messages.
-            // BindValidation(ViewModel, vmProperty, viewControlProperty)
+            // BindValidationUnsafe(ViewModel, vmProperty, viewControlProperty)
             // This will bind the validation message for the specified property to the control property.
-            this.BindValidation(ViewModel, x => x.UserName, x => x.UserNameErrorLabel.Text)
+            this.BindValidationUnsafe(ViewModel, x => x.UserName, x => x.UserNameErrorLabel.Text)
                 .DisposeWith(disposables);
-            this.BindValidation(ViewModel, x => x.Password, x => x.PasswordErrorLabel.Text)
+            this.BindValidationUnsafe(ViewModel, x => x.Password, x => x.PasswordErrorLabel.Text)
                 .DisposeWith(disposables);
-            this.BindValidation(ViewModel, x => x.ConfirmPassword, x => x.ConfirmPasswordErrorLabel.Text)
+            this.BindValidationUnsafe(ViewModel, x => x.ConfirmPassword, x => x.ConfirmPasswordErrorLabel.Text)
                 .DisposeWith(disposables);
 
             // ReactiveUI.Validation: Compound validation bindings.
-            // BindValidation(ViewModel, viewControlProperty)
+            // BindValidationUnsafe(ViewModel, viewControlProperty)
             // This will bind all validation messages for the entire ViewModel to the control property.
-            this.BindValidation(ViewModel, x => x.ErrorLabel.Text)
+            this.BindValidationUnsafe(ViewModel, x => x.ErrorLabel.Text)
                 .DisposeWith(disposables);
 
             // Controlling visibility of validation messages based on their content.

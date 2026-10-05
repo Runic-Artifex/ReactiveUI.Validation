@@ -38,18 +38,18 @@ public class ValidationBindingTests
         var view = new TestView(new TestViewModel { Name = "some" });
 
         await Assert.That(view.ViewModel).IsNotNull();
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             vm => vm!.Name,
             static s => !string.IsNullOrEmpty(s),
             "Name is required.");
 
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             vm => vm!.Name,
             static s => s!.Length > minimumLength,
             _ => minimumLengthErrorMessage);
 
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
-        _ = view.BindValidation(view.ViewModel, vm => vm.Name, v => v.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, vm => vm.Name, v => v.NameErrorLabel);
 
         view.ViewModel!.Name = "som";
 
@@ -73,18 +73,18 @@ public class ValidationBindingTests
         var view = new TestView(new TestViewModel { Name = "some" });
 
         await Assert.That(view.ViewModel).IsNotNull();
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             vm => vm.Name,
             static s => !string.IsNullOrEmpty(s),
             "Name is required.");
 
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             vm => vm.Name,
             static s => s?.Length > minimumLength,
             minimumLengthErrorMessage);
 
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
-        _ = view.BindValidation(view.ViewModel, vm => vm.Name, v => v.NameErrorContainer.Text);
+        _ = view.BindValidationUnsafe(view.ViewModel, vm => vm.Name, v => v.NameErrorContainer.Text);
 
         using (Assert.Multiple())
         {
@@ -103,13 +103,13 @@ public class ValidationBindingTests
         var view = new TestView(new TestViewModel { Name = validName });
 
         await Assert.That(view.ViewModel).IsNotNull();
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             vm => vm.Name,
             static s => !string.IsNullOrEmpty(s),
             static s => $"Name {s} isn't valid");
 
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
-        _ = view.BindValidation(view.ViewModel, vm => vm.Name, v => v.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, vm => vm.Name, v => v.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -126,19 +126,19 @@ public class ValidationBindingTests
         var view = new TestView(new TestViewModel { Name = string.Empty });
 
         await Assert.That(view.ViewModel).IsNotNull();
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             viewModelProperty => viewModelProperty.Name,
             static s => !string.IsNullOrEmpty(s),
             "Name should not be empty.");
 
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             viewModelProperty => viewModelProperty.Name2,
             static s => !string.IsNullOrEmpty(s),
             "Name2 should not be empty.");
 
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
         _ = view.Bind(view.ViewModel, vm => vm.Name2, v => v.Name2Label);
-        _ = view.BindValidation(view.ViewModel, v => v.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, v => v.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -166,7 +166,7 @@ public class ValidationBindingTests
             view.ViewModel!.WhenAnyValue(x => x.Name, x => x.Name2, static (name, name2) => name == name2),
             errorMessage);
 
-        _ = view.BindValidation(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -186,18 +186,18 @@ public class ValidationBindingTests
         var model = new SourceDestinationViewModel();
         var view = new SourceDestinationView(model);
 
-        _ = model.ValidationRule(
+        _ = model.ValidationRuleUnsafe(
             viewModel => viewModel.Source.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             "Source text");
 
-        _ = model.ValidationRule(
+        _ = model.ValidationRuleUnsafe(
             viewModel => viewModel.Destination.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             "Destination text");
 
-        _ = view.BindValidation(view.ViewModel, x => x.Source.Name, x => x.SourceError);
-        _ = view.BindValidation(view.ViewModel, x => x.Destination.Name, x => x.DestinationError);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Source.Name, x => x.SourceError);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Destination.Name, x => x.DestinationError);
 
         using (Assert.Multiple())
         {
@@ -218,13 +218,13 @@ public class ValidationBindingTests
         await Assert.That(view.ViewModel).IsNotNull();
         view.ViewModel!.NameRule = view
             .ViewModel!
-            .ValidationRule(
+            .ValidationRuleUnsafe(
                 viewModelProperty => viewModelProperty.Name,
                 static s => !string.IsNullOrEmpty(s),
                 nameErrorMessage);
 
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
-        _ = view.BindValidation(view.ViewModel, vm => vm!.NameRule, v => v.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, vm => vm!.NameRule, v => v.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -268,7 +268,7 @@ public class ValidationBindingTests
 
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
         _ = view.Bind(view.ViewModel, vm => vm.Name2, v => v.Name2Label);
-        _ = view.BindValidation(view.ViewModel, vm => vm!.NameRule, v => v.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, vm => vm!.NameRule, v => v.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -299,7 +299,7 @@ public class ValidationBindingTests
         await Assert.That(view.ViewModel).IsNotNull();
         view.ViewModel!.NameRule = view
             .ViewModel!
-            .ValidationRule(
+            .ValidationRuleUnsafe(
                 viewModelProperty => viewModelProperty.Name,
                 static s => !string.IsNullOrEmpty(s),
                 nameErrorMessage);
@@ -331,13 +331,13 @@ public class ValidationBindingTests
         var view = new TestView(new TestViewModel { Name = string.Empty });
 
         await Assert.That(view.ViewModel).IsNotNull();
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             vm => vm.Name,
             static s => !string.IsNullOrEmpty(s),
             "Name should not be empty.");
 
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
-        _ = view.BindValidation(view.ViewModel, v => v.NameErrorLabel, new ConstFormatter(validationConstant));
+        _ = view.BindValidationUnsafe(view.ViewModel, v => v.NameErrorLabel, new ConstFormatter(validationConstant));
 
         using (Assert.Multiple())
         {
@@ -369,7 +369,7 @@ public class ValidationBindingTests
         view.ViewModel!.NameRule = new(outerContext);
 
         _ = view.Bind(view.ViewModel, vm => vm.Name, v => v.NameLabel);
-        _ = view.BindValidation(view.ViewModel, vm => vm!.NameRule, v => v.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, vm => vm!.NameRule, v => v.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -425,7 +425,7 @@ public class ValidationBindingTests
 
         _ = view.Bind(view.ViewModel, x => x.Name, x => x.NameLabel);
         _ = view.Bind(view.ViewModel, x => x.Name2, x => x.Name2Label);
-        _ = view.BindValidation(view.ViewModel, x => x.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -458,7 +458,7 @@ public class ValidationBindingTests
         var view = new TestView(new TestViewModel { Name = string.Empty });
 
         await Assert.That(view.ViewModel).IsNotNull();
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             vm => vm.Name,
             static s => !string.IsNullOrEmpty(s),
             nameErrorMessage);
@@ -492,7 +492,7 @@ public class ValidationBindingTests
         await Assert.That(view.ViewModel).IsNotNull();
         view.ViewModel!.NameRule = view
             .ViewModel!
-            .ValidationRule(
+            .ValidationRuleUnsafe(
                 vm => vm.Name,
                 static s => !string.IsNullOrEmpty(s),
                 nameErrorMessage);
@@ -525,7 +525,7 @@ public class ValidationBindingTests
         var view = new TestView(new TestViewModel { Name = string.Empty });
 
         await Assert.That(view.ViewModel).IsNotNull();
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             vm => vm.Name,
             static s => !string.IsNullOrEmpty(s),
             nameErrorMessage);
@@ -556,13 +556,13 @@ public class ValidationBindingTests
         var view = new SampleView(new SampleViewModel());
 
         await Assert.That(view.ViewModel).IsNotNull();
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             viewModel => viewModel.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             nameErrorMessage);
 
         _ = view.Bind(view.ViewModel, x => x.Name, x => x.NameLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -594,19 +594,19 @@ public class ValidationBindingTests
         const string name2ErrorMessage = "Name shouldn't be empty.";
         var view = new TestView(new TestViewModel { Name = string.Empty });
         await Assert.That(view.ViewModel).IsNotNull();
-        var nameRule = view.ViewModel!.ValidationRule(
+        var nameRule = view.ViewModel!.ValidationRuleUnsafe(
             viewModel => viewModel.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             nameErrorMessage);
 
-        var name2Rule = view.ViewModel!.ValidationRule(
+        var name2Rule = view.ViewModel!.ValidationRuleUnsafe(
             viewModel => viewModel.Name2,
             static name => !string.IsNullOrWhiteSpace(name),
             name2ErrorMessage);
 
         _ = view.Bind(view.ViewModel, x => x.Name, x => x.NameLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.Name2, x => x.Name2ErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Name2, x => x.Name2ErrorLabel);
 
         await Assert.That(view.ViewModel).IsNotNull();
 
@@ -638,7 +638,7 @@ public class ValidationBindingTests
             await Assert.That(view.Name2ErrorLabel).IsEmpty();
         }
 
-        _ = view.ViewModel.ValidationRule(
+        _ = view.ViewModel.ValidationRuleUnsafe(
             viewModel => viewModel.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             nameErrorMessage);
@@ -663,18 +663,18 @@ public class ValidationBindingTests
     {
         var view = new TestView(new TestViewModel { Name = string.Empty });
         await Assert.That(view.ViewModel).IsNotNull();
-        var nameRule = view.ViewModel!.ValidationRule(
+        var nameRule = view.ViewModel!.ValidationRuleUnsafe(
             viewModel => viewModel.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             NameIsEmptyMessage);
 
-        var name2Rule = view.ViewModel!.ValidationRule(
+        var name2Rule = view.ViewModel!.ValidationRuleUnsafe(
             viewModel => viewModel.Name2,
             static name => !string.IsNullOrWhiteSpace(name),
             "Name2 is empty.");
 
         _ = view.Bind(view.ViewModel, x => x.Name, x => x.NameLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.NameErrorContainer.Text);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.NameErrorContainer.Text);
 
         using (Assert.Multiple())
         {
@@ -701,7 +701,7 @@ public class ValidationBindingTests
             await Assert.That(view.NameErrorContainer.Text).IsEmpty();
         }
 
-        _ = view.ViewModel.ValidationRule(
+        _ = view.ViewModel.ValidationRuleUnsafe(
             viewModel => viewModel.Name,
             static name => !string.IsNullOrWhiteSpace(name),
             NameIsEmptyMessage);
@@ -725,13 +725,13 @@ public class ValidationBindingTests
 
         await Assert.That(view.ViewModel).IsNotNull();
         view.ViewModel!.NameRule = view.ViewModel!
-            .ValidationRule(
+            .ValidationRuleUnsafe(
                 viewModel => viewModel.Name,
                 static name => !string.IsNullOrWhiteSpace(name),
                 nameErrorMessage);
 
         _ = view.Bind(view.ViewModel, x => x.Name, x => x.NameLabel);
-        _ = view.BindValidation(view.ViewModel, x => x!.NameRule, x => x.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x!.NameRule, x => x.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -752,7 +752,7 @@ public class ValidationBindingTests
 
         const string secretMessage = "This is the secret message.";
         view.ViewModel.NameRule = view.ViewModel
-            .ValidationRule(
+            .ValidationRuleUnsafe(
                 viewModel => viewModel.Name,
                 static name => !string.IsNullOrWhiteSpace(name),
                 secretMessage);
@@ -795,8 +795,8 @@ public class ValidationBindingTests
         _ = view.ViewModel!.ValidationRule(viewModelBlockedValidationState);
 
         _ = view.Bind(view.ViewModel, x => x.Name, x => x.NameLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.NameErrorContainer.Text);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.NameErrorContainer.Text);
 
         using (Assert.Multiple())
         {
@@ -846,8 +846,8 @@ public class ValidationBindingTests
                 new CustomValidationState(!blocked, viewModelIsBlockedMessage)));
 
         _ = view.Bind(view.ViewModel, x => x.Name, x => x.NameLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.NameErrorContainer.Text);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.NameErrorContainer.Text);
 
         using (Assert.Multiple())
         {
@@ -877,8 +877,8 @@ public class ValidationBindingTests
         var view = new TestView { NameErrorLabel = string.Empty, NameErrorContainer = { Text = string.Empty }, };
 
         _ = view.Bind(view.ViewModel, x => x.Name, x => x.NameLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.NameErrorContainer.Text);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.NameErrorContainer.Text);
 
         using (Assert.Multiple())
         {
@@ -888,7 +888,7 @@ public class ValidationBindingTests
 
         const string errorMessage = "Name shouldn't be empty.";
         var viewModel = new TestViewModel();
-        _ = viewModel.ValidationRule(x => x.Name, static x => !string.IsNullOrWhiteSpace(x), errorMessage);
+        _ = viewModel.ValidationRuleUnsafe(x => x.Name, static x => !string.IsNullOrWhiteSpace(x), errorMessage);
         view.ViewModel = viewModel;
 
         using (Assert.Multiple())

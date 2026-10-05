@@ -35,8 +35,8 @@ public class MultipleValidationContextTests
     {
         using var model = new ContextModel { Name = "ok" };
         using var advice = new ValidationContext(ImmediateContextScheduler.Instance);
-        using var warning = model.ValidationRule(advice, vm => vm.Name, static name => name == "excellent", "Improve the name");
-        using var blocking = model.ValidationRule(vm => vm.Name, static name => !string.IsNullOrEmpty(name), "Name required");
+        using var warning = model.ValidationRuleUnsafe(advice, vm => vm.Name, static name => name == "excellent", "Improve the name");
+        using var blocking = model.ValidationRuleUnsafe(vm => vm.Name, static name => !string.IsNullOrEmpty(name), "Name required");
         var saveEnabled = false;
         using var saveGate = model.ValidationContext.Valid.Subscribe(valid => saveEnabled = valid);
         await Assert.That(saveEnabled).IsTrue();
@@ -59,9 +59,9 @@ public class MultipleValidationContextTests
         using var first = new ValidationContext(ImmediateContextScheduler.Instance);
         using var replacement = new ValidationContext(ImmediateContextScheduler.Instance);
         model.Advice = first;
-        using var retained = model.ValidationRule(first, vm => vm.Name, static _ => false, "retained");
-        var removed = model.ValidationRule(model.Advice, vm => vm.Name, static _ => false, "removed");
-        using var other = model.ValidationRule(replacement, vm => vm.Name, static _ => false, "other");
+        using var retained = model.ValidationRuleUnsafe(first, vm => vm.Name, static _ => false, "retained");
+        var removed = model.ValidationRuleUnsafe(model.Advice, vm => vm.Name, static _ => false, "removed");
+        using var other = model.ValidationRuleUnsafe(replacement, vm => vm.Name, static _ => false, "other");
         model.Advice = replacement;
         removed.Dispose();
         removed.Dispose();
@@ -81,7 +81,7 @@ public class MultipleValidationContextTests
         using var advice = new ValidationContext(ImmediateContextScheduler.Instance);
         using var booleans = new BehaviorSubject<bool>(false);
         using var states = new BehaviorSubject<IValidationState>(new ValidationState(false, "state"));
-        using var dynamicRule = model.ValidationRule(advice, vm => vm.Name, static value => value == "long", static value => $"Improve {value}");
+        using var dynamicRule = model.ValidationRuleUnsafe(advice, vm => vm.Name, static value => value == "long", static value => $"Improve {value}");
         using var wholeBool = model.ValidationRule(advice, booleans, "whole bool");
         using var propertyBool = model.ValidationRule(advice, vm => vm.Name, booleans, "property bool");
         using var wholeState = model.ValidationRule(advice, states);
@@ -116,10 +116,10 @@ public class MultipleValidationContextTests
         var view = new ContextView { ViewModel = firstModel };
         var wholeMessage = string.Empty;
         var propertyMessage = string.Empty;
-        using var wholeText = view.BindValidationContext(firstModel, vm => vm.Advice, v => v.WholeText);
-        using var propertyText = view.BindValidationContext(firstModel, vm => vm.Advice, vm => vm.Name, v => v.PropertyText);
-        using var wholeAction = view.BindValidationContext(firstModel, vm => vm.Advice, state => wholeMessage = state.Text.ToSingleLine());
-        using var propertyAction = view.BindValidationContext(
+        using var wholeText = view.BindValidationContextUnsafe(firstModel, vm => vm.Advice, v => v.WholeText);
+        using var propertyText = view.BindValidationContextUnsafe(firstModel, vm => vm.Advice, vm => vm.Name, v => v.PropertyText);
+        using var wholeAction = view.BindValidationContextUnsafe(firstModel, vm => vm.Advice, state => wholeMessage = state.Text.ToSingleLine());
+        using var propertyAction = view.BindValidationContextUnsafe(
             firstModel,
             vm => vm.Advice,
             vm => vm.Name,
@@ -165,8 +165,8 @@ public class MultipleValidationContextTests
         using var model = new ContextModel();
         var view = new ContextView();
         var valid = false;
-        using var binding = view.BindValidationContext(model, vm => vm.Advice, state => valid = state.IsValid);
-        using var text = view.BindValidationContext(model, vm => vm.Advice, vm => vm.Name, v => v.PropertyText);
+        using var binding = view.BindValidationContextUnsafe(model, vm => vm.Advice, state => valid = state.IsValid);
+        using var text = view.BindValidationContextUnsafe(model, vm => vm.Advice, vm => vm.Name, v => v.PropertyText);
         await Assert.That(valid).IsTrue();
         await Assert.That(view.PropertyText).IsEqualTo(string.Empty);
         view.ViewModel = model;
@@ -182,19 +182,19 @@ public class MultipleValidationContextTests
         using var model = new ContextModel();
         using var invalid = new ValidationContext(ImmediateContextScheduler.Instance);
         using var empty = new ValidationContext(ImmediateContextScheduler.Instance);
-        using var rule = model.ValidationRule(invalid, vm => vm.Name, static _ => false, FirstMessage);
+        using var rule = model.ValidationRuleUnsafe(invalid, vm => vm.Name, static _ => false, FirstMessage);
         model.Advice = invalid;
         var view = new ContextView { ViewModel = model, PropertyText = "stale" };
-        using var binding = view.BindValidationContext(model, vm => vm.Advice, vm => vm.Name, v => v.PropertyText);
+        using var binding = view.BindValidationContextUnsafe(model, vm => vm.Advice, vm => vm.Name, v => v.PropertyText);
         await Assert.That(view.PropertyText).IsEqualTo(FirstMessage);
         model.Advice = empty;
         await Assert.That(view.PropertyText).IsEqualTo(string.Empty);
-        var lateRule = model.ValidationRule(empty, vm => vm.Name, static _ => false, SecondMessage);
+        var lateRule = model.ValidationRuleUnsafe(empty, vm => vm.Name, static _ => false, SecondMessage);
         await Assert.That(view.PropertyText).IsEqualTo(SecondMessage);
         lateRule.Dispose();
         await Assert.That(view.PropertyText).IsEqualTo(string.Empty);
         view.PropertyText = "initial stale";
-        using var secondBinding = view.BindValidationContext(model, vm => vm.Advice, vm => vm.Name, v => v.PropertyText);
+        using var secondBinding = view.BindValidationContextUnsafe(model, vm => vm.Advice, vm => vm.Name, v => v.PropertyText);
         await Assert.That(view.PropertyText).IsEqualTo(string.Empty);
     }
 
@@ -210,8 +210,8 @@ public class MultipleValidationContextTests
         model.Advice = context;
         var view = new ContextView { ViewModel = model };
         var message = string.Empty;
-        var text = view.BindValidationContext(model, vm => vm.Advice, vm => vm.Name, v => v.PropertyText);
-        var action = view.BindValidationContext(model, vm => vm.Advice, state => message = state.Text.ToSingleLine());
+        var text = view.BindValidationContextUnsafe(model, vm => vm.Advice, vm => vm.Name, v => v.PropertyText);
+        var action = view.BindValidationContextUnsafe(model, vm => vm.Advice, state => message = state.Text.ToSingleLine());
         text.Dispose();
         action.Dispose();
         text.Dispose();
@@ -253,7 +253,7 @@ public class MultipleValidationContextTests
         var view = new ContextView { ViewModel = model };
         IValidationBinding? binding = null;
         var notifications = 0;
-        binding = view.BindValidationContext(model, vm => vm.Advice, state =>
+        binding = view.BindValidationContextUnsafe(model, vm => vm.Advice, state =>
         {
             notifications++;
             if (!state.IsValid)
@@ -278,10 +278,10 @@ public class MultipleValidationContextTests
         using var model = new ContextModel();
         using var context = new ValidationContext(ImmediateContextScheduler.Instance);
         var view = new ContextView { ViewModel = model };
-        await Assert.That(() => model.ValidationRule(null!, vm => vm.Name, static _ => false, FirstMessage)).Throws<ArgumentNullException>();
-        await Assert.That(() => model.ValidationRule(context, vm => vm.Name, (Func<string?, bool>)null!, FirstMessage)).Throws<ArgumentNullException>();
-        await Assert.That(() => view.BindValidationContext(model, null!, static _ => { })).Throws<ArgumentNullException>();
-        await Assert.That(() => view.BindValidationContext(model, vm => vm.Advice, (Action<IValidationState>)null!)).Throws<ArgumentNullException>();
+        await Assert.That(() => model.ValidationRuleUnsafe(null!, vm => vm.Name, static _ => false, FirstMessage)).Throws<ArgumentNullException>();
+        await Assert.That(() => model.ValidationRuleUnsafe(context, vm => vm.Name, (Func<string?, bool>)null!, FirstMessage)).Throws<ArgumentNullException>();
+        await Assert.That(() => view.BindValidationContextUnsafe(model, null!, static _ => { })).Throws<ArgumentNullException>();
+        await Assert.That(() => view.BindValidationContextUnsafe(model, vm => vm.Advice, (Action<IValidationState>)null!)).Throws<ArgumentNullException>();
         await Assert.That(context.Validations.Count).IsEqualTo(0);
         await Assert.That(model.ValidationContext.Validations.Count).IsEqualTo(0);
     }
@@ -293,11 +293,11 @@ public class MultipleValidationContextTests
     {
         using var model = new ContextModel();
         using var context = new ValidationContext(ImmediateContextScheduler.Instance);
-        using var rule = model.ValidationRule(context, vm => vm.Name, static _ => false, FirstMessage);
+        using var rule = model.ValidationRuleUnsafe(context, vm => vm.Name, static _ => false, FirstMessage);
         model.Advice = context;
         var view = new ContextView { ViewModel = model };
         List<IList<IValidationState>> received = [];
-        using var binding = view.BindValidationContext(model, vm => vm.Advice, vm => vm.Name, received.Add);
+        using var binding = view.BindValidationContextUnsafe(model, vm => vm.Advice, vm => vm.Name, received.Add);
         await Assert.That(received.Count).IsGreaterThan(0);
         await Assert.That(received.TrueForAll(static states => states.Count == 1 && !states[0].IsValid)).IsTrue();
         model.Advice = null;

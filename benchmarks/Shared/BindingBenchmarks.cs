@@ -118,9 +118,9 @@ public class BindingBenchmarks
         _second.Dispose();
     }
 
-    private static IDisposable CreateBinding(BenchmarkView view) => view.BindValidation(view.ViewModel, static vm => vm.Name, static target => target.Error);
+    private static IDisposable CreateBinding(BenchmarkView view) => view.BindValidationUnsafe(view.ViewModel, static vm => vm.Name, static target => target.Error);
 
     private ValidationHelper[] CreateRules(BenchmarkViewModel model) => Enumerable.Range(0, Count)
-        .Select(_ => model.ValidationRule(static vm => vm.Name, static name => name == "valid", static name => name!))
+        .Select(_ => model.ValidationRuleUnsafe(static vm => vm.Name, static name => name == "valid", static name => name!))
         .ToArray();
 }

@@ -150,7 +150,7 @@ public class ValidationBindingLifetimeTests
         first.Name = ValidName;
         first.Name = string.Empty;
         await Assert.That(ReadMessage(view, path)).IsEmpty();
-        using var rule = empty.ValidationRule(vm => vm.Name, static name => !string.IsNullOrEmpty(name), SecondError);
+        using var rule = empty.ValidationRuleUnsafe(vm => vm.Name, static name => !string.IsNullOrEmpty(name), SecondError);
         empty.NameRule = rule;
         await Assert.That(ReadMessage(view, path)).IsEqualTo(SecondError);
     }
@@ -194,7 +194,7 @@ public class ValidationBindingLifetimeTests
     public async Task HelperReplacementDetachesPreviousHelper(BindingPath path)
     {
         using var model = CreateModel(FirstError);
-        using var replacement = model.ValidationRule(vm => vm.Name2, static name => !string.IsNullOrEmpty(name), SecondError);
+        using var replacement = model.ValidationRuleUnsafe(vm => vm.Name2, static name => !string.IsNullOrEmpty(name), SecondError);
         var view = new TestView(model);
         using var binding = CreateBinding(view, path);
         model.NameRule = replacement;
@@ -460,7 +460,7 @@ public class ValidationBindingLifetimeTests
     private static TestViewModel CreateModel(string error)
     {
         var model = new TestViewModel { Name = string.Empty };
-        model.NameRule = model.ValidationRule(vm => vm.Name, static name => !string.IsNullOrEmpty(name), error);
+        model.NameRule = model.ValidationRuleUnsafe(vm => vm.Name, static name => !string.IsNullOrEmpty(name), error);
         return model;
     }
 
