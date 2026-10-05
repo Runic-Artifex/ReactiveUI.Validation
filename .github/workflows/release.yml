@@ -4,33 +4,18 @@ on:
 permissions:
   contents: write
 jobs:
+  verification:
+    uses: ./.github/workflows/ci-build.yml
   release:
+    needs: verification
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - name: Download the packages verified at this workflow SHA
+        uses: actions/download-artifact@v4
         with:
-          fetch-depth: 0
-      - uses: actions/setup-dotnet@v5.3.0
-        with:
-          global-json-file: global.json
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.x'
-      - name: Test package dependency guards
-        run: python -B -m unittest discover -s eng -p test_verify_packages.py -v
-      - run: python eng/restore-fork-dependencies.py
-      - working-directory: src
-        run: dotnet build ReactiveUI.Validation.slnx -c Release -warnaserror
-      - working-directory: src
-        run: dotnet test --solution ReactiveUI.Validation.slnx -c Release -- --maximum-parallel-tests 4
-      - name: Run Primitives collection example
-        run: dotnet run --project examples/CollectionValidation/Primitives/CollectionValidation.Primitives.csproj -c Release
-      - name: Run Reactive collection example
-        run: dotnet run --project examples/CollectionValidation/Reactive/CollectionValidation.Reactive.csproj -c Release
-      - working-directory: src
-        run: dotnet pack ReactiveUI.Validation.slnx -c Release --no-build -o ../artifacts/packages
-      - name: Verify package consumers
-        run: python eng/verify-packages.py
+          name: packages-ubuntu-latest
+          path: artifacts/packages
       - name: Release NuGet assets
         env:
           GH_TOKEN: ${{ github.token }}
