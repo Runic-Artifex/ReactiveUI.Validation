@@ -27,6 +27,34 @@ internal sealed class BenchmarkViewModel : ReactiveObject, IValidatableViewModel
     public void Dispose() => ValidationContext.Dispose();
 }
 
+// An ordinary CLR view exercises library assignment and switching without a UI dispatcher or toolkit.
+internal sealed class BenchmarkView : ReactiveObject, IViewFor<BenchmarkViewModel>
+{
+    public BenchmarkViewModel? ViewModel
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    }
+
+    object? IViewFor.ViewModel
+    {
+        get => ViewModel;
+        set => ViewModel = (BenchmarkViewModel?)value;
+    }
+
+    public string Error
+    {
+        get;
+        set
+        {
+            field = value;
+            Assignments++;
+        }
+    } = string.Empty;
+
+    internal int Assignments { get; private set; }
+}
+
 // A controlled component isolates aggregate context cost from property observation and rule construction.
 internal sealed class MutableComponent : IValidationComponent, IDisposable
 {
