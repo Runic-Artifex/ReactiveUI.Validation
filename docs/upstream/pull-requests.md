@@ -2,7 +2,7 @@
 
 Snapshot: 2026-10-05. Every accessible upstream pull request is listed, including closed records. Total: **936**.
 
-Read the [Runic assessment](README.md) for prioritized implementation notes. Dates, authors, labels and review depth are in [catalog.json](catalog.json).
+Read the [Runic assessment](README.md) for prioritized implementation notes.
 
 The summary describes the upstream item; the final column is our assessment. A merged commit being inherited does not mean every historical implementation is still present. Routine dependency summaries describe the requested version change and do not claim patch-level review.
 
