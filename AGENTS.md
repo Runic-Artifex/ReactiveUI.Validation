@@ -12,7 +12,8 @@ Runic `origin/main`, pin an upstream SHA and use a reviewed real merge; never
 squash syncs. Use local rerere with automatic staging disabled and inspect reused
 resolutions. Keep small logical topic commits, update the register when a
 difference changes or retires, and keep useful regressions after an upstream
-replacement. Nothing is sent upstream.
+replacement. Nothing is sent upstream. The monthly upstream review is a workflow
+artifact plus an `Upstream review YYYY-MM` issue; never commit inventory snapshots.
 
 Preserve the .NET 10/SDK pin, both shared-source flavors, the matching released
 Runic.DynamicData pair, scheduler/namespace contracts and branded package IDs.
