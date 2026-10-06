@@ -48,7 +48,7 @@ found. Later imported merge parents provide the separate real-merge evidence.
 Snapshots live under `eng/upstream/reviews/YYYY-MM-base12-upstream12`; a retry
 retains the first branch snapshot and archives the selected snapshot with its
 branch status. Collection failures retain artifacts. If repository token
-settings block a PR, retain the branch and exact manual command. Human review,
+settings block a PR, retain the branch and exact manual compare URL. Human review,
 a real merge and implementation verification remain subsequent decisions.
 
 Release verification consumes an existing exact-main Build rather than deriving
@@ -57,7 +57,7 @@ same version, correct source/dependencies, MIT attribution and Generated payload
 The latest eligible trusted run and current core/native/generated jobs must have
 succeeded. A verification-only dispatch does not create a tag, draft or uploaded
 release assets; set `verify_only: true` explicitly because the workflow default
-is publication. Publication requires separate authorization, no existing tag/release,
+is publication. Publication requires no existing tag/release,
 verified draft bytes and a new tag resolving to the accepted source. No new
 Validation release is part of this task.
 
