@@ -43,7 +43,7 @@ public class DisposalAndOverloadTests
     {
         var viewModel = new TestViewModel { Name = "valid" };
         var view = new TestView(viewModel);
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             static vm => vm.Name,
             static name => !string.IsNullOrEmpty(name),
             NameRequiredMessage);
@@ -84,7 +84,7 @@ public class DisposalAndOverloadTests
     public async Task ObserveForWithoutStrictReportsPropertyStates()
     {
         using var viewModel = new TestViewModel { Name = string.Empty };
-        _ = viewModel.ValidationRule(
+        _ = viewModel.ValidationRuleUnsafe(
             static vm => vm.Name,
             static name => !string.IsNullOrEmpty(name),
             NameRequiredMessage);
@@ -96,6 +96,69 @@ public class DisposalAndOverloadTests
 
         await Assert.That(latest).IsNotNull();
         await Assert.That(latest!.Any(static state => !state.IsValid)).IsTrue();
+    }
+
+    /// <summary>Verifies that property observations follow rule additions, value changes and removals.</summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Test]
+    public async Task ObserveForTracksDynamicRuleMembership()
+    {
+        using var viewModel = new TestViewModel { Name = string.Empty };
+        IList<IValidationState>? latest = null;
+        using var subscription = viewModel.ValidationContext
+            .ObserveFor(static (TestViewModel vm) => vm.Name)
+            .Subscribe(states => latest = states);
+
+        // An empty DynamicData list has no change set to publish until the first rule is added.
+        await Assert.That(latest).IsNull();
+
+        var requiredRule = viewModel.ValidationRuleUnsafe(
+            static vm => vm.Name,
+            static name => !string.IsNullOrEmpty(name),
+            NameRequiredMessage);
+        var secondRule = viewModel.ValidationRuleUnsafe(
+            static vm => vm.Name,
+            static name => name == "accepted",
+            SecondMessage);
+
+        await Assert.That(latest!.Select(static state => state.Text.ToSingleLine()))
+            .IsEquivalentTo([NameRequiredMessage, SecondMessage]);
+
+        viewModel.Name = "present";
+        await Assert.That(latest!.Count(static state => !state.IsValid)).IsEqualTo(1);
+
+        secondRule.Dispose();
+        await Assert.That(latest!.Count).IsEqualTo(1);
+        await Assert.That(latest!.All(static state => state.IsValid)).IsTrue();
+
+        requiredRule.Dispose();
+        await Assert.That(latest!.All(static state => state.IsValid)).IsTrue();
+        await Assert.That(viewModel.ValidationContext.Validations.Count).IsEqualTo(0);
+    }
+
+    /// <summary>Verifies that disposing a property observation stops subsequent validation notifications.</summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Test]
+    public async Task ObserveForDisposalStopsNotifications()
+    {
+        using var viewModel = new TestViewModel { Name = string.Empty };
+        var rule = viewModel.ValidationRuleUnsafe(
+            static vm => vm.Name,
+            static name => !string.IsNullOrEmpty(name),
+            NameRequiredMessage);
+        var notifications = 0;
+        var subscription = viewModel.ValidationContext
+            .ObserveFor(static (TestViewModel vm) => vm.Name)
+            .Subscribe(_ => notifications++);
+
+        await Assert.That(notifications).IsGreaterThan(0);
+        subscription.Dispose();
+        var countAfterDisposal = notifications;
+
+        viewModel.Name = "valid";
+        rule.Dispose();
+
+        await Assert.That(notifications).IsEqualTo(countAfterDisposal);
     }
 
     /// <summary>Verifies that a multi-message text enumerates through the non-generic interface.</summary>

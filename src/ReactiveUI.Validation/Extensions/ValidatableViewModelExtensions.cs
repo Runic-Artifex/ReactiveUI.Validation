@@ -4,6 +4,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 #if REACTIVE_SHIM
 namespace ReactiveUI.Validation.Reactive.Extensions;
@@ -22,26 +23,17 @@ public static class ValidatableViewModelExtensions
         /// Registers an <see cref="IValidationComponent"/> into the <see cref="ValidationContext"/>
         /// of the specified <see cref="IValidatableViewModel"/>. Disposes and removes the
         /// <see cref="IValidationComponent"/> from the <see cref="ValidationContext"/> when the
-        /// <see cref="ValidationHelper"/> is disposed.
+        /// <see cref="ValidationHelper"/> is disposed. The context is captured during registration, even
+        /// if the view model later replaces its default context.
         /// </summary>
         /// <typeparam name="TValidationComponent">The disposable validation component type.</typeparam>
         /// <param name="validation">The disposable validation component to register into the context.</param>
         /// <returns>The bindable validation helper holding the disposable.</returns>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal ValidationHelper RegisterValidation<TValidationComponent>(
             TValidationComponent validation)
-            where TValidationComponent : IValidationComponent, IDisposable
-        {
-            viewModel.ValidationContext.Add(validation);
-            return new(validation, Disposable.Create(
-                (viewModel, validation),
-                static state =>
-                {
-                    state.viewModel.ValidationContext?.Remove(state.validation);
-                    state.validation.Dispose();
-                }));
-        }
+            where TValidationComponent : IValidationComponent, IDisposable =>
+            ValidationRuleContextExtensions.RegisterValidation(viewModel.ValidationContext, validation);
     }
 
     /// <summary>Provides validation rule extension members for <paramref name="viewModel"/>.</summary>
@@ -58,29 +50,14 @@ public static class ValidatableViewModelExtensions
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="message"/> is empty.</exception>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+        /// <remarks>Requires the Runic Validation generator. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
         public ValidationHelper ValidationRule<TViewModelProp>(
             Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
             Func<TViewModelProp?, bool> isPropertyValid,
             string message)
         {
-            ArgumentExceptionHelper.ThrowIfNull(viewModel);
-
-            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
-
-            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
-
-            ArgumentExceptionHelper.ThrowIfNullOrEmpty(message);
-
-            // We need to associate the ViewModel property with
-            // something that can be easily looked up and bound to.
-            return viewModel.RegisterValidation(
-                new BasePropertyValidation<TViewModel, TViewModelProp>(
-                    viewModel,
-                    viewModelProperty,
-                    isPropertyValid,
-                    message));
+            _ = viewModel;
+            throw GeneratedValidationObservation.RequiresGenerator(nameof(ValidationRule));
         }
 
         /// <summary>Setup a validation rule for a specified ViewModel property with dynamic error message.</summary>
@@ -90,27 +67,14 @@ public static class ValidatableViewModelExtensions
         /// <param name="message">Func to define the validation error message based on the viewModelProperty value.</param>
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+        /// <remarks>Requires the Runic Validation generator. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
         public ValidationHelper ValidationRule<TViewModelProp>(
             Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
             Func<TViewModelProp?, bool> isPropertyValid,
             Func<TViewModelProp?, string> message)
         {
-            ArgumentExceptionHelper.ThrowIfNull(viewModel);
-
-            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
-
-            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
-
-            ArgumentExceptionHelper.ThrowIfNull(message);
-
-            return viewModel.RegisterValidation(
-                new BasePropertyValidation<TViewModel, TViewModelProp>(
-                    viewModel,
-                    viewModelProperty,
-                    isPropertyValid,
-                    message));
+            _ = viewModel;
+            throw GeneratedValidationObservation.RequiresGenerator(nameof(ValidationRule));
         }
 
         /// <summary>Setup a validation rule with a general observable indicating validity and a static error message.</summary>
@@ -122,8 +86,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule(
             IObservable<bool> validationObservable,
             string message)
@@ -156,8 +118,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TValue>(
             IObservable<TValue> validationObservable,
             Func<TValue, bool> isValidFunc,
@@ -187,8 +147,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule(
             IObservable<IValidationState> validationObservable)
         {
@@ -210,8 +168,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TValue>(
             IObservable<TValue> validationObservable)
             where TValue : IValidationState
@@ -239,8 +195,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp>(
             Expression<Func<TViewModel, TViewModelProp>> viewModelProperty,
             IObservable<bool> viewModelObservable,
@@ -279,8 +233,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp, TValue>(
             Expression<Func<TViewModel, TViewModelProp>> viewModelProperty,
             IObservable<TValue> viewModelObservable,
@@ -316,8 +268,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp>(
             Expression<Func<TViewModel, TViewModelProp>> viewModelProperty,
             IObservable<IValidationState> validationObservable)
@@ -345,8 +295,6 @@ public static class ValidatableViewModelExtensions
         /// It should be noted that the observable should provide an initial value, otherwise that can result
         /// in an inconsistent performance.
         /// </remarks>
-        [RequiresDynamicCode("WhenAnyValue uses expression trees which require dynamic code generation in AOT scenarios.")]
-        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
         public ValidationHelper ValidationRule<TViewModelProp, TValue>(
             Expression<Func<TViewModel, TViewModelProp>> viewModelProperty,
             IObservable<TValue> validationObservable)
@@ -362,6 +310,67 @@ public static class ValidatableViewModelExtensions
                 new ObservableValidation<TViewModel, bool, TViewModelProp>(
                     viewModelProperty,
                     validationObservable.Select(static v => v as IValidationState)));
+        }
+
+        /// <summary>Setup a validation rule for a specified ViewModel property with static error message.</summary>
+        /// <typeparam name="TViewModelProp">ViewModel property type.</typeparam>
+        /// <param name="viewModelProperty">ViewModel property.</param>
+        /// <param name="isPropertyValid">Func to define if the viewModelProperty is valid or not.</param>
+        /// <param name="message">Validation error message.</param>
+        /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="message"/> is empty.</exception>
+        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+        public ValidationHelper ValidationRuleUnsafe<TViewModelProp>(
+            Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
+            Func<TViewModelProp?, bool> isPropertyValid,
+            string message)
+        {
+            ArgumentExceptionHelper.ThrowIfNull(viewModel);
+
+            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
+
+            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
+
+            ArgumentExceptionHelper.ThrowIfNullOrEmpty(message);
+
+            // We need to associate the ViewModel property with
+            // something that can be easily looked up and bound to.
+            return viewModel.RegisterValidation(
+                new BasePropertyValidation<TViewModel, TViewModelProp>(
+                    viewModel,
+                    viewModelProperty,
+                    isPropertyValid,
+                    message));
+        }
+
+        /// <summary>Setup a validation rule for a specified ViewModel property with dynamic error message.</summary>
+        /// <typeparam name="TViewModelProp">ViewModel property type.</typeparam>
+        /// <param name="viewModelProperty">ViewModel property.</param>
+        /// <param name="isPropertyValid">Func to define if the viewModelProperty is valid or not.</param>
+        /// <param name="message">Func to define the validation error message based on the viewModelProperty value.</param>
+        /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
+        [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+        public ValidationHelper ValidationRuleUnsafe<TViewModelProp>(
+            Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
+            Func<TViewModelProp?, bool> isPropertyValid,
+            Func<TViewModelProp?, string> message)
+        {
+            ArgumentExceptionHelper.ThrowIfNull(viewModel);
+
+            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
+
+            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
+
+            ArgumentExceptionHelper.ThrowIfNull(message);
+
+            return viewModel.RegisterValidation(
+                new BasePropertyValidation<TViewModel, TViewModelProp>(
+                    viewModel,
+                    viewModelProperty,
+                    isPropertyValid,
+                    message));
         }
 
         /// <summary>Clears the validation rules associated with the specified property.</summary>

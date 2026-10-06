@@ -6,6 +6,7 @@
   <PropertyGroup>
     <TargetFrameworks>$(LibraryTargetFrameworks)</TargetFrameworks>
     <DefineConstants>$(DefineConstants);REACTIVE_SHIM</DefineConstants>
+    <PackageId>Runic.ReactiveUI.Validation.Reactive</PackageId>
     <ValidationNamespaceRoot>ReactiveUI.Validation.Reactive</ValidationNamespaceRoot>
     <Description>Validations library for ReactiveUI.Reactive, the System.Reactive flavour of ReactiveUI.</Description>
     <PackageTags>$(PackageTags);system.reactive</PackageTags>
@@ -19,10 +20,11 @@
 
   <ItemGroup>
     <PackageReference Include="ReactiveUI.Reactive" />
-    <PackageReference Include="DynamicData" />
+    <PackageReference Include="Runic.DynamicData.Reactive" />
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="DynamicData.Reactive" />
     <Using Include="ReactiveUI.Reactive" />
     <Using Include="ReactiveUI.Binding.Reactive" />
     <Using Include="ReactiveUI.Binding.Reactive.Expressions" />

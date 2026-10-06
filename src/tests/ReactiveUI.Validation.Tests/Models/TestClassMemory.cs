@@ -23,7 +23,7 @@ public sealed class TestClassMemory : ReactiveValidationObject
     /// <summary>Initializes a new instance of the <see cref="TestClassMemory"/> class.</summary>
     public TestClassMemory()
     {
-        _ = this.ValidationRule(
+        _ = this.ValidationRuleUnsafe(
             vmp => vmp.Name,
             static name => !string.IsNullOrEmpty(name),
             "The name is empty.")

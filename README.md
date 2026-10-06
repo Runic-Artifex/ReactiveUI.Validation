@@ -1,6 +1,73 @@
+# Runic ReactiveUI.Validation (.NET 10)
+
+This Runic-Artifex fork starts from upstream `cde3062` (2026-10-04) and uses
+ReactiveUI **26.0.1** with the released **10.0.0-runic.30** DynamicData fork.
+It ships two core NuGet packages:
+
+| Package ID | Namespace root | Dependencies |
+| --- | --- | --- |
+| `Runic.ReactiveUI.Validation` | `ReactiveUI.Validation` | `ReactiveUI`, `Runic.DynamicData` |
+| `Runic.ReactiveUI.Validation.Reactive` | `ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive`, `Runic.DynamicData.Reactive` |
+
+Both target .NET 10. Use the flavor that matches your ReactiveUI package.
+The Reactive flavor's validation collection uses `DynamicData.Reactive` types.
+Keep one implementation of each flavor in an application; replace upstream
+validation and DynamicData package references with their matching `Runic.*` IDs.
+The original MIT license and authorship remain.
+
+See [CONTRIBUTING](CONTRIBUTING.md) for build/test instructions and the pinned
+DynamicData download bootstrap. The manual release workflow attaches core NuGet
+assets to [GitHub releases](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases).
+Download those assets and the matching DynamicData packages into a local NuGet
+feed to consume the fork. AndroidX and platform samples are retained outside
+core CI and releases. This fork will not be proposed upstream.
+
+The [upstream review](docs/upstream/README.md) catalogs every accessible issue and
+pull request, with Runic priorities, implementation plans and diagnostic evidence.
+The [implementation ledger](docs/upstream/implementation-2026-10.md) tracks subsequent
+decisions, exact adoption and verification.
+For monthly syncs and retained fork adaptations, see the
+[maintenance policy](docs/maintenance.md) and
+[fork difference register](docs/fork-differences.md).
+
+## Unreleased generated validation API
+
+The implemented generated/Unsafe split makes inline-lambda predicate `ValidationRule` and expression
+`BindValidation`, `BindValidationContext` and `BindValidationState` calls the
+primary generated surface. The matching core package embeds the Validation
+analyzer and interceptor allowlist props; consuming projects must retain those
+assets and recompile their call sites. Supported calls generate direct property
+observation and typed assignment. Unsupported selectors produce build errors.
+A normal call left unintercepted throws, including a previously compiled call;
+there is no reflection fallback. Generated normal property text bindings expose
+actual initial invalid text immediately; explicit Unsafe property callbacks
+retain the legacy synthetic empty-list prelude.
+
+Use `ValidationRuleUnsafe`, `BindValidationUnsafe`,
+`BindValidationContextUnsafe` or `BindValidationStateUnsafe` when deliberately
+using runtime expressions. Those methods retain trimming warnings. Supplied
+observable/metadata rule overloads and the explicit observable APIs remain
+available. See the [migration and examples](docs/examples/generated-validation.md)
+and [generator contract](docs/generated-validation-design.md).
+
+This change is implemented and verified at source
+`2550376b230ccfb78beb8d3b4ced8866b65d809e`, and remains **UNRELEASED** until
+publication. Local and [Linux/Windows CI](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109)
+pass 683 tests; actual-package generated consumers pass managed, full trimming
+and NativeAOT on Linux/Windows x64 with zero positive warnings/errors. The
+[verification record](docs/upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
+keeps tested source and local/CI package hashes separate. Published releases and
+their historical behavior remain unchanged; this later documentation record is
+not the tested package source.
+
+---
+
+The upstream usage guide and contributor history below are retained for reference.
+Its NuGet badges link to the upstream distribution.
+
 [![NuGet](https://img.shields.io/nuget/v/ReactiveUI.Validation.svg)](https://www.nuget.org/packages/ReactiveUI.Validation)
 [![Downloads](https://img.shields.io/nuget/dt/ReactiveUI.Validation.svg)](https://www.nuget.org/packages/ReactiveUI.Validation)
-[![Build](https://github.com/reactiveui/ReactiveUI.Validation/actions/workflows/ci-build.yml/badge.svg)](https://github.com/reactiveui/ReactiveUI.Validation/actions/workflows/ci-build.yml)
+[![Build](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/workflows/ci-build.yml/badge.svg)](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/workflows/ci-build.yml)
 [![Code Coverage](https://codecov.io/gh/reactiveui/ReactiveUI.Validation/branch/main/graph/badge.svg)](https://codecov.io/gh/reactiveui/ReactiveUI.Validation)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Slack](https://img.shields.io/badge/chat-slack-blue.svg)](https://reactiveui.net/slack)
@@ -42,46 +109,11 @@ Validation for ReactiveUI based solutions, functioning in a reactive way.
 
 ReactiveUI.Validation was originally developed by [@jcmm33](https://github.com/jcmm33) as [Vistian.Reactive.Validation](https://github.com/jcmm33/ReactiveUI.Validation), and then refactored and updated by [Àlex Martínez Morón](https://github.com/alexmartinezm) and the ReactiveUI community.
 
-## Supported Platforms
+## Runic support and packages
 
-| Platform | Targets |
-|----------|---------|
-| .NET | net8.0, net9.0, net10.0 |
-| .NET Framework | net462, net472, net481 |
-| Windows | net8.0-windows10.0.19041.0, net9.0-windows10.0.19041.0, net10.0-windows10.0.19041.0 |
-| Android (MAUI) | net9.0-android, net10.0-android |
-
-## NuGet Packages
-
-Install the following package into your class library and into a platform-specific project.
-
-| Platform | Package | NuGet |
-|----------|---------|-------|
-| Any Platform | [ReactiveUI.Validation][CoreDoc] | [![CoreBadge]][Core] |
-| AndroidX (MAUI) | [ReactiveUI.Validation.AndroidX][DroDoc] | [![DroXBadge]][DroX] |
-| Any Platform, with `ReactiveUI.Reactive` | ReactiveUI.Validation.Reactive | [![ReactiveBadge]][Reactive] |
-| AndroidX (MAUI), with `ReactiveUI.Reactive` | ReactiveUI.Validation.AndroidX.Reactive | [![DroXReactiveBadge]][DroXReactive] |
-
-Pick the package that matches your ReactiveUI package:
-
-- If your app uses `ReactiveUI`, install `ReactiveUI.Validation`.
-- If your app uses `ReactiveUI.Reactive` (the System.Reactive flavour), install `ReactiveUI.Validation.Reactive`. On AndroidX, install `ReactiveUI.Validation.AndroidX.Reactive` as well.
-
-`ReactiveUI.Validation.Reactive` has the same API. Its namespaces start with `ReactiveUI.Validation.Reactive` instead of `ReactiveUI.Validation`. Its schedulers are System.Reactive `IScheduler` instances.
-
-[Core]: https://www.nuget.org/packages/ReactiveUI.Validation/
-[CoreBadge]: https://img.shields.io/nuget/v/ReactiveUI.Validation.svg
-[CoreDoc]: https://reactiveui.net/docs/handbook/user-input-validation/
-
-[DroX]: https://www.nuget.org/packages/ReactiveUI.Validation.AndroidX/
-[DroXBadge]: https://img.shields.io/nuget/v/ReactiveUI.Validation.AndroidX.svg
-[DroDoc]: https://github.com/reactiveui/reactiveui.validation#example-with-android-extensions
-
-[Reactive]: https://www.nuget.org/packages/ReactiveUI.Validation.Reactive/
-[ReactiveBadge]: https://img.shields.io/nuget/v/ReactiveUI.Validation.Reactive.svg
-
-[DroXReactive]: https://www.nuget.org/packages/ReactiveUI.Validation.AndroidX.Reactive/
-[DroXReactiveBadge]: https://img.shields.io/nuget/v/ReactiveUI.Validation.AndroidX.Reactive.svg
+The two packages listed above support .NET 10, including platform-specific .NET 10
+applications. AndroidX source projects are retained for separate workload builds;
+they are not included in the core release assets. See [CONTRIBUTING](CONTRIBUTING.md).
 
 ## How to Use
 

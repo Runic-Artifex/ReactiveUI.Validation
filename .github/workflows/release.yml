@@ -1,75 +1,58 @@
-name: Release
-
+name: Package release
 on:
   workflow_dispatch:
     inputs:
-      bump:
-        description: 'Release level'
-        required: true
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-
-      sourceRef:
-        description: 'Optional git ref (tag/branch/SHA) to release from. Leave blank to release from this branch (normally main).'
+      verify_only:
+        description: Verify accepted Build evidence without creating a release
         required: false
-        type: string
-        default: ''
-
+        default: false
+        type: boolean
 permissions:
+  actions: read
   contents: write
-  id-token: write
-  packages: read
-
+concurrency:
+  group: validation-package-release-${{ github.repository }}
+  cancel-in-progress: false
 jobs:
   release:
-    uses: reactiveui/actions-common/.github/workflows/workflow-common-release.yml@main
-    with:
-      solutionFile: ReactiveUI.Validation.slnx
-      installWorkloads: true
-      minverMinimumMajorMinor: '7.1'
-      bump: ${{ inputs.bump }}
-      sourceRef: ${{ inputs.sourceRef }}
-    secrets:
-      CERTUM_USER_ID: ${{ secrets.CERTUM_USER_ID }}
-      CERTUM_OTP_URI: ${{ secrets.CERTUM_OTP_URI }}
-      CERTUM_CERT_FINGERPRINT: ${{ secrets.CERTUM_CERT_FINGERPRINT }}
-
-  publish-nuget:
-    needs: release
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    environment:
-      name: release
-    permissions:
-      id-token: write
+    timeout-minutes: 30
     steps:
-      - name: Download signed packages
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          name: signed-nuget
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
-
-      - name: NuGet login (OIDC trusted publishing)
-        id: nuget-login
-        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Run release guard fixtures
+        run: python3 -B -m unittest discover -s eng/release -p test_release_assets.py -v
+      - name: Resolve accepted Build evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 eng/release/release_assets.py resolve --output artifacts/release-input/source.json
+      - name: Download digest-verified Build artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 eng/release/release_assets.py download --source-report artifacts/release-input/source.json --output artifacts/release-input
+      - name: Verify package and consumer evidence
+        run: python3 eng/release/release_assets.py verify --input artifacts/release-input --source-report artifacts/release-input/source.json --output artifacts/release-input/verified.json
+      - name: Retain release guard evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          user: ${{ secrets.NUGET_USER }}
-
-      - name: Push to NuGet
-        shell: bash
-        run: |
-          for pkg in *.nupkg; do
-            dotnet nuget push "$pkg" --source https://api.nuget.org/v3/index.json --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
-          done
-
-  create-release:
-    needs: [release, publish-nuget]
-    uses: reactiveui/actions-common/.github/workflows/workflow-common-create-release.yml@main
-    with:
-      version: ${{ needs.release.outputs.semver2 }}
-      tag: ${{ needs.release.outputs.tag }}
-      target: ${{ needs.release.outputs.sourceSha }}
+          name: release-guard-evidence-${{ github.run_id }}
+          path: |
+            artifacts/release-input/source.json
+            artifacts/release-input/download-metadata.json
+            artifacts/release-input/verified.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Verification-only completion
+        if: inputs.verify_only
+        run: echo 'Accepted Build evidence verified; no release mutation requested.'
+      - name: Release verified NuGet assets
+        if: ${{ !inputs.verify_only }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 eng/release/release_assets.py publish --verified artifacts/release-input/verified.json

@@ -3,9 +3,7 @@
 // See the LICENSE file in the project root for full license information.
 
 using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using DynamicData;
 
 #if REACTIVE_SHIM
 namespace ReactiveUI.Validation.Reactive.Contexts;
@@ -49,7 +47,6 @@ public class ValidationContext : ReactiveObject, IValidationContext
     private int _isActive;
 
     /// <summary>Initializes a new instance of the <see cref="ValidationContext"/> class that uses the current thread scheduler.</summary>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public ValidationContext()
         : this(null)
     {
@@ -57,11 +54,18 @@ public class ValidationContext : ReactiveObject, IValidationContext
 
     /// <summary>Initializes a new instance of the <see cref="ValidationContext"/> class.</summary>
     /// <param name="scheduler">Scheduler to use for the properties. Uses the current thread scheduler when null.</param>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
+    /// <remarks>
+    /// Rule membership, current validity and validation-state streams update synchronously.
+    /// The scheduler controls presentation updates to <see cref="IsValid"/> and <see cref="Text"/>.
+    /// The caller must serialize rule mutations and rule notifications with its model owner.
+    /// </remarks>
     public ValidationContext(IScheduler? scheduler)
     {
         scheduler ??= CurrentThreadSequencer.Instance;
-        var changeSets = _validationSource.Connect().ObserveOn(scheduler);
+
+        // Domain membership and aggregate state belong to the serialized model
+        // owner. Only the presentation properties below use the scheduler.
+        var changeSets = _validationSource.Connect();
         Validations = changeSets.AsObservableList();
 
         _validationObservable = changeSets
@@ -83,7 +87,7 @@ public class ValidationContext : ReactiveObject, IValidationContext
             .ToProperty(this, nameof(Text), ValidationText.None, scheduler);
 
         _ = SubscribeExtensions.Subscribe(_validSubject
-             .Select(_ => new ValidationState(IsValid, BuildText()))
+             .Select(isValid => new ValidationState(isValid, BuildText()))
              .Do(_validationStatusChange.OnNext))
              .DisposeWith(_disposables);
     }

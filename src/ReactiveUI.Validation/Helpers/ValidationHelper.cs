@@ -2,8 +2,6 @@
 // ReactiveUI and Contributors licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
-using System.Diagnostics.CodeAnalysis;
-
 #if REACTIVE_SHIM
 namespace ReactiveUI.Validation.Reactive.Helpers;
 #else
@@ -31,7 +29,6 @@ public sealed class ValidationHelper : ReactiveObject, IDisposable
     /// <summary>Initializes a new instance of the <see cref="ValidationHelper"/> class.</summary>
     /// <param name="validation">Validation property.</param>
     /// <exception cref="ArgumentNullException">Thrown when <c>validation</c> is <see langword="null"/>.</exception>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public ValidationHelper(IValidationComponent validation)
         : this(validation, null)
     {
@@ -41,7 +38,6 @@ public sealed class ValidationHelper : ReactiveObject, IDisposable
     /// <param name="validation">Validation property.</param>
     /// <param name="cleanup">The disposable to dispose when the helper is disposed, or null for none.</param>
     /// <exception cref="ArgumentNullException">Thrown when <c>validation</c> is <see langword="null"/>.</exception>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     public ValidationHelper(IValidationComponent validation, IDisposable? cleanup)
     {
         _validation = validation ?? throw new ArgumentNullException(nameof(validation));

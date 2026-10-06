@@ -88,7 +88,7 @@ public partial class SignUpViewModel : ReactiveValidationObject, IRoutableViewMo
 
         // 1. Basic property validation rule.
         // Validates that UserName is not empty.
-        _ = this.ValidationRule(
+        _ = this.ValidationRuleUnsafe(
             vm => vm.UserName,
             static name => !string.IsNullOrWhiteSpace(name),
             "UserName is required.")
@@ -96,7 +96,7 @@ public partial class SignUpViewModel : ReactiveValidationObject, IRoutableViewMo
 
         // 2. Multiple rules for a single property.
         // First rule: Password is required.
-        _ = this.ValidationRule(
+        _ = this.ValidationRuleUnsafe(
             vm => vm.Password,
             static password => !string.IsNullOrWhiteSpace(password),
             "Password is required.")
@@ -104,14 +104,14 @@ public partial class SignUpViewModel : ReactiveValidationObject, IRoutableViewMo
 
         // Second rule: Password length requirement.
         // Demonstrates using a lambda for the error message to include dynamic information.
-        _ = this.ValidationRule(
+        _ = this.ValidationRuleUnsafe(
             vm => vm.Password,
             static password => password?.Length >= MinimumPasswordLength,
             static password => $"Password should be longer, current length: {password!.Length}")
             .DisposeWith(_disposables);
 
         // 3. Simple cross-property validation.
-        _ = this.ValidationRule(
+        _ = this.ValidationRuleUnsafe(
             vm => vm.ConfirmPassword,
             static confirmation => !string.IsNullOrWhiteSpace(confirmation),
             "Confirm password field is required.")

@@ -4,9 +4,7 @@
 
 using System.Collections;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using DynamicData;
 
 #if REACTIVE_SHIM
 namespace ReactiveUI.Validation.Reactive.Helpers;
@@ -31,7 +29,6 @@ public class ReactiveValidationObject : ReactiveObject, IValidatableViewModel, I
     private readonly HashSet<string> _mentionedPropertyNames = [];
 
     /// <summary>Initializes a new instance of the <see cref="ReactiveValidationObject"/> class.</summary>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     protected ReactiveValidationObject()
         : this(null, null)
     {
@@ -41,7 +38,6 @@ public class ReactiveValidationObject : ReactiveObject, IValidatableViewModel, I
     /// <param name="scheduler">
     /// Scheduler for the <see cref="ValidationContext"/>. Uses <see cref="ReactiveUI.Primitives.Concurrency.CurrentThreadSequencer"/> when null.
     /// </param>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     protected ReactiveValidationObject(IScheduler? scheduler)
         : this(scheduler, null)
     {
@@ -56,7 +52,6 @@ public class ReactiveValidationObject : ReactiveObject, IValidatableViewModel, I
     /// default value, implement <see cref="IValidationTextFormatter{TOut}"/> and register an instance of
     /// IValidationTextFormatter&lt;string&gt; into Splat.Locator.
     /// </param>
-    [RequiresUnreferencedCode("WhenAnyValue may reference members that could be trimmed in AOT scenarios.")]
     protected ReactiveValidationObject(
         IScheduler? scheduler,
         IValidationTextFormatter<string>? formatter)

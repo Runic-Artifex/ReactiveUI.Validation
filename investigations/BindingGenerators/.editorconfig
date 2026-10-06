@@ -1,0 +1,5 @@
+[*.cs]
+# Investigation: retain reported trim/AOT diagnostics so probes can execute.
+# These are warning severities, not suppressions or claims of compatibility.
+dotnet_diagnostic.IL2026.severity = warning
+dotnet_diagnostic.IL3050.severity = warning

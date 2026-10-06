@@ -1,27 +1,8 @@
 <Solution>
-  <Folder Name="/Solution Items/">
-    <File Path="../.editorconfig" />
-    <File Path="../.gitignore" />
-    <File Path="../README.md" />
-    <File Path="../version.json" />
-    <File Path="Directory.build.props" />
-    <File Path="Directory.build.targets" />
-    <File Path="Directory.Packages.props" />
-  </Folder>
-  <Project Path="ReactiveUI.Validation.AndroidX/ReactiveUI.Validation.AndroidX.csproj" />
-  <Project Path="ReactiveUI.Validation.AndroidX.Reactive/ReactiveUI.Validation.AndroidX.Reactive.csproj" />
+  <Project Path="ReactiveUI.Validation.SourceGenerators/ReactiveUI.Validation.SourceGenerators.csproj" />
+  <Project Path="tests/ReactiveUI.Validation.SourceGenerators.Tests/ReactiveUI.Validation.SourceGenerators.Tests.csproj" />
   <Project Path="ReactiveUI.Validation/ReactiveUI.Validation.csproj" />
   <Project Path="ReactiveUI.Validation.Reactive/ReactiveUI.Validation.Reactive.csproj" />
   <Project Path="tests/ReactiveUI.Validation.Tests/ReactiveUI.Validation.Tests.csproj" />
   <Project Path="tests/ReactiveUI.Validation.Reactive.Tests/ReactiveUI.Validation.Reactive.Tests.csproj" />
-  <Folder Name="/Samples/">
-    <Project Path="samples/AvaloniaApplication1/AvaloniaApplication1.csproj" />
-    <File Path="samples/Directory.Packages.props" />
-    <Project Path="samples/AvaloniaApplication1.Desktop/AvaloniaApplication1.Desktop.csproj" />
-    <Project Path="samples/LoginApp/LoginApp.csproj" />
-    <Project Path="samples/LoginApp.Avalonia/LoginApp.Avalonia.csproj" />
-    <Project Path="samples/LoginApp.Avalonia.Desktop/LoginApp.Avalonia.Desktop.csproj" />
-    <Project Path="samples/LoginApp.WinForms/LoginApp.WinForms.csproj" />
-    <Project Path="samples/LoginApp.Wpf/LoginApp.Wpf.csproj" />
-  </Folder>
 </Solution>

@@ -18,4 +18,8 @@
     <Using Include="ReactiveUI.Primitives.Concurrency" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="../../../examples/CollectionValidation/CollectionValidationRecipe.cs;../../../examples/CollectionValidation/RecipeChild.cs" Link="Examples/%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>

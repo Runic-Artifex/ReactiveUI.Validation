@@ -25,17 +25,17 @@ public partial class SignUpView : ReactiveUserControl<SignUpViewModel>
                     .BindTo(this, x => x.DataContext));
 
             // ReactiveUI.Validation: Bindings for error messages.
-            // BindValidation(ViewModel, vmProperty, viewControlProperty)
+            // BindValidationUnsafe(ViewModel, vmProperty, viewControlProperty)
             // This will bind the validation message for the specified property to the control property.
-            disposables.Add(this.BindValidation(ViewModel, x => x.UserName, x => x.UserNameValidation.Text));
-            disposables.Add(this.BindValidation(ViewModel, x => x.Password, x => x.PasswordValidation.Text));
-            disposables.Add(this.BindValidation(ViewModel, x => x.ConfirmPassword, x => x.ConfirmPasswordValidation.Text));
+            disposables.Add(this.BindValidationUnsafe(ViewModel, x => x.UserName, x => x.UserNameValidation.Text));
+            disposables.Add(this.BindValidationUnsafe(ViewModel, x => x.Password, x => x.PasswordValidation.Text));
+            disposables.Add(this.BindValidationUnsafe(ViewModel, x => x.ConfirmPassword, x => x.ConfirmPasswordValidation.Text));
 
             // ReactiveUI.Validation: Compound validation bindings.
-            // BindValidation(ViewModel, viewControlProperty)
+            // BindValidationUnsafe(ViewModel, viewControlProperty)
             // This will bind all validation messages for the entire ViewModel to the control property.
             // We use a formatter to join multiple error messages with a new line.
-            disposables.Add(this.BindValidation(ViewModel, x => x.CompoundValidation.Text, new SingleLineFormatter(Environment.NewLine)));
+            disposables.Add(this.BindValidationUnsafe(ViewModel, x => x.CompoundValidation.Text, new SingleLineFormatter(Environment.NewLine)));
 
             // Controlling visibility of validation messages based on their content.
             disposables.Add(

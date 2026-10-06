@@ -6,7 +6,7 @@
   <PropertyGroup>
     <TargetFrameworks>$(MauiAndroidTargets)</TargetFrameworks>
     <PackageDescription>Provides ReactiveUI.Validation.Reactive extensions for the AndroidX Library, for apps that use ReactiveUI.Reactive.</PackageDescription>
-    <PackageId>ReactiveUI.Validation.AndroidX.Reactive</PackageId>
+    <PackageId>Runic.ReactiveUI.Validation.AndroidX.Reactive</PackageId>
     <PackageTags>$(PackageTags);system.reactive</PackageTags>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <Nullable>enable</Nullable>

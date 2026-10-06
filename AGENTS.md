@@ -1,3 +1,37 @@
+# Runic fork instructions
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md), the [maintenance policy](docs/maintenance.md)
+and [fork difference register](docs/fork-differences.md) before implementation.
+The files under `docs/upstream/` are dated research; review records distinguish
+proposals from integrated work. Verify a claim against the current branch.
+Run the dependency bootstrap first, reuse the Runic SDK's locked shell on NixOS,
+and build/test from
+`src`. Only the core .NET 10 solution is required by CI; platform projects are
+retained separately. Both validation flavors must use their matching released
+Runic DynamicData package. Preserve branded package IDs and the MIT license.
+The upstream guidance below applies within this fork's support and build scope.
+
+Preserve existing upstream/Runic history. Monthly syncs start from fetched Runic
+`origin/main`, pin an upstream SHA and use a reviewed real merge; do not squash
+syncs or reconstruct the fork as a patch stack. Use local rerere with automatic
+staging disabled and inspect reused resolutions. The integration owner reviews
+and integrates tested results. Keep small logical topic commits and update the
+register when a difference changes or retires. Retain useful regressions after
+an upstream replacement. No upstream messages or contributions are part of this
+workflow.
+
+Preserve the .NET 10/SDK pin, both shared-source flavors, matching released
+DynamicData package pair, scheduler/namespace contracts and branded package IDs.
+Update dependency versions and verified bootstrap hashes together; do not switch
+to a sibling checkout or inherit enclosing workspace package versions. Keep
+Primitives consumers free of System.Reactive and all consumers free of upstream
+DynamicData. Published tags, versions and assets are immutable.
+
+Use focused checks while iterating, then the required final Linux/Windows core
+and independent package-consumer gates for implementation. Preserve useful logs
+and shared caches; remove only task-owned disposable outputs, not all build/cache
+directories routinely. Do not treat inherited broad cleanup examples as required.
+
 # AGENTS.md
 
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
@@ -238,4 +272,4 @@ this.ValidationRule(
 - Parallel test execution enabled (`"parallel": true` in testconfig.json)
 - Always write unit tests for new features or bug fixes
 - Follow existing test patterns in `tests/ReactiveUI.Validation.Tests/`
-- API approval tests use **Verify.TUnit** — run tests to regenerate `.verified.txt` files when the public API changes
+- Shipped library APIs use **PublicApiSharp.Analyzers** and `PublicAPI/net10.0/PublicAPI.txt`. Review intentional changes to both flavor baselines; do not blindly regenerate or disable the check to accept drift.

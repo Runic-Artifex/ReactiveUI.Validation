@@ -81,7 +81,7 @@ public class ValidationBindingEdgeCaseTests
         var view = new TestView(new TestViewModel { Name = string.Empty });
         await Assert.That(view.ViewModel).IsNotNull();
 
-        _ = view.ViewModel!.ValidationRule(
+        _ = view.ViewModel!.ValidationRuleUnsafe(
             vm => vm.Name,
             static s => !string.IsNullOrEmpty(s),
             "Name is required.");
@@ -117,7 +117,7 @@ public class ValidationBindingEdgeCaseTests
                     nameErrorMessage)));
 
         _ = view.Bind(view.ViewModel, x => x.Name, x => x.NameLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -152,7 +152,7 @@ public class ValidationBindingEdgeCaseTests
                     nameErrorMessage)));
 
         _ = view.Bind(view.ViewModel, x => x.Name, x => x.NameLabel);
-        _ = view.BindValidation(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
+        _ = view.BindValidationUnsafe(view.ViewModel, x => x.Name, x => x.NameErrorLabel);
 
         using (Assert.Multiple())
         {
@@ -177,13 +177,13 @@ public class ValidationBindingEdgeCaseTests
         using (Assert.Multiple())
         {
             // Property + predicate + static message
-            await Assert.That(static () => ((TestViewModel)null!).ValidationRule(
+            await Assert.That(static () => ((TestViewModel)null!).ValidationRuleUnsafe(
                 vm => vm.Name,
                 static s => !string.IsNullOrEmpty(s),
                 ErrorMessage)).Throws<ArgumentNullException>();
 
             // Property + predicate + dynamic message
-            await Assert.That(static () => ((TestViewModel)null!).ValidationRule(
+            await Assert.That(static () => ((TestViewModel)null!).ValidationRuleUnsafe(
                 vm => vm.Name,
                 static s => !string.IsNullOrEmpty(s),
                 static s => ErrorMessage)).Throws<ArgumentNullException>();
@@ -295,13 +295,13 @@ public class ValidationBindingEdgeCaseTests
         using (Assert.Multiple())
         {
             // Property + predicate + null message
-            await Assert.That(() => viewModel.ValidationRule(
+            await Assert.That(() => viewModel.ValidationRuleUnsafe(
                 vm => vm.Name,
                 static s => !string.IsNullOrEmpty(s),
                 (string)null!)).Throws<ArgumentNullException>();
 
             // Property + predicate + empty message
-            await Assert.That(() => viewModel.ValidationRule(
+            await Assert.That(() => viewModel.ValidationRuleUnsafe(
                 vm => vm.Name,
                 static s => !string.IsNullOrEmpty(s),
                 string.Empty)).Throws<ArgumentException>();

@@ -414,7 +414,7 @@ public class ValidationContextTests
     {
         var vm = new NullableContextViewModel();
 
-        var helper = vm.ValidationRule(
+        var helper = vm.ValidationRuleUnsafe(
             v => v.Name,
             static name => !string.IsNullOrEmpty(name),
             NameRequiredMessage);

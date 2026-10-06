@@ -1,4 +1,12 @@
 <Project>
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'ReactiveUI.Validation' or '$(MSBuildProjectName)' == 'ReactiveUI.Validation.Reactive'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)ReactiveUI.Validation.SourceGenerators/ReactiveUI.Validation.SourceGenerators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" PrivateAssets="all" />
+    <None Include="$(MSBuildThisFileDirectory)ReactiveUI.Validation.SourceGenerators/bin/$(Configuration)/netstandard2.0/ReactiveUI.Validation.SourceGenerators.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.9/cs" />
+    <None Include="$(MSBuildThisFileDirectory)ReactiveUI.Validation.SourceGenerators/buildTransitive/Runic.ReactiveUI.Validation.props" Pack="true" PackagePath="buildTransitive/$(PackageId).props" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsTestProject)' == 'true' and '$(MSBuildProjectName)' != 'ReactiveUI.Validation.SourceGenerators.Tests'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)ReactiveUI.Validation.SourceGenerators/ReactiveUI.Validation.SourceGenerators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" PrivateAssets="all" />
+  </ItemGroup>
   <PropertyGroup>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <AndroidUseIntermediateDesignerFile>False</AndroidUseIntermediateDesignerFile>

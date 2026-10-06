@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);ReactiveUI.Validation.Generated</InterceptorsNamespaces>
+  </PropertyGroup>
+</Project>
