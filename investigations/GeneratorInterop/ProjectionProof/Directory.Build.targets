@@ -1,0 +1,6 @@
+<Project>
+  <Target Name="IsolateCompilerHost" BeforeTargets="CoreCompile" DependsOnTargets="ResolveReferences">
+    <ItemGroup><Analyzer Remove="@(Analyzer)" /></ItemGroup>
+    <WriteLinesToFile File="$(MSBuildProjectDirectory)/obj/$(Flavor)/references.txt" Lines="@(ReferencePath->'%(FullPath)')" Overwrite="true" />
+  </Target>
+</Project>

@@ -116,7 +116,9 @@ still work when every type named by the generated call is accessible and
 closed. Internal types in the same consumer assembly are supported. No hosted
 partial implementation or attribute API is shipped. Members that exist only in
 another generator's output are not automatically discovered from the original
-compilation.
+compilation. The [generated-member interoperability investigation](generated-member-interop.md)
+compares declared partial properties, actual producer output and private semantic
+projection without changing this shipped support boundary.
 
 | Diagnostic | Meaning and action |
 | --- | --- |

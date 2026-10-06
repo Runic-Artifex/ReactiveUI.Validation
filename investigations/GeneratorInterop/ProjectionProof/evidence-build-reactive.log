@@ -1,0 +1,12 @@
+[0mdirenv: loading ~/Development/RunicArtifex/runic-sdk/.envrc
+[0mdirenv: using flake
+[0mdirenv: nix-direnv: Using cached dev shell
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  ProjectionProof -> /home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/bin/Reactive/Release/net10.0/ProjectionProof.Reactive.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.76

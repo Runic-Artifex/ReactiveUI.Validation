@@ -1,0 +1,5 @@
+[0mdirenv: loading ~/Development/RunicArtifex/runic-sdk/.envrc
+[0mdirenv: using flake
+[0mdirenv: nix-direnv: Using cached dev shell
+Primitives producer-first PASS: initial-invalid -> Ada-valid -> null-invalid -> disposed; Binding=[null,Ada,null,Detached]
+Primitives adapter-first PASS: initial-invalid -> Ada-valid -> null-invalid -> disposed; Binding=[null,Ada,null,Detached]

@@ -1,0 +1,19 @@
+Primitives-PARTIAL-managed: 0
+Primitives-FIELD_EMAIL-managed: 1
+RUVG001: The validation selector cannot be resolved in the original compilation. Declare the property contract in source (including a partial property), use an explicit observable, or choose Unsafe explicitly.
+RUVG005: This normal validation call has no generated interceptor. Retain the bundled analyzer and namespace props, declare selectors in original source, use an explicit observable, or choose Unsafe explicitly.
+Primitives-FIELD_HELPER-managed: 1
+RUVG001: The validation selector cannot be resolved in the original compilation. Declare the property contract in source (including a partial property), use an explicit observable, or choose Unsafe explicitly.
+RUVG005: This normal validation call has no generated interceptor. Retain the bundled analyzer and namespace props, declare selectors in original source, use an explicit observable, or choose Unsafe explicitly.
+Primitives-FIELD_CONTEXT-managed: 1
+RUVG001: The validation selector cannot be resolved in the original compilation. Declare the property contract in source (including a partial property), use an explicit observable, or choose Unsafe explicitly.
+RUVG005: This normal validation call has no generated interceptor. Retain the bundled analyzer and namespace props, declare selectors in original source, use an explicit observable, or choose Unsafe explicitly.
+Primitives-FIELD_TARGET-managed: 1
+RUVG001: The validation selector cannot be resolved in the original compilation. Declare the property contract in source (including a partial property), use an explicit observable, or choose Unsafe explicitly.
+RUVG005: This normal validation call has no generated interceptor. Retain the bundled analyzer and namespace props, declare selectors in original source, use an explicit observable, or choose Unsafe explicitly.
+Primitives-COMMAND_METADATA-managed: 1
+RUVG001: The validation selector cannot be resolved in the original compilation. Declare the property contract in source (including a partial property), use an explicit observable, or choose Unsafe explicitly.
+Primitives-GENERATED_INTERFACE-managed: 1
+RUVG001: The validation selector cannot be resolved in the original compilation. Declare the property contract in source (including a partial property), use an explicit observable, or choose Unsafe explicitly.
+RUVG005: This normal validation call has no generated interceptor. Retain the bundled analyzer and namespace props, declare selectors in original source, use an explicit observable, or choose Unsafe explicitly.
+Primitives-FIELD_OBSERVABLE-managed: 0

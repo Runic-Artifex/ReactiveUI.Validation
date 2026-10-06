@@ -124,6 +124,9 @@ compile-time literal. Method calls, indexers, casts, non-notifying observation
 owners, inaccessible/open generic call types and unsupported target shapes
 produce actionable build errors. See the [diagnostic
 contract](../generated-validation-design.md#selector-and-assignment-support).
+For ReactiveUI-generated properties and notification interfaces, see the
+[generated-member investigation](../generated-member-interop.md) and its declared
+partial-property convention.
 For runtime expressions, explicitly use the Unsafe counterpart:
 
 ```csharp

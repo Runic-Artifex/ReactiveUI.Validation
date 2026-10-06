@@ -1,0 +1,2 @@
+{"case":"field-observable-workaround","passed":true}
+{"case":"declared-partial-and-oaph","passed":true}

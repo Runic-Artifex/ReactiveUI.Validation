@@ -1,0 +1,1 @@
+{"case":"declared-partial-and-oaph","passed":true}

@@ -1,0 +1,38 @@
+{
+  "shippingSource": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
+  "shippingVersion": "8.1.0-runic.0.790.17.15.10",
+  "host": "Linux x64",
+  "sdk": "10.0.401",
+  "managedChecks": 16,
+  "nativeChecks": 4,
+  "nativeImpliesFullTrimming": true,
+  "separateTrimmedManagedRun": false,
+  "runnerSha256": "244dded1f13e290d1d3e5629a816f0bb1ede7aec480306db929f87f1a7038971",
+  "fixtureFiles": {
+    "Imports.cs": "9dfa12e5367d46db0ac1e6900e31b68d97b26763545974839c272237dbe7c79f",
+    "Directory.Build.props": "82435745c5afdd62478c90a5f7236f448ee2f49d66d1c7fcc93d6582e51798b0",
+    "Directory.Build.targets": "979d471ee55f7b2f5c465a2ed345775b46a9670b17499745cebed9c141ab1fe5",
+    "Streams.cs": "00c1187b5ca45ea0b05ad97789499f07538748d80cb8dc9b5426733d112077e1",
+    "Models.cs": "37b5f465d96802d29c754ec847bc657975e855de1afdb4f6ed208336258e5222",
+    "Program.cs": "87adec24ff8622b4d563fa344825b31fd389ac519585386a0725a903cdd41c9e",
+    "Primitives/Probe.csproj": "8b6ee5938c4b7945f88b679e285b9efc8020bcb67a9f6b0c134b1f63a0fcde67",
+    "Reactive/Probe.csproj": "d7151eb565bb7ad27ea994786abd483e27a9ad98249882ec4625592553658752"
+  },
+  "reports": [
+    {
+      "file": "managed-results.json",
+      "sha256": "70ea9e29e17759b0cd2cc2252263ceeefc11847948b06afaaea1a2503d7dab30",
+      "checks": 16
+    },
+    {
+      "file": "native-partial-results.json",
+      "sha256": "3472cc95ad11d25f4e0a8a74ad7c8de08786b5e9567408325a96c65c2c080198",
+      "checks": 2
+    },
+    {
+      "file": "native-field-results.json",
+      "sha256": "d74a34f58c2f79d9c306479f5791182f4689494f33d6771004698e7eddf99af4",
+      "checks": 2
+    }
+  ]
+}

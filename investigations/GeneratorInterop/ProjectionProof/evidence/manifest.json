@@ -1,0 +1,337 @@
+{
+  "purpose": "bounded nonshipping private semantic projection feasibility proof",
+  "sdk": "10.0.401",
+  "worktreeBase": "4ca1ee98dd04a8998be3da54da2595cc735cf4a3",
+  "candidateSource": {
+    "source": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
+    "packages": [
+      {
+        "id": "Runic.ReactiveUI.Validation",
+        "version": "8.1.0-runic.0.790.17.15.10",
+        "sha256": "ffea7c200bde9893b535dcf3dc9d8fe81ddaba747aad3f95d8b24315218b01c5",
+        "bytes": 221625,
+        "file": "candidate-packages/Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.15.10.nupkg",
+        "repository": {
+          "type": "git",
+          "url": "https://github.com/Runic-Artifex/ReactiveUI.Validation",
+          "branch": "refs/heads/runic/generated-validation",
+          "commit": "2550376b230ccfb78beb8d3b4ced8866b65d809e"
+        },
+        "analyzer": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+        "analyzerSha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+      },
+      {
+        "id": "Runic.ReactiveUI.Validation.Reactive",
+        "version": "8.1.0-runic.0.790.17.15.10",
+        "sha256": "1f1cb6b0b8404d0914d935306575f2c399b7686e302846b2627f513112ca1a46",
+        "bytes": 222296,
+        "file": "candidate-packages/Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.15.10.nupkg",
+        "repository": {
+          "type": "git",
+          "url": "https://github.com/Runic-Artifex/ReactiveUI.Validation",
+          "branch": "refs/heads/runic/generated-validation",
+          "commit": "2550376b230ccfb78beb8d3b4ced8866b65d809e"
+        },
+        "analyzer": "analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+        "analyzerSha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+      }
+    ]
+  },
+  "packages": [
+    {
+      "path": "/home/viktor/Development/RunicArtifex/ReactiveUI.Validation/artifacts/verification/generated-support/2550376/candidate-packages/Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.15.10.nupkg",
+      "sha256": "ffea7c200bde9893b535dcf3dc9d8fe81ddaba747aad3f95d8b24315218b01c5"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/ReactiveUI.Validation/artifacts/verification/generated-support/2550376/candidate-packages/Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.15.10.nupkg",
+      "sha256": "1f1cb6b0b8404d0914d935306575f2c399b7686e302846b2627f513112ca1a46"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.sourcegenerators/4.2.0/reactiveui.sourcegenerators.4.2.0.nupkg",
+      "sha256": "9f631dfa1b6b1eeb2a4b9010a48abdf68fc32b09165380ad63c01cd0355be0b4"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.binding/9.1.0/reactiveui.binding.9.1.0.nupkg",
+      "sha256": "b9f9e2fe5d2fcd63aab810d5c2c45a8d096dff1604c1598c12b7db5f223188ac"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.binding.reactive/9.1.0/reactiveui.binding.reactive.9.1.0.nupkg",
+      "sha256": "e7674abb786b502c54ba044d523bfcef27f5fc11708933b942bd40482c27de09"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui/26.0.1/reactiveui.26.0.1.nupkg",
+      "sha256": "8b8e4ef3a51d07b16d6dd28ff4baa884396a7ed913f893e488aa2afa1f21e110"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.reactive/26.0.1/reactiveui.reactive.26.0.1.nupkg",
+      "sha256": "1dda292340e5a523010623b14eb01c41131bc7046e1b3539b28a67f269c905d9"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/runic.dynamicdata/10.0.0-runic.5/runic.dynamicdata.10.0.0-runic.5.nupkg",
+      "sha256": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/runic.dynamicdata.reactive/10.0.0-runic.5/runic.dynamicdata.reactive.10.0.0-runic.5.nupkg",
+      "sha256": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/microsoft.codeanalysis.csharp/5.9.0/microsoft.codeanalysis.csharp.5.9.0.nupkg",
+      "sha256": "7602c3dbaa122268f3b26c6cc0dd02eb9224dea9442ed27af5c3fe56d643993f"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/microsoft.codeanalysis.common/5.9.0/microsoft.codeanalysis.common.5.9.0.nupkg",
+      "sha256": "77efd4715c24c8cd6b36f9b92980a2f5a86e4a7b53648d4f1ca3b79a3933a429"
+    }
+  ],
+  "bindingProjectionReferenceRevision": "05c45cec845835d670960fac733bb302bc1c1071",
+  "bindingProjectionReferenceFiles": [
+    {
+      "path": "/tmp/runic-validation-binding-sources/binding/src/ReactiveUI.Binding.SourceGenerators/Generators/SourceGeneratorsCompilation.cs",
+      "sha256": "15e5db238ccf350091105009a569aaffc9322619daba2af321c0eb92785f9344"
+    },
+    {
+      "path": "/tmp/runic-validation-binding-sources/binding/src/ReactiveUI.Binding.SourceGenerators/Helpers/SourceGeneratorsMemberExtractor.cs",
+      "sha256": "717818611ea6585192e1909d9f207fa34b6d1fd0e6f4678d385d8c9d3a03edf9"
+    }
+  ],
+  "proofSources": [
+    {
+      "path": "Directory.Build.props",
+      "sha256": "215892c811a7ff81e7f0d47327522501369b14c96531364ca3a993b3bb23fcd1"
+    },
+    {
+      "path": "Directory.Build.targets",
+      "sha256": "a5da923c33af13c1f593c0e100d8cd2d845e7d1239d03ece7c123a304b1de8e6"
+    },
+    {
+      "path": "Program.cs",
+      "sha256": "bbee2e750fd6c1d465654b43070d32dd3877b0c9458bcaaf13acd1af02628199"
+    },
+    {
+      "path": "ProjectionProof.csproj",
+      "sha256": "ce44e6e0e87dc0998ebe298a9ee2587f3474c28f9b5aaa016467b283543b9c09"
+    },
+    {
+      "path": "run.py",
+      "sha256": "c5679e7be1393822fdc4200ecfc65c9b2f1f7ba6e16bca714f16f73d3d7d61e4"
+    }
+  ],
+  "runs": [
+    {
+      "flavor": "Primitives",
+      "roslyn": "Microsoft.CodeAnalysis.CSharp, Version=5.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+      "sdkDefaultNoWarn": "1701;1702",
+      "inputs": [
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Roslyn.dll",
+          "sha256": "9b055317e4aa3e98d7d9a56d762f5ec2ba66f0119553fb5a5424b2cd3f2ede32"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.binding/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.SourceGenerators.dll",
+          "sha256": "137188a5a23c66516201ff4431bbd576bc69d3707926231a172b827b1c300896"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/runic.reactiveui.validation/8.1.0-runic.0.790.17.15.10/analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+          "sha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+        }
+      ],
+      "generators": [
+        "ReactiveUI.SourceGenerators.BindableDerivedListGenerator",
+        "ReactiveUI.SourceGenerators.ReactiveCollectionGenerator",
+        "ReactiveUI.SourceGenerators.ReactiveCommandGenerator",
+        "ReactiveUI.SourceGenerators.ReactiveObjectGenerator",
+        "ReactiveUI.SourceGenerators.ReactiveGenerator",
+        "ReactiveUI.SourceGenerators.WinForms.RoutedControlHostGenerator",
+        "ReactiveUI.SourceGenerators.WinForms.ViewModelControlHostGenerator",
+        "ReactiveUI.Binding.SourceGenerators.BindingGenerator"
+      ],
+      "results": [
+        {
+          "order": "producer-first",
+          "trace": "initial-invalid -> Ada-valid -> null-invalid -> disposed; Binding=[null,Ada,null,Detached]",
+          "generatedCount": 4,
+          "emittedProjection": false,
+          "finalDispatchDiagnostics": 0,
+          "originalPath": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Primitives/OriginalInput.cs",
+          "originalSourceSha256": "802f5021cd0cb0f26ed5a6eda07313dd371a8a65a403459be28813511522d344",
+          "originalCallSpan": "[765..854)",
+          "originalCallLineSpan": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Primitives/OriginalInput.cs: (24,25)-(24,114)",
+          "interceptor": "ReactiveUI.Validation.Generated.Assembly_ProjectionConsumer_Primitives_producer_first.ValidationInterceptors.Intercept0(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, System.Func<string?, bool>, string)",
+          "bindingInterceptor": "ReactiveUI.Binding.Generated.Interceptors.ProjectionConsumer_Primitives_producer_first.__ReactiveUIGeneratedBindings.__Intercept_WhenAnyValue_7FFFEBDF87256747(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, string, string, int)",
+          "producedProperty": "ProjectionInput.Model.Name",
+          "innerDriver": "prototype-only private Validation analysis",
+          "sources": [
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "ProjectionInput.Model.Properties.g.cs"
+            },
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "GeneratedBindingsAttributes.g.cs"
+            },
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "WhenAnyValueDispatch.g.cs"
+            },
+            {
+              "generator": "ProjectionAdapter",
+              "HintName": "ValidationInterceptors.g.cs"
+            }
+          ]
+        },
+        {
+          "order": "adapter-first",
+          "trace": "initial-invalid -> Ada-valid -> null-invalid -> disposed; Binding=[null,Ada,null,Detached]",
+          "generatedCount": 4,
+          "emittedProjection": false,
+          "finalDispatchDiagnostics": 0,
+          "originalPath": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Primitives/OriginalInput.cs",
+          "originalSourceSha256": "802f5021cd0cb0f26ed5a6eda07313dd371a8a65a403459be28813511522d344",
+          "originalCallSpan": "[765..854)",
+          "originalCallLineSpan": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Primitives/OriginalInput.cs: (24,25)-(24,114)",
+          "interceptor": "ReactiveUI.Validation.Generated.Assembly_ProjectionConsumer_Primitives_adapter_first.ValidationInterceptors.Intercept0(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, System.Func<string?, bool>, string)",
+          "bindingInterceptor": "ReactiveUI.Binding.Generated.Interceptors.ProjectionConsumer_Primitives_adapter_first.__ReactiveUIGeneratedBindings.__Intercept_WhenAnyValue_7FFFEBDF87256747(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, string, string, int)",
+          "producedProperty": "ProjectionInput.Model.Name",
+          "innerDriver": "prototype-only private Validation analysis",
+          "sources": [
+            {
+              "generator": "ProjectionAdapter",
+              "HintName": "ValidationInterceptors.g.cs"
+            },
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "ProjectionInput.Model.Properties.g.cs"
+            },
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "GeneratedBindingsAttributes.g.cs"
+            },
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "WhenAnyValueDispatch.g.cs"
+            }
+          ]
+        }
+      ],
+      "control": {
+        "generatorDiagnostics": [
+          "RUVG001"
+        ],
+        "dispatchDiagnostics": [
+          "RUVG005"
+        ]
+      }
+    },
+    {
+      "flavor": "Reactive",
+      "roslyn": "Microsoft.CodeAnalysis.CSharp, Version=5.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+      "sdkDefaultNoWarn": "1701;1702",
+      "inputs": [
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Roslyn.dll",
+          "sha256": "9b055317e4aa3e98d7d9a56d762f5ec2ba66f0119553fb5a5424b2cd3f2ede32"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.binding.reactive/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.SourceGenerators.dll",
+          "sha256": "137188a5a23c66516201ff4431bbd576bc69d3707926231a172b827b1c300896"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/runic.reactiveui.validation.reactive/8.1.0-runic.0.790.17.15.10/analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+          "sha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+        }
+      ],
+      "generators": [
+        "ReactiveUI.SourceGenerators.BindableDerivedListGenerator",
+        "ReactiveUI.SourceGenerators.ReactiveCollectionGenerator",
+        "ReactiveUI.SourceGenerators.ReactiveCommandGenerator",
+        "ReactiveUI.SourceGenerators.ReactiveObjectGenerator",
+        "ReactiveUI.SourceGenerators.ReactiveGenerator",
+        "ReactiveUI.SourceGenerators.WinForms.RoutedControlHostGenerator",
+        "ReactiveUI.SourceGenerators.WinForms.ViewModelControlHostGenerator",
+        "ReactiveUI.Binding.SourceGenerators.BindingGenerator"
+      ],
+      "results": [
+        {
+          "order": "producer-first",
+          "trace": "initial-invalid -> Ada-valid -> null-invalid -> disposed; Binding=[null,Ada,null,Detached]",
+          "generatedCount": 4,
+          "emittedProjection": false,
+          "finalDispatchDiagnostics": 0,
+          "originalPath": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Reactive/OriginalInput.cs",
+          "originalSourceSha256": "0c2c43b858bcf00493436d3baa7792c3a09515f0370671da1f5334afc2cd09b0",
+          "originalCallSpan": "[800..889)",
+          "originalCallLineSpan": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Reactive/OriginalInput.cs: (24,25)-(24,114)",
+          "interceptor": "ReactiveUI.Validation.Generated.Assembly_ProjectionConsumer_Reactive_producer_first.ValidationInterceptors.Intercept0(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, System.Func<string?, bool>, string)",
+          "bindingInterceptor": "ReactiveUI.Binding.Generated.Interceptors.ProjectionConsumer_Reactive_producer_first.__ReactiveUIGeneratedBindings.__Intercept_WhenAnyValue_7FFFEBDF87256747(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, string, string, int)",
+          "producedProperty": "ProjectionInput.Model.Name",
+          "innerDriver": "prototype-only private Validation analysis",
+          "sources": [
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "ProjectionInput.Model.Properties.g.cs"
+            },
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "GeneratedBindingsAttributes.g.cs"
+            },
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "WhenAnyValueDispatch.g.cs"
+            },
+            {
+              "generator": "ProjectionAdapter",
+              "HintName": "ValidationInterceptors.g.cs"
+            }
+          ]
+        },
+        {
+          "order": "adapter-first",
+          "trace": "initial-invalid -> Ada-valid -> null-invalid -> disposed; Binding=[null,Ada,null,Detached]",
+          "generatedCount": 4,
+          "emittedProjection": false,
+          "finalDispatchDiagnostics": 0,
+          "originalPath": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Reactive/OriginalInput.cs",
+          "originalSourceSha256": "0c2c43b858bcf00493436d3baa7792c3a09515f0370671da1f5334afc2cd09b0",
+          "originalCallSpan": "[800..889)",
+          "originalCallLineSpan": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Reactive/OriginalInput.cs: (24,25)-(24,114)",
+          "interceptor": "ReactiveUI.Validation.Generated.Assembly_ProjectionConsumer_Reactive_adapter_first.ValidationInterceptors.Intercept0(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, System.Func<string?, bool>, string)",
+          "bindingInterceptor": "ReactiveUI.Binding.Generated.Interceptors.ProjectionConsumer_Reactive_adapter_first.__ReactiveUIGeneratedBindings.__Intercept_WhenAnyValue_7FFFEBDF87256747(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, string, string, int)",
+          "producedProperty": "ProjectionInput.Model.Name",
+          "innerDriver": "prototype-only private Validation analysis",
+          "sources": [
+            {
+              "generator": "ProjectionAdapter",
+              "HintName": "ValidationInterceptors.g.cs"
+            },
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "ProjectionInput.Model.Properties.g.cs"
+            },
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "GeneratedBindingsAttributes.g.cs"
+            },
+            {
+              "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+              "HintName": "WhenAnyValueDispatch.g.cs"
+            }
+          ]
+        }
+      ],
+      "control": {
+        "generatorDiagnostics": [
+          "RUVG001"
+        ],
+        "dispatchDiagnostics": [
+          "RUVG005"
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "one public nongeneric partial model and one [Reactive] string? _name field",
+    "private inner Validation driver is prototype plumbing, not production generator ordering",
+    "no command, derived list, generated IReactiveObject, XAML, nested/generic model, attribute modifier, or version matrix",
+    "managed compiler and runtime proof only; no NativeAOT publishing or production support change"
+  ]
+}

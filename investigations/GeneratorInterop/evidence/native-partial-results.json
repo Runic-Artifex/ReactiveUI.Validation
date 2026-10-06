@@ -1,0 +1,182 @@
+{
+  "investigationHead": "4ca1ee98dd04a8998be3da54da2595cc735cf4a3",
+  "shippingSource": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
+  "shippingVersion": "8.1.0-runic.0.790.17.15.10",
+  "sdk": "10.0.401",
+  "host": "Linux-7.2.8-x86_64-with-glibc2.44",
+  "mode": "native",
+  "runnerSha256": "244dded1f13e290d1d3e5629a816f0bb1ede7aec480306db929f87f1a7038971",
+  "fixtureSources": {
+    "Imports.cs": "9dfa12e5367d46db0ac1e6900e31b68d97b26763545974839c272237dbe7c79f",
+    "Streams.cs": "00c1187b5ca45ea0b05ad97789499f07538748d80cb8dc9b5426733d112077e1",
+    "Models.cs": "37b5f465d96802d29c754ec847bc657975e855de1afdb4f6ed208336258e5222",
+    "Program.cs": "87adec24ff8622b4d563fa344825b31fd389ac519585386a0725a903cdd41c9e"
+  },
+  "publishedDynamicDataSha256": {
+    "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+    "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+  },
+  "shippingPackages": {
+    "Primitives": {
+      "id": "Runic.ReactiveUI.Validation",
+      "version": "8.1.0-runic.0.790.17.15.10",
+      "sha256": "ffea7c200bde9893b535dcf3dc9d8fe81ddaba747aad3f95d8b24315218b01c5"
+    },
+    "Reactive": {
+      "id": "Runic.ReactiveUI.Validation.Reactive",
+      "version": "8.1.0-runic.0.790.17.15.10",
+      "sha256": "1f1cb6b0b8404d0914d935306575f2c399b7686e302846b2627f513112ca1a46"
+    }
+  },
+  "checks": [
+    {
+      "name": "Primitives-PARTIAL-native",
+      "returnCode": 0,
+      "analyzersInReportedOrder": [
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/reactiveui.binding/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.SourceGenerators.dll",
+          "sha256": "137188a5a23c66516201ff4431bbd576bc69d3707926231a172b827b1c300896"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Roslyn.dll",
+          "sha256": "9b055317e4aa3e98d7d9a56d762f5ec2ba66f0119553fb5a5424b2cd3f2ede32"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/runic.reactiveui.validation/8.1.0-runic.0.790.17.15.10/analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+          "sha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+        }
+      ],
+      "generated": [
+        {
+          "path": "Primitives-PARTIAL-native-generated/ReactiveUI.Validation.SourceGenerators/ReactiveUI.Validation.SourceGenerators.ValidationGenerator/ValidationInterceptors.g.cs",
+          "sha256": "e157924ee04e5ff78034361caf9cdc81c5bd9afbb27caecca9efc890f2b4833d"
+        },
+        {
+          "path": "Primitives-PARTIAL-native-generated/ReactiveUI.SourceGenerators.Roslyn/ReactiveUI.SourceGenerators.ReactiveGenerator/GeneratorInterop.Model.PartialProperties.g.cs",
+          "sha256": "8c8f37d4a65b403ba09e2e997cf2c823e9f66390b6cd134c7c88a09f8d35b443"
+        },
+        {
+          "path": "Primitives-PARTIAL-native-generated/ReactiveUI.SourceGenerators.Roslyn/ReactiveUI.SourceGenerators.ReactiveGenerator/GeneratorInterop.Address.PartialProperties.g.cs",
+          "sha256": "27cec33095448662e1b8349ce70beca72d14647a7b5fdd255f022e79d3a4917a"
+        },
+        {
+          "path": "Primitives-PARTIAL-native-generated/ReactiveUI.SourceGenerators.Roslyn/ReactiveUI.SourceGenerators.ReactiveGenerator/GeneratorInterop.View.PartialProperties.g.cs",
+          "sha256": "6e482f0f7ed447c1f53b22fb80945bab39a967729f612e67991813887e8fed37"
+        },
+        {
+          "path": "Primitives-PARTIAL-native-generated/ReactiveUI.Binding.SourceGenerators/ReactiveUI.Binding.SourceGenerators.BindingGenerator/GeneratedBindingsAttributes.g.cs",
+          "sha256": "6419b43b02930aa94ac80dfe5740c80b2e062102520f2775689ba77f0b41af66"
+        },
+        {
+          "path": "Primitives-PARTIAL-native-generated/ReactiveUI.Binding.SourceGenerators/ReactiveUI.Binding.SourceGenerators.BindingGenerator/ViewDispatch.g.cs",
+          "sha256": "5ac49614abc4baa8d34f78ebe6e094e9569c88a0d174924482acccea6cbf3e22"
+        },
+        {
+          "path": "Primitives-PARTIAL-native-generated/ReactiveUI.Binding.SourceGenerators/ReactiveUI.Binding.SourceGenerators.BindingGenerator/GeneratorInterop.Model.ObservableAsProperties.g.cs",
+          "sha256": "6e5bb9e0a7020903151f1135e73264c8bafe0074c40d0b784cf243d2caac8118"
+        },
+        {
+          "path": "Primitives-PARTIAL-native-generated/ReactiveUI.Binding.SourceGenerators/ReactiveUI.Binding.SourceGenerators.BindingGenerator/ToPropertyDispatch.g.cs",
+          "sha256": "c0fa895a80f340b03f7e6cc20fb4203a8b629393d008027138103f0d61799c5c"
+        }
+      ],
+      "cohortPackages": {
+        "ReactiveUI": {
+          "version": "26.0.1",
+          "sha256": "8b8e4ef3a51d07b16d6dd28ff4baa884396a7ed913f893e488aa2afa1f21e110"
+        },
+        "ReactiveUI.Binding": {
+          "version": "9.1.0",
+          "sha256": "b9f9e2fe5d2fcd63aab810d5c2c45a8d096dff1604c1598c12b7db5f223188ac"
+        },
+        "ReactiveUI.SourceGenerators": {
+          "version": "4.2.0",
+          "sha256": "9f631dfa1b6b1eeb2a4b9010a48abdf68fc32b09165380ad63c01cd0355be0b4"
+        }
+      },
+      "nativeRuntimeRequired": true,
+      "errors": [],
+      "warnings": [],
+      "runtimePassed": true,
+      "expectedDiagnostics": [],
+      "expectedOutcomeMatched": true
+    },
+    {
+      "name": "Reactive-PARTIAL-native",
+      "returnCode": 0,
+      "analyzersInReportedOrder": [
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/reactiveui.binding.reactive/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.SourceGenerators.dll",
+          "sha256": "137188a5a23c66516201ff4431bbd576bc69d3707926231a172b827b1c300896"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Roslyn.dll",
+          "sha256": "9b055317e4aa3e98d7d9a56d762f5ec2ba66f0119553fb5a5424b2cd3f2ede32"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/runic.reactiveui.validation.reactive/8.1.0-runic.0.790.17.15.10/analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+          "sha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+        }
+      ],
+      "generated": [
+        {
+          "path": "Reactive-PARTIAL-native-generated/ReactiveUI.Validation.SourceGenerators/ReactiveUI.Validation.SourceGenerators.ValidationGenerator/ValidationInterceptors.g.cs",
+          "sha256": "8fcc784fc8f4b53e39cba1116aeee1d18e4447472ec33cf86d9d81c1f9a2968f"
+        },
+        {
+          "path": "Reactive-PARTIAL-native-generated/ReactiveUI.SourceGenerators.Roslyn/ReactiveUI.SourceGenerators.ReactiveGenerator/GeneratorInterop.Model.PartialProperties.g.cs",
+          "sha256": "a6dae9c87a687e010f99ef3e5065975ae88053989162462ea70d49f373d343af"
+        },
+        {
+          "path": "Reactive-PARTIAL-native-generated/ReactiveUI.SourceGenerators.Roslyn/ReactiveUI.SourceGenerators.ReactiveGenerator/GeneratorInterop.Address.PartialProperties.g.cs",
+          "sha256": "024abea3d306cb5f02148ac987121234b2d582d248ce599ab182a2c852b4914f"
+        },
+        {
+          "path": "Reactive-PARTIAL-native-generated/ReactiveUI.SourceGenerators.Roslyn/ReactiveUI.SourceGenerators.ReactiveGenerator/GeneratorInterop.View.PartialProperties.g.cs",
+          "sha256": "f6f1e20f25145f7efa1cb4a161afca38e1c4ee0eb672f8722b95d5c88aaa8984"
+        },
+        {
+          "path": "Reactive-PARTIAL-native-generated/ReactiveUI.Binding.SourceGenerators/ReactiveUI.Binding.SourceGenerators.BindingGenerator/GeneratedBindingsAttributes.g.cs",
+          "sha256": "cc8a24aa4cd99d97c1713dab242e261654c710ecf0297d770bd45a97d000dfab"
+        },
+        {
+          "path": "Reactive-PARTIAL-native-generated/ReactiveUI.Binding.SourceGenerators/ReactiveUI.Binding.SourceGenerators.BindingGenerator/ViewDispatch.g.cs",
+          "sha256": "1db406b0345c587e970e39a29c4d8df4df65c987579ad98ec553cc5eba8cbada"
+        },
+        {
+          "path": "Reactive-PARTIAL-native-generated/ReactiveUI.Binding.SourceGenerators/ReactiveUI.Binding.SourceGenerators.BindingGenerator/GeneratorInterop.Model.ObservableAsProperties.g.cs",
+          "sha256": "d355d97654c09bb16ff024e74f20b9beb9b4257bf2a3667007304da8b5222572"
+        },
+        {
+          "path": "Reactive-PARTIAL-native-generated/ReactiveUI.Binding.SourceGenerators/ReactiveUI.Binding.SourceGenerators.BindingGenerator/ToPropertyDispatch.g.cs",
+          "sha256": "ca6098fcd85fe198f6c9f555ebf9f6575c09766acb9c0755b58e9739b9e9db0d"
+        }
+      ],
+      "cohortPackages": {
+        "ReactiveUI.Reactive": {
+          "version": "26.0.1",
+          "sha256": "1dda292340e5a523010623b14eb01c41131bc7046e1b3539b28a67f269c905d9"
+        },
+        "ReactiveUI.Binding.Reactive": {
+          "version": "9.1.0",
+          "sha256": "e7674abb786b502c54ba044d523bfcef27f5fc11708933b942bd40482c27de09"
+        },
+        "ReactiveUI.SourceGenerators": {
+          "version": "4.2.0",
+          "sha256": "9f631dfa1b6b1eeb2a4b9010a48abdf68fc32b09165380ad63c01cd0355be0b4"
+        }
+      },
+      "nativeRuntimeRequired": true,
+      "errors": [],
+      "warnings": [],
+      "runtimePassed": true,
+      "expectedDiagnostics": [],
+      "expectedOutcomeMatched": true
+    }
+  ],
+  "retainedGraphAudit": {
+    "noRoslynRuntimePackagesOrAnalyzerAssets": true,
+    "separateFromCompilation": true,
+    "auditorRunnerSha256": "244dded1f13e290d1d3e5629a816f0bb1ede7aec480306db929f87f1a7038971"
+  }
+}

@@ -1,0 +1,5 @@
+<Project>
+  <Target Name="RecordAnalyzerInputs" BeforeTargets="CoreCompile">
+    <WriteLinesToFile File="$(MSBuildProjectDirectory)/obj/analyzers.txt" Lines="@(Analyzer)" Overwrite="true" />
+  </Target>
+</Project>

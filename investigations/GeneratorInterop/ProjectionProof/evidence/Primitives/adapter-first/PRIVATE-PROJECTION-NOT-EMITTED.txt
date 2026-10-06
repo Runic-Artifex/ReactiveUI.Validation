@@ -1,0 +1,3 @@
+// PRIVATE_SEMANTIC_PROJECTION_NEVER_EMIT
+#nullable enable
+namespace ProjectionInput { public sealed partial class Model { public string? Name { get { throw null!; } set { } } } }

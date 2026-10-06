@@ -1,0 +1,105 @@
+{
+  "flavor": "Primitives",
+  "roslyn": "Microsoft.CodeAnalysis.CSharp, Version=5.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+  "sdkDefaultNoWarn": "1701;1702",
+  "inputs": [
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Roslyn.dll",
+      "sha256": "9b055317e4aa3e98d7d9a56d762f5ec2ba66f0119553fb5a5424b2cd3f2ede32"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.binding/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.SourceGenerators.dll",
+      "sha256": "137188a5a23c66516201ff4431bbd576bc69d3707926231a172b827b1c300896"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/runic.reactiveui.validation/8.1.0-runic.0.790.17.15.10/analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+      "sha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+    }
+  ],
+  "generators": [
+    "ReactiveUI.SourceGenerators.BindableDerivedListGenerator",
+    "ReactiveUI.SourceGenerators.ReactiveCollectionGenerator",
+    "ReactiveUI.SourceGenerators.ReactiveCommandGenerator",
+    "ReactiveUI.SourceGenerators.ReactiveObjectGenerator",
+    "ReactiveUI.SourceGenerators.ReactiveGenerator",
+    "ReactiveUI.SourceGenerators.WinForms.RoutedControlHostGenerator",
+    "ReactiveUI.SourceGenerators.WinForms.ViewModelControlHostGenerator",
+    "ReactiveUI.Binding.SourceGenerators.BindingGenerator"
+  ],
+  "results": [
+    {
+      "order": "producer-first",
+      "trace": "initial-invalid -\u003E Ada-valid -\u003E null-invalid -\u003E disposed; Binding=[null,Ada,null,Detached]",
+      "generatedCount": 4,
+      "emittedProjection": false,
+      "finalDispatchDiagnostics": 0,
+      "originalPath": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Primitives/OriginalInput.cs",
+      "originalSourceSha256": "802f5021cd0cb0f26ed5a6eda07313dd371a8a65a403459be28813511522d344",
+      "originalCallSpan": "[765..854)",
+      "originalCallLineSpan": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Primitives/OriginalInput.cs: (24,25)-(24,114)",
+      "interceptor": "ReactiveUI.Validation.Generated.Assembly_ProjectionConsumer_Primitives_producer_first.ValidationInterceptors.Intercept0(ProjectionInput.Model, System.Linq.Expressions.Expression\u003CSystem.Func\u003CProjectionInput.Model, string?\u003E\u003E, System.Func\u003Cstring?, bool\u003E, string)",
+      "bindingInterceptor": "ReactiveUI.Binding.Generated.Interceptors.ProjectionConsumer_Primitives_producer_first.__ReactiveUIGeneratedBindings.__Intercept_WhenAnyValue_7FFFEBDF87256747(ProjectionInput.Model, System.Linq.Expressions.Expression\u003CSystem.Func\u003CProjectionInput.Model, string?\u003E\u003E, string, string, int)",
+      "producedProperty": "ProjectionInput.Model.Name",
+      "innerDriver": "prototype-only private Validation analysis",
+      "sources": [
+        {
+          "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+          "HintName": "ProjectionInput.Model.Properties.g.cs"
+        },
+        {
+          "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+          "HintName": "GeneratedBindingsAttributes.g.cs"
+        },
+        {
+          "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+          "HintName": "WhenAnyValueDispatch.g.cs"
+        },
+        {
+          "generator": "ProjectionAdapter",
+          "HintName": "ValidationInterceptors.g.cs"
+        }
+      ]
+    },
+    {
+      "order": "adapter-first",
+      "trace": "initial-invalid -\u003E Ada-valid -\u003E null-invalid -\u003E disposed; Binding=[null,Ada,null,Detached]",
+      "generatedCount": 4,
+      "emittedProjection": false,
+      "finalDispatchDiagnostics": 0,
+      "originalPath": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Primitives/OriginalInput.cs",
+      "originalSourceSha256": "802f5021cd0cb0f26ed5a6eda07313dd371a8a65a403459be28813511522d344",
+      "originalCallSpan": "[765..854)",
+      "originalCallLineSpan": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/evidence/Primitives/OriginalInput.cs: (24,25)-(24,114)",
+      "interceptor": "ReactiveUI.Validation.Generated.Assembly_ProjectionConsumer_Primitives_adapter_first.ValidationInterceptors.Intercept0(ProjectionInput.Model, System.Linq.Expressions.Expression\u003CSystem.Func\u003CProjectionInput.Model, string?\u003E\u003E, System.Func\u003Cstring?, bool\u003E, string)",
+      "bindingInterceptor": "ReactiveUI.Binding.Generated.Interceptors.ProjectionConsumer_Primitives_adapter_first.__ReactiveUIGeneratedBindings.__Intercept_WhenAnyValue_7FFFEBDF87256747(ProjectionInput.Model, System.Linq.Expressions.Expression\u003CSystem.Func\u003CProjectionInput.Model, string?\u003E\u003E, string, string, int)",
+      "producedProperty": "ProjectionInput.Model.Name",
+      "innerDriver": "prototype-only private Validation analysis",
+      "sources": [
+        {
+          "generator": "ProjectionAdapter",
+          "HintName": "ValidationInterceptors.g.cs"
+        },
+        {
+          "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+          "HintName": "ProjectionInput.Model.Properties.g.cs"
+        },
+        {
+          "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+          "HintName": "GeneratedBindingsAttributes.g.cs"
+        },
+        {
+          "generator": "Microsoft.CodeAnalysis.IncrementalGeneratorWrapper",
+          "HintName": "WhenAnyValueDispatch.g.cs"
+        }
+      ]
+    }
+  ],
+  "control": {
+    "generatorDiagnostics": [
+      "RUVG001"
+    ],
+    "dispatchDiagnostics": [
+      "RUVG005"
+    ]
+  }
+}
