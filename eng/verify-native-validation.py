@@ -36,6 +36,16 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def write_report(output, report):
+    (output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
+
+
+def initialize_report(output, report):
+    """Invalidate prior success before any input or toolchain check can fail."""
+    report["completed"] = False
+    write_report(output, report)
+
+
 def verify_native_graph(assets, reactive, pins, version, rid=None):
     """Validate every RID target as well as the neutral target using the core gate."""
     expected = {"net10.0"} | ({f"net10.0/{rid}"} if rid else set())
@@ -160,16 +170,6 @@ def packed_versions(feed, pins, source=None):
     return selected
 
 
-def verify_restored_bytes(assets, package_id, version, expected):
-    library = assets["libraries"][f"{package_id}/{version}"]
-    relative = Path(library["path"])
-    candidates = [Path(base) / relative / f"{package_id.lower()}.{version}.nupkg"
-                  for base in assets["packageFolders"]]
-    present = [path for path in candidates if path.is_file()]
-    if len(present) != 1 or digest(present[0]) != expected:
-        raise ValueError(f"Restored {package_id} bytes do not match the verified input package")
-
-
 def legacy_pins(pins):
     """Keep the immutable Validation baseline on its released DynamicData pair."""
     result = dict(pins)
@@ -186,11 +186,18 @@ def main():
                         help="Use same-SHA core CI package artifacts; default freshly packs current source")
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts/verification/native-gates")
     args = parser.parse_args()
+    output = args.output.resolve()
+    output.mkdir(parents=True, exist_ok=True)
+    report = {"source": None, "dirty": None, "sdk": None, "rid": args.rid, "mode": args.mode,
+              "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
+              "cohorts": {
+                  "candidate": {"dynamicDataVersion": DEPENDENCIES.CURRENT_VERSION, "dynamicDataSha256": DEPENDENCIES.DIGESTS},
+                  "baseline": {"dynamicDataVersion": DEPENDENCIES.LEGACY_VERSION, "dynamicDataSha256": DEPENDENCIES.LEGACY_DIGESTS},
+              }, "packages": {}, "checks": []}
+    initialize_report(output, report)
     expected_host = "Windows" if args.rid == "win-x64" else "Linux"
     if platform.system() != expected_host or platform.machine().lower() not in {"x86_64", "amd64"}:
         raise ValueError(f"Actual {args.rid} execution requires a matching x64 host")
-    output = args.output.resolve()
-    output.mkdir(parents=True, exist_ok=True)
     sdk = subprocess.check_output(["dotnet", "--version"], cwd=ROOT, text=True).strip()
     if sdk != json.loads((ROOT / "global.json").read_text())["sdk"]["version"]:
         raise ValueError("Pinned SDK is required")
@@ -204,14 +211,10 @@ def main():
             raise ValueError(f"DynamicData release bytes differ from bootstrap SHA-256: {package}")
     baseline_pins = legacy_pins(pins)
     DEPENDENCIES.restore_cohort(DEPENDENCIES.LEGACY_VERSION, DEPENDENCIES.LEGACY_DIGESTS)
-    report = {"source": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
-              "dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip()),
-              "sdk": sdk, "rid": args.rid, "mode": args.mode,
-              "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
-              "cohorts": {
-                  "candidate": {"dynamicDataVersion": DEPENDENCIES.CURRENT_VERSION, "dynamicDataSha256": DEPENDENCIES.DIGESTS},
-                  "baseline": {"dynamicDataVersion": DEPENDENCIES.LEGACY_VERSION, "dynamicDataSha256": DEPENDENCIES.LEGACY_DIGESTS},
-              }, "packages": {}, "checks": []}
+    report.update({"source": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
+                   "dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip()),
+                   "sdk": sdk})
+    write_report(output, report)
     # Each invocation packs current source into its own feed. Consumers have no
     # production ProjectReference and restore Validation in a fresh local cache.
     with tempfile.TemporaryDirectory(prefix="work-", dir=output) as temporary:
@@ -276,9 +279,9 @@ def main():
                     code, content = run(command, output / f"{stem}.build.log", folder, expected=kind == "baseline")
                     assets = json.loads((project.parent / "obj/project.assets.json").read_text())
                     verify_native_graph(assets, reactive, cohort_pins, version, rid)
-                    verify_restored_bytes(assets, package_id, version, package_hash)
+                    PACKAGES.verify_restored_bytes(assets, package_id, version, package_hash)
                     dynamic_data = PACKAGES.flavor_ids(reactive)[1]
-                    verify_restored_bytes(assets, dynamic_data, cohort_pins[dynamic_data.casefold()], cohort_digests[dynamic_data])
+                    PACKAGES.verify_restored_bytes(assets, dynamic_data, cohort_pins[dynamic_data.casefold()], cohort_digests[dynamic_data])
                     (output / f"{stem}.graph.json").write_text(json.dumps(assets, indent=2))
                     if kind == "baseline":
                         verify_expected_failure(code, content)
@@ -296,7 +299,9 @@ def main():
                         verify_runtime(runtime_output)
                         print(runtime_output, flush=True)
                     report["checks"].append({"name": stem, "passed": True})
-                    (output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
+                    write_report(output, report)
+    report["completed"] = True
+    write_report(output, report)
     print(f"Strict package consumer gate passed: {output / 'results.json'}", flush=True)
 
 

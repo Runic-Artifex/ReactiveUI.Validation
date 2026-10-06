@@ -158,6 +158,16 @@ def guard_consumer_sources(folder):
             raise ValueError("Generated acceptance consumer must exercise normal call names")
 
 
+def write_report(output, report):
+    (output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
+
+
+def initialize_report(output, report):
+    """Invalidate prior success before any input or toolchain check can fail."""
+    report["completed"] = False
+    write_report(output, report)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rid", choices=("linux-x64", "win-x64"), required=True)
@@ -165,16 +175,21 @@ def main():
     parser.add_argument("--package-feed", type=Path, help="Use exact same-SHA CI package artifact; otherwise pack current source")
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts/verification/generated-gates")
     args = parser.parse_args()
-    if platform.system() != ("Windows" if args.rid == "win-x64" else "Linux") or platform.machine().lower() not in {"x86_64", "amd64"}:
-        raise ValueError("Execution requires a matching x64 host for the selected RID")
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
+    report = {"source": None, "dirty": None, "sdk": None, "rid": args.rid, "mode": args.mode,
+              "dynamicDataSha256": DEPENDENCIES.DIGESTS, "packages": {}, "checks": []}
+    initialize_report(output, report)
+    if platform.system() != ("Windows" if args.rid == "win-x64" else "Linux") or platform.machine().lower() not in {"x86_64", "amd64"}:
+        raise ValueError("Execution requires a matching x64 host for the selected RID")
     sdk = subprocess.check_output(["dotnet", "--version"], cwd=ROOT, text=True).strip()
     if sdk != json.loads((ROOT / "global.json").read_text())["sdk"]["version"]:
         raise ValueError("Pinned SDK is required")
     if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip():
         raise ValueError("Strict generated acceptance requires a clean current source checkout")
     source = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    report.update({"source": source, "dirty": False, "sdk": sdk})
+    write_report(output, report)
     print(f"Available space: {shutil.disk_usage(output).free // (1024 ** 3)} GiB", flush=True)
     fixture = ROOT / "examples/GeneratedValidation"
     guard_consumer_sources(fixture)
@@ -183,8 +198,6 @@ def main():
         package = ROOT / "artifacts/dependencies" / f"{package_id}.{pins[package_id.casefold()]}.nupkg"
         if NATIVE.digest(package) != expected:
             raise ValueError("DynamicData feed must match the SHA-verified immutable release")
-    report = {"source": source, "dirty": False, "sdk": sdk, "rid": args.rid, "mode": args.mode,
-              "dynamicDataSha256": DEPENDENCIES.DIGESTS, "packages": {}, "checks": []}
     with tempfile.TemporaryDirectory(prefix="work-", dir=output) as temporary:
         work = Path(temporary)
         feed = args.package_feed.resolve() if args.package_feed else work / "candidate-feed"
@@ -232,9 +245,9 @@ def main():
                 assets = json.loads((project.parent / "obj/project.assets.json").read_text())
                 NATIVE.verify_native_graph(assets, reactive, pins, version, rid)
                 verify_no_roslyn_runtime(assets)
-                NATIVE.verify_restored_bytes(assets, package_id, version, package_hash)
+                PACKAGES.verify_restored_bytes(assets, package_id, version, package_hash)
                 dynamic_data = PACKAGES.flavor_ids(reactive)[1]
-                NATIVE.verify_restored_bytes(assets, dynamic_data, pins[dynamic_data.casefold()], DEPENDENCIES.DIGESTS[dynamic_data])
+                PACKAGES.verify_restored_bytes(assets, dynamic_data, pins[dynamic_data.casefold()], DEPENDENCIES.DIGESTS[dynamic_data])
                 (output / f"{stem}.graph.json").write_text(json.dumps(assets, indent=2))
                 generated_evidence = verify_generated_sources(project, output / f"{stem}-generated")
                 generated_evidence.update({"source": source, "packageSha256": package_hash, "flavor": flavor, "stage": stage})
@@ -246,7 +259,7 @@ def main():
                 verify_runtime(runtime_output)
                 print(runtime_output, flush=True)
                 report["checks"].append({"name": stem, "passed": True, "generatedSources": generated_evidence["sourceCount"], "generated": generated_evidence})
-                (output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
+                write_report(output, report)
             # Fresh folders avoid previous RID/negative outputs influencing compiler evidence.
             for negative, diagnostic in NEGATIVES.items():
                 negative_folder = work / f"{flavor}-{negative}"
@@ -256,7 +269,9 @@ def main():
                 code, content = NATIVE.run(["dotnet", "build", negative_project, *flags, f"-p:NegativeCase={negative}"], output / f"{stem}.build.log", negative_folder, expected=True)
                 verify_negative(code, content, diagnostic)
                 report["checks"].append({"name": stem, "diagnostic": diagnostic, "passed": True})
-                (output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
+                write_report(output, report)
+    report["completed"] = True
+    write_report(output, report)
     print(f"Generated package acceptance passed: {output / 'results.json'}", flush=True)
 
 

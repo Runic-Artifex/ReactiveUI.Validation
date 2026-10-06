@@ -2,15 +2,33 @@
 # Copyright (c) 2026 Runic Artifex. Licensed under the MIT license.
 """Restore and exercise each packed validation flavor in an independent consumer."""
 
+import base64
+import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import shutil
 import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT = Path(__file__).resolve().parent.parent
 NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
+
+
+def module(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    result = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(result)
+    return result
+
+
+DEPENDENCIES = module("fork_dependencies", ROOT / "eng/restore-fork-dependencies.py")
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def dependency_pins(root):
@@ -69,6 +87,62 @@ def verify_metadata(metadata, reactive, pins):
     return version
 
 
+def verify_repository_source(metadata, package, source):
+    """Require the packed Validation bytes to identify this clean checkout."""
+    repository = metadata.find("n:metadata/n:repository", NS)
+    if repository is None or repository.get("commit") != source:
+        raise ValueError(f"Packed package must record source SHA {source}: {package}")
+
+
+def verify_restored_bytes(assets, package_id, version, expected):
+    """Prove NuGet restored the exact input nupkg, never a stale same-version cache entry."""
+    library = assets["libraries"][f"{package_id}/{version}"]
+    relative = Path(library["path"])
+    candidates = [Path(base) / relative / f"{package_id.lower()}.{version}.nupkg"
+                  for base in assets["packageFolders"]]
+    present = [path for path in candidates if path.is_file()]
+    if len(present) != 1 or digest(present[0]) != expected:
+        raise ValueError(f"Restored {package_id} bytes do not match the verified input package")
+    restored_sha512 = base64.b64encode(hashlib.sha512(present[0].read_bytes()).digest()).decode()
+    if library.get("sha512") != restored_sha512:
+        raise ValueError(f"Restored {package_id} asset SHA-512 does not bind its package bytes")
+
+
+def verified_dynamic_data_inputs(pins):
+    """Return the current immutable DynamicData pair after checking its bootstrap hashes."""
+    inputs = {}
+    for package_id, expected_hash in DEPENDENCIES.DIGESTS.items():
+        version = pins[package_id.casefold()]
+        if version != DEPENDENCIES.CURRENT_VERSION:
+            raise ValueError(f"{package_id} must use the current immutable DynamicData version")
+        package = ROOT / "artifacts" / "dependencies" / f"{package_id}.{version}.nupkg"
+        if not package.is_file() or digest(package) != expected_hash:
+            raise ValueError(f"DynamicData feed must match the SHA-verified immutable release: {package}")
+        inputs[package_id] = expected_hash
+    return inputs
+
+
+def write_report(output, report):
+    (output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
+
+
+def initialize_report(output, report):
+    """Invalidate prior success before any input or toolchain check can fail."""
+    report["completed"] = False
+    write_report(output, report)
+
+
+def run(command, log, cwd):
+    print(f"Running {' '.join(map(str, command))}", flush=True)
+    with log.open("w") as output:
+        result = subprocess.run(list(map(str, command)), check=False, cwd=cwd,
+                                stdout=output, stderr=subprocess.STDOUT)
+    if result.returncode:
+        content = log.read_text(errors="replace")
+        print(content[-20000:], flush=True)
+        raise RuntimeError(f"Command failed ({result.returncode}); full log: {log}")
+
+
 def verify_graph(assets, reactive, pins, validation_version):
     """Reject restored graphs that mix package flavors or dependency generations."""
     package_id, dynamic_data, reactive_ui = flavor_ids(reactive)
@@ -102,7 +176,21 @@ def verify_graph(assets, reactive, pins, validation_version):
 
 def main():
     """Verify package metadata, consumer behavior and the restored dependency graph."""
+    output = ROOT / "artifacts" / "verification" / "package-smoke"
+    output.mkdir(parents=True, exist_ok=True)
+    report = {"source": None, "dirty": None, "sdk": None, "packages": {}, "checks": []}
+    initialize_report(output, report)
     pins = dependency_pins(ROOT)
+    report.update({"source": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
+                   "dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip()),
+                   "sdk": subprocess.check_output(["dotnet", "--version"], cwd=ROOT, text=True).strip()})
+    write_report(output, report)
+    if report["dirty"]:
+        raise ValueError("Package acceptance requires a clean source checkout")
+    source = report["source"]
+    if report["sdk"] != json.loads((ROOT / "global.json").read_text())["sdk"]["version"]:
+        raise ValueError("Pinned SDK is required")
+    dynamic_data_hashes = verified_dynamic_data_inputs(pins)
     selected = []
     for reactive in (False, True):
         package_id, _, _ = flavor_ids(reactive)
@@ -116,12 +204,28 @@ def main():
                           if name.startswith("lib/") and name.endswith(".dll")}
         if frameworks != {"net10.0"}:
             raise ValueError(f"{package_id} must contain only net10.0 library assemblies")
-        selected.append((reactive, package_id, verify_metadata(metadata, reactive, pins)))
+        version = verify_metadata(metadata, reactive, pins)
+        verify_repository_source(metadata, packages[0], source)
+        selected.append((reactive, package_id, version, packages[0], digest(packages[0])))
     if selected[0][2] != selected[1][2]:
         raise ValueError("Packed validation flavors must have the same version")
-    for reactive, package_id, version in selected:
+    cache = output / "packages"
+    for reactive, package_id, version, package, package_hash in selected:
         suffix = ".Reactive" if reactive else ""
-        with tempfile.TemporaryDirectory(prefix="package-smoke-", dir=ROOT / "artifacts") as temporary:
+        dynamic_data = flavor_ids(reactive)[1]
+        flavor = "Reactive" if reactive else "Primitives"
+        expected_inputs = ((package_id, version, package_hash),
+                           (dynamic_data, pins[dynamic_data.casefold()], dynamic_data_hashes[dynamic_data]))
+        for input_id, input_version, input_hash in expected_inputs:
+            cached = cache / input_id.lower() / input_version
+            cached_package = cached / f"{input_id.lower()}.{input_version}.nupkg"
+            if cached.exists() and (not cached_package.is_file() or digest(cached_package) != input_hash):
+                shutil.rmtree(cached)
+        report["packages"][flavor] = {"id": package_id, "version": version, "sha256": package_hash,
+                                      "repositoryCommit": source, "dynamicData": {"id": dynamic_data,
+                                      "version": pins[dynamic_data.casefold()], "sha256": dynamic_data_hashes[dynamic_data]}}
+        write_report(output, report)
+        with tempfile.TemporaryDirectory(prefix="work-", dir=output) as temporary:
             folder = Path(temporary)
             (folder / "nuget.config").write_text(f'''<configuration>
   <packageSources>
@@ -289,9 +393,20 @@ public sealed class ModelView : ReactiveObject, IViewFor<Model>
     }}
 }}
 ''')
-            subprocess.run(["dotnet", "run", "--project", str(project), "-c", "Release"], check=True, cwd=folder)
+            config = folder / "nuget.config"
+            run(["dotnet", "restore", str(project), "--configfile", str(config),
+                 f"-p:RestorePackagesPath={cache}"], output / f"{flavor}.restore.log", folder)
             assets = json.loads((folder / "obj" / "project.assets.json").read_text())
             verify_graph(assets, reactive, pins, version)
+            for input_id, input_version, input_hash in expected_inputs:
+                verify_restored_bytes(assets, input_id, input_version, input_hash)
+            (output / f"{flavor}.graph.json").write_text(json.dumps(assets, indent=2) + "\n")
+            run(["dotnet", "run", "--project", str(project), "--no-restore", "-c", "Release",
+                 f"-p:RestorePackagesPath={cache}"], output / f"{flavor}.runtime.log", folder)
+            report["checks"].append({"name": f"{flavor}-managed", "passed": True})
+            write_report(output, report)
+    report["completed"] = True
+    write_report(output, report)
 
 
 
