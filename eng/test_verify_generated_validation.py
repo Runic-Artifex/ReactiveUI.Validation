@@ -126,6 +126,18 @@ class GeneratedGateTests(unittest.TestCase):
                 with self.subTest(text=text), self.assertRaises(ValueError):
                     VERIFY.guard_consumer_sources(folder)
 
+    def test_incomplete_report_replaces_prior_success_and_keeps_partial_evidence(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp)
+            (output / "results.json").write_text(json.dumps({"completed": True, "checks": [{"name": "old"}]}))
+            report = {"source": "current", "checks": []}
+            VERIFY.initialize_report(output, report)
+            report["checks"].append({"name": "current-first", "passed": True})
+            VERIFY.write_report(output, report)
+            actual = json.loads((output / "results.json").read_text())
+            self.assertFalse(actual["completed"])
+            self.assertEqual(actual["checks"], [{"name": "current-first", "passed": True}])
+
 
 if __name__ == "__main__":
     unittest.main()

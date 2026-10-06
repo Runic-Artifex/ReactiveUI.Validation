@@ -3,8 +3,12 @@
 """Negative dependency-cohort cases for the independent package consumer gate."""
 
 from copy import deepcopy
+import base64
+import hashlib
 import importlib.util
+import json
 from pathlib import Path
+import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 
@@ -115,6 +119,42 @@ class PackageCohortTests(unittest.TestCase):
             VERIFY.verify_metadata(metadata, False, PINS)
         with self.assertRaisesRegex(ValueError, "Expected package ID"):
             VERIFY.verify_metadata(package_metadata(True), False, PINS)
+
+    def test_package_must_record_the_clean_checkout_source(self):
+        metadata = package_metadata()
+        namespace = "{http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd}"
+        ET.SubElement(metadata.find(f"{namespace}metadata"), f"{namespace}repository", commit="expected-source")
+        VERIFY.verify_repository_source(metadata, "candidate.nupkg", "expected-source")
+        with self.assertRaisesRegex(ValueError, "source SHA"):
+            VERIFY.verify_repository_source(metadata, "candidate.nupkg", "other-source")
+
+    def test_restored_package_must_bind_its_asset_sha512_and_input_sha256(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            package = root / "package/1.0/package.1.0.nupkg"
+            package.parent.mkdir(parents=True)
+            package.write_bytes(b"verified package")
+            sha512 = base64.b64encode(hashlib.sha512(package.read_bytes()).digest()).decode()
+            assets = {"libraries": {"Package/1.0": {"path": "package/1.0", "sha512": sha512}},
+                      "packageFolders": {str(root): {}}}
+            VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
+            with self.assertRaisesRegex(ValueError, "bytes"):
+                VERIFY.verify_restored_bytes(assets, "Package", "1.0", "different-input-hash")
+            assets["libraries"]["Package/1.0"]["sha512"] = "sha512-stale"
+            with self.assertRaisesRegex(ValueError, "SHA-512"):
+                VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
+
+    def test_incomplete_report_replaces_prior_success_and_keeps_partial_evidence(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp)
+            (output / "results.json").write_text('{"completed": true, "checks": [{"name": "old"}]}')
+            report = {"source": "current", "checks": []}
+            VERIFY.initialize_report(output, report)
+            report["checks"].append({"name": "current-first", "passed": True})
+            VERIFY.write_report(output, report)
+            actual = json.loads((output / "results.json").read_text())
+            self.assertFalse(actual["completed"])
+            self.assertEqual(actual["checks"], [{"name": "current-first", "passed": True}])
 
 
 if __name__ == "__main__":

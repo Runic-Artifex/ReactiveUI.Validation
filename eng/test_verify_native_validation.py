@@ -3,6 +3,8 @@
 """Adversarial cases for strict native evidence, not native compiler simulations."""
 
 from copy import deepcopy
+import base64
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -97,10 +99,28 @@ class NativeGateTests(unittest.TestCase):
             folder.mkdir(parents=True)
             package = folder / "package.1.0.nupkg"
             package.write_bytes(b"stale package")
-            assets = {"libraries": {"Package/1.0": {"path": "package/1.0"}}, "packageFolders": {str(root): {}}}
+            sha512 = base64.b64encode(hashlib.sha512(package.read_bytes()).digest()).decode()
+            assets = {"libraries": {"Package/1.0": {"path": "package/1.0", "sha512": sha512}}, "packageFolders": {str(root): {}}}
+            # GeneratorInterop's dated probe imports this native entry point, so
+            # preserve it as a delegate to the shared SHA-512-aware helper.
             VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
             with self.assertRaisesRegex(ValueError, "bytes do not match"):
                 VERIFY.verify_restored_bytes(assets, "Package", "1.0", "new-package-hash")
+            assets["libraries"]["Package/1.0"]["sha512"] = "stale-asset-binding"
+            with self.assertRaisesRegex(ValueError, "SHA-512"):
+                VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
+
+    def test_incomplete_report_replaces_prior_success_and_keeps_partial_evidence(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp)
+            (output / "results.json").write_text(json.dumps({"completed": True, "checks": [{"name": "old"}]}))
+            report = {"source": "current", "checks": []}
+            VERIFY.initialize_report(output, report)
+            report["checks"].append({"name": "current-first", "passed": True})
+            VERIFY.write_report(output, report)
+            actual = json.loads((output / "results.json").read_text())
+            self.assertFalse(actual["completed"])
+            self.assertEqual(actual["checks"], [{"name": "current-first", "passed": True}])
 
 
 if __name__ == "__main__":
