@@ -18,19 +18,27 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
-      - uses: actions/setup-dotnet@v5.3.0
+      - uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # v5.3.0
         with:
           global-json-file: global.json
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: '3.x'
       - name: Test package dependency guards
         run: python -B -m unittest discover -s eng -p test_verify_packages.py -v
       - name: Test generated package acceptance guards
         run: python -B -m unittest discover -s eng -p test_verify_generated_validation.py -v
+      - name: Test release promotion guards
+        if: runner.os == 'Linux'
+        run: python -B -m unittest discover -s eng/release -p test_release_assets.py -v
+      - name: Test upstream maintenance fixtures
+        if: runner.os == 'Linux'
+        run: |
+          node eng/upstream/test-collect-inventory.mjs
+          node eng/upstream/test-review.mjs
       - name: Restore pinned Runic DynamicData packages
         run: python eng/restore-fork-dependencies.py
       - name: Build .NET 10
@@ -54,17 +62,65 @@ jobs:
           rid=linux-x64
           if [[ "$RUNNER_OS" == "Windows" ]]; then rid=win-x64; fi
           python eng/verify-generated-validation.py --rid "$rid" --mode managed --package-feed artifacts/packages
+      - name: Bind the verified package pair to this checkout
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $files = @(Get-ChildItem artifacts/packages -File -Filter '*.nupkg' | Sort-Object Name)
+          if ($files.Count -ne 2) { throw 'Expected exactly two verified packages' }
+          $versions = @()
+          foreach ($file in $files) {
+            if ($file.Name -cnotmatch '^Runic\.ReactiveUI\.Validation(\.Reactive)?\.([0-9][0-9A-Za-z.+-]*)\.nupkg$') { throw "Unexpected package: $($file.Name)" }
+            $versions += $Matches[2]
+          }
+          if (@($versions | Select-Object -Unique).Count -ne 1 -or @($files | Where-Object Name -Match '^Runic\.ReactiveUI\.Validation\.Reactive\.').Count -ne 1) { throw 'Expected matching versions of both flavors' }
+          $packages = @($files | ForEach-Object { [ordered]@{ filename = $_.Name; sha256 = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant(); size = $_.Length } })
+          [ordered]@{ source = $env:GITHUB_SHA; packages = $packages } | ConvertTo-Json -Depth 4 | Set-Content artifacts/packages/package-manifest.json -Encoding utf8
       - name: Upload the exact verified package pair
-        uses: actions/upload-artifact@v4.6.2
+        id: package_upload
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
+          if-no-files-found: error
           name: packages-${{ matrix.os }}
-          path: artifacts/packages/*.nupkg
-      - uses: actions/upload-artifact@v4.6.2
+          path: |
+            artifacts/packages/*.nupkg
+            artifacts/packages/package-manifest.json
+      - name: Require the uploaded artifact identity
+        shell: pwsh
+        env:
+          PACKAGE_ARTIFACT_ID: ${{ steps.package_upload.outputs.artifact-id }}
+        run: |
+          if ($env:PACKAGE_ARTIFACT_ID -notmatch '^[1-9][0-9]*$') { throw 'Package upload did not produce an artifact ID' }
+      - name: Download this host's uploaded package pair
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          artifact-ids: ${{ steps.package_upload.outputs.artifact-id }}
+          path: ${{ runner.temp }}/verified-packages
+          digest-mismatch: error
+      - name: Verify package artifact byte roundtrip
+        shell: pwsh
+        env:
+          ROUNDTRIP_PATH: ${{ runner.temp }}/verified-packages
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $originals = @(Get-ChildItem artifacts/packages -File | Where-Object { $_.Extension -eq '.nupkg' -or $_.Name -eq 'package-manifest.json' })
+          $downloaded = @(Get-ChildItem $env:ROUNDTRIP_PATH -File -Recurse)
+          if ($originals.Count -ne 3 -or $downloaded.Count -ne 3) { throw 'Expected only the package pair and manifest in the roundtrip' }
+          foreach ($file in $originals) {
+            $copy = Join-Path $env:ROUNDTRIP_PATH $file.Name
+            if (-not (Test-Path $copy -PathType Leaf)) { throw "Missing roundtrip file: $($file.Name)" }
+            if ((Get-Item $copy).Length -ne $file.Length -or (Get-FileHash $copy -Algorithm SHA256).Hash -cne (Get-FileHash $file.FullName -Algorithm SHA256).Hash) { throw "Artifact byte mismatch: $($file.Name)" }
+          }
+          Write-Host 'Package artifact roundtrip verified: two packages and source manifest'
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
+          if-no-files-found: error
           name: validation-${{ matrix.os }}
           path: |
             src/TestResults
+            artifacts/verification/package-smoke/*.log
+            artifacts/verification/package-smoke/*.json
             artifacts/verification/generated-gates/*.log
             artifacts/verification/generated-gates/*.json
             artifacts/verification/generated-gates/*-generated/**/*.cs
