@@ -12,7 +12,7 @@ const openPr = resolve(root, 'eng/upstream/open-review-pr.sh');
 const temporary = mkdtempSync(join(tmpdir(), 'runic-validation-upstream-review-'));
 function run(command, args, cwd, env = {}) { return execFileSync(command, args, { cwd, env: { ...process.env, ...env }, encoding: 'utf8', stdio: 'pipe' }).trim(); }
 function git(args, repo) { return run('git', args, repo); }
-function commit(repo, message) { git(['add', '.'], repo); git(['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '-m', message], repo); return git(['rev-parse', 'HEAD'], repo); }
+function commit(repo, message) { git(['add', '.'], repo); git(['-c', 'commit.gpgsign=false', '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '-m', message], repo); return git(['rev-parse', 'HEAD'], repo); }
 function inventory(file, pin) { writeFileSync(file, JSON.stringify({ requestedUpstreamCommit: pin, observedUpstreamMainCommit: pin, collectedAt: '2026-10-01T00:00:00Z', counts: { issues: 0, pullRequests: 0, open: 0, total: 0 }, assessmentPolicy: 'fresh' }) + '\n'); }
 function prepareSnapshot(repo, base, upstream, destination) { const data = join(temporary, `inventory-${Math.random()}.json`); inventory(data, upstream); return JSON.parse(run('node', [prepare, '--repo', repo, '--base', base, '--upstream', upstream, '--month', '2026-10', '--inventory', data, '--output', destination], root)); }
 try {
