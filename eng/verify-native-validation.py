@@ -36,6 +36,11 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def verify_restored_bytes(assets, package_id, version, expected):
+    """Compatibility entry point for dated investigation consumers of this gate."""
+    return PACKAGES.verify_restored_bytes(assets, package_id, version, expected)
+
+
 def write_report(output, report):
     (output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
 

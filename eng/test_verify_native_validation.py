@@ -101,9 +101,14 @@ class NativeGateTests(unittest.TestCase):
             package.write_bytes(b"stale package")
             sha512 = base64.b64encode(hashlib.sha512(package.read_bytes()).digest()).decode()
             assets = {"libraries": {"Package/1.0": {"path": "package/1.0", "sha512": sha512}}, "packageFolders": {str(root): {}}}
-            VERIFY.PACKAGES.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
+            # GeneratorInterop's dated probe imports this native entry point, so
+            # preserve it as a delegate to the shared SHA-512-aware helper.
+            VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
             with self.assertRaisesRegex(ValueError, "bytes do not match"):
-                VERIFY.PACKAGES.verify_restored_bytes(assets, "Package", "1.0", "new-package-hash")
+                VERIFY.verify_restored_bytes(assets, "Package", "1.0", "new-package-hash")
+            assets["libraries"]["Package/1.0"]["sha512"] = "stale-asset-binding"
+            with self.assertRaisesRegex(ValueError, "SHA-512"):
+                VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
 
     def test_incomplete_report_replaces_prior_success_and_keeps_partial_evidence(self):
         with tempfile.TemporaryDirectory() as temp:

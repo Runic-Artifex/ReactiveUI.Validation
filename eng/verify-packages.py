@@ -397,10 +397,10 @@ public sealed class ModelView : ReactiveObject, IViewFor<Model>
             run(["dotnet", "restore", str(project), "--configfile", str(config),
                  f"-p:RestorePackagesPath={cache}"], output / f"{flavor}.restore.log", folder)
             assets = json.loads((folder / "obj" / "project.assets.json").read_text())
+            (output / f"{flavor}.graph.json").write_text(json.dumps(assets, indent=2) + "\n")
             verify_graph(assets, reactive, pins, version)
             for input_id, input_version, input_hash in expected_inputs:
                 verify_restored_bytes(assets, input_id, input_version, input_hash)
-            (output / f"{flavor}.graph.json").write_text(json.dumps(assets, indent=2) + "\n")
             run(["dotnet", "run", "--project", str(project), "--no-restore", "-c", "Release",
                  f"-p:RestorePackagesPath={cache}"], output / f"{flavor}.runtime.log", folder)
             report["checks"].append({"name": f"{flavor}-managed", "passed": True})
