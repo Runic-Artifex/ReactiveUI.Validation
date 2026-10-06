@@ -13,7 +13,7 @@ namespace ReactiveUI.Validation.Extensions;
 
 /// <summary>Registers validation rules into an explicitly selected context.</summary>
 /// <remarks>These overloads leave the view model's default context unchanged. Dispose each returned helper before disposing its context.</remarks>
-public static class ValidationRuleContextExtensions
+public static partial class ValidationRuleContextExtensions
 {
     /// <summary>Provides explicit-context rule extension members for <paramref name="viewModel"/>.</summary>
     /// <typeparam name="TViewModel">The view model type.</typeparam>
@@ -30,15 +30,24 @@ public static class ValidationRuleContextExtensions
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="message"/> is empty.</exception>
-        /// <remarks>Requires the Runic Validation generator. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
+        /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
         public ValidationHelper ValidationRule<TViewModelProp>(
             IValidationContext context,
             Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
             Func<TViewModelProp?, bool> isPropertyValid,
             string message)
         {
-            _ = viewModel;
-            throw GeneratedValidationObservation.RequiresGenerator(nameof(ValidationRule));
+            ArgumentExceptionHelper.ThrowIfNull(viewModel);
+            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
+            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
+            ArgumentExceptionHelper.ThrowIfNull(context);
+            ArgumentExceptionHelper.ThrowIfNullOrEmpty(message);
+            var selector = ValidationRuntime.ResolveSelector(viewModel, viewModelProperty, ValidationPlanRole.RuleValue, string.Empty);
+            return ValidationRuntime.RegisterRule(viewModel, context, selector, value =>
+            {
+                var valid = isPropertyValid(value);
+                return new ValidationState(valid, valid ? ValidationText.Empty : ValidationText.Create(message));
+            });
         }
 
         /// <summary>Setup a validation rule for a specified ViewModel property with dynamic error message.</summary>
@@ -49,15 +58,24 @@ public static class ValidationRuleContextExtensions
         /// <param name="message">Func to define the validation error message based on the viewModelProperty value.</param>
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
-        /// <remarks>Requires the Runic Validation generator. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
+        /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
         public ValidationHelper ValidationRule<TViewModelProp>(
             IValidationContext context,
             Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
             Func<TViewModelProp?, bool> isPropertyValid,
             Func<TViewModelProp?, string> message)
         {
-            _ = viewModel;
-            throw GeneratedValidationObservation.RequiresGenerator(nameof(ValidationRule));
+            ArgumentExceptionHelper.ThrowIfNull(viewModel);
+            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
+            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
+            ArgumentExceptionHelper.ThrowIfNull(context);
+            ArgumentExceptionHelper.ThrowIfNull(message);
+            var selector = ValidationRuntime.ResolveSelector(viewModel, viewModelProperty, ValidationPlanRole.RuleValue, string.Empty);
+            return ValidationRuntime.RegisterRule(viewModel, context, selector, value =>
+            {
+                var valid = isPropertyValid(value);
+                return new ValidationState(valid, valid ? ValidationText.None : ValidationText.Create(message(value)));
+            });
         }
 
         /// <summary>Setup a validation rule with a general observable indicating validity and a static error message.</summary>

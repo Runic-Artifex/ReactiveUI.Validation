@@ -11,6 +11,7 @@ from pathlib import Path
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
+import zipfile
 
 SPEC = importlib.util.spec_from_file_location("verify_packages", Path(__file__).with_name("verify-packages.py"))
 VERIFY = importlib.util.module_from_spec(SPEC)
@@ -133,7 +134,11 @@ class PackageCohortTests(unittest.TestCase):
             root = Path(temp)
             package = root / "package/1.0/package.1.0.nupkg"
             package.parent.mkdir(parents=True)
-            package.write_bytes(b"verified package")
+            with zipfile.ZipFile(package, "w") as archive:
+                archive.writestr("lib/net10.0/Package.dll", b"verified DLL")
+            extracted = package.parent / "lib/net10.0/Package.dll"
+            extracted.parent.mkdir(parents=True)
+            extracted.write_bytes(b"verified DLL")
             sha512 = base64.b64encode(hashlib.sha512(package.read_bytes()).digest()).decode()
             assets = {"libraries": {"Package/1.0": {"path": "package/1.0", "sha512": sha512}},
                       "packageFolders": {str(root): {}}}
@@ -143,6 +148,39 @@ class PackageCohortTests(unittest.TestCase):
             assets["libraries"]["Package/1.0"]["sha512"] = "sha512-stale"
             with self.assertRaisesRegex(ValueError, "SHA-512"):
                 VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
+
+    def test_verified_archive_cannot_hide_a_corrupt_or_missing_extracted_dll(self):
+        # This cache is task-owned and isolated: never mutate a shared released package.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            folder = root / "package/1.0"
+            folder.mkdir(parents=True)
+            package = folder / "package.1.0.nupkg"
+            entries = {"lib/net10.0/Package.dll": b"core DLL",
+                       "analyzers/dotnet/roslyn5.9/cs/Package.Generator.dll": b"analyzer DLL"}
+            with zipfile.ZipFile(package, "w") as archive:
+                for name, content in entries.items():
+                    archive.writestr(name, content)
+                    extracted = folder / name
+                    extracted.parent.mkdir(parents=True, exist_ok=True)
+                    extracted.write_bytes(content)
+            assets = {"libraries": {"Package/1.0": {"path": "package/1.0", "sha512":
+                base64.b64encode(hashlib.sha512(package.read_bytes()).digest()).decode()}},
+                "packageFolders": {str(root): {}}}
+            expected = VERIFY.digest(package)
+            VERIFY.verify_restored_bytes(assets, "Package", "1.0", expected)
+            for name, original in entries.items():
+                extracted = folder / name
+                with self.subTest(entry=name, state="corrupt"):
+                    extracted.write_bytes(b"stale extracted bytes")
+                    with self.assertRaisesRegex(ValueError, "extracted DLL"):
+                        VERIFY.verify_restored_bytes(assets, "Package", "1.0", expected)
+                with self.subTest(entry=name, state="missing"):
+                    extracted.unlink()
+                    with self.assertRaisesRegex(ValueError, "extracted DLL"):
+                        VERIFY.verify_restored_bytes(assets, "Package", "1.0", expected)
+                extracted.write_bytes(original)
+            VERIFY.verify_restored_bytes(assets, "Package", "1.0", expected)
 
     def test_incomplete_report_replaces_prior_success_and_keeps_partial_evidence(self):
         with tempfile.TemporaryDirectory() as temp:

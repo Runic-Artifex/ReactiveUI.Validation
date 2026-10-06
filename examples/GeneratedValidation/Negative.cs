@@ -1,27 +1,50 @@
+// Copyright (c) 2026 Runic Artifex. Licensed under the MIT license.
 using System.Linq.Expressions;
 
 internal static class Negative
 {
-    public static void Unsupported(Customer customer, Editor editor)
+    public static void Unsupported(Customer customer, Editor editor, Expression<Func<Customer, string?>> opaqueSelector)
     {
-#if NEGATIVE_STORED_SELECTOR
-        Expression<Func<Customer, string?>> selector = model => model.Email;
-        using var rule = customer.ValidationRule(selector, static value => !string.IsNullOrEmpty(value), "required");
+#if NEGATIVE_OPAQUE_SELECTOR
+        using var rule = customer.ValidationRule(opaqueSelector, static value => !string.IsNullOrEmpty(value), "required");
 #endif
-#if NEGATIVE_COMPUTED_SELECTOR
-        using var rule = customer.ValidationRule(model => model.Email.Trim(), static value => !string.IsNullOrEmpty(value), "required");
+#if NEGATIVE_UNMARKED_INIT
+        var view = new DiagnosticView { ViewModel = customer };
+        using var binding = view.BindValidation(customer, model => model.Email, target => target.InitialMessage);
 #endif
-#if NEGATIVE_INDEXER
-        using var rule = customer.ValidationRule(model => model.Email[0], static value => value != ' ', "required");
+#if NEGATIVE_UNMARKED_READONLY
+        var view = new DiagnosticView { ViewModel = customer };
+        using var binding = view.BindValidation(customer, model => model.Email, target => target.ReadonlyMessage);
 #endif
-#if NEGATIVE_NONNOTIFY_RULE
-        using var rule = customer.ValidationRule(model => model.Metadata.Value, static value => !string.IsNullOrEmpty(value), "required");
+#if NEGATIVE_GET_ONLY_TARGET
+        var view = new DiagnosticView { ViewModel = customer };
+        using var binding = view.BindValidation(customer, model => model.Email, target => target.GetOnlyMessage);
 #endif
-#if NEGATIVE_STRUCT_OWNER
-        using var rule = customer.ValidationRule(model => model.StructInfo.Value, static value => !string.IsNullOrEmpty(value), "required");
+#if NEGATIVE_INVALID_ASSIGNMENT
+        using var binding = editor.BindValidationState<Editor, Customer, object>(customer, model => model.AddressRule, target => target.Message, static state => (object)"invalid storage conversion");
 #endif
-#if NEGATIVE_NESTED_TARGET
-        using var binding = editor.BindValidation(customer, model => model.Email, view => view.PlainPanel.Child.Message);
+#if NEGATIVE_VALUE_VIEW
+        var view = new ValueView { ViewModel = customer };
+        using var binding = view.BindValidation(customer, model => model.Email, target => target.Message);
 #endif
+    }
+
+#if NEGATIVE_UNMARKED_INIT || NEGATIVE_UNMARKED_READONLY || NEGATIVE_GET_ONLY_TARGET
+    private sealed class DiagnosticView : ReactiveObject, IViewFor<Customer>
+    {
+        public Customer? ViewModel { get; set => this.RaiseAndSetIfChanged(ref field, value); }
+        object? IViewFor.ViewModel { get => ViewModel; set => ViewModel = (Customer?)value; }
+        public string InitialMessage { get; init; } = "";
+        public readonly string ReadonlyMessage = "";
+        public string GetOnlyMessage { get; } = "";
+    }
+
+#endif
+
+    private struct ValueView : IViewFor<Customer>
+    {
+        public Customer? ViewModel { get; set; }
+        object? IViewFor.ViewModel { get => ViewModel; set => ViewModel = (Customer?)value; }
+        public string? Message { get; set; }
     }
 }

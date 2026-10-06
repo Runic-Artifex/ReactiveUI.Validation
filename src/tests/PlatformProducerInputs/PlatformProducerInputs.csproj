@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsTestProject>false</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <TrackPublicApi>false</TrackPublicApi>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode>true</RestoreLockedMode>
+    <!-- Use the exact explicit desktop metadata download on every host rather
+         than SDK-installed targeting-pack discovery or implicit downloads. -->
+    <EnableWindowsTargeting>false</EnableWindowsTargeting>
+  </PropertyGroup>
+  <!-- Restore-only compiler inputs: the tests select framework metadata and run
+       the actual generators explicitly. No UI workload or application is built. -->
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <!-- Invoke the packaged XAML generator DLL explicitly, as MAUI's workload
+         targets do. PackageDownload avoids restoring unrelated binding tools. -->
+    <PackageDownload Include="Microsoft.Maui.Controls.SourceGen" Version="[10.0.110]" />
+    <!-- Cross-host WinForms compiler metadata; no desktop workload or runtime UI. -->
+    <PackageDownload Include="Microsoft.WindowsDesktop.App.Ref" Version="[10.0.12]" />
+    <PackageReference Include="Microsoft.Maui.Controls.Core" />
+    <PackageReference Include="Microsoft.Maui.Controls.Xaml" />
+  </ItemGroup>
+</Project>

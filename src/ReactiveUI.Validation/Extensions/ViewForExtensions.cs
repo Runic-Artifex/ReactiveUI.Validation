@@ -18,7 +18,7 @@ namespace ReactiveUI.Validation.Extensions;
     "SST1703:Use extension block",
     Justification = "The receiver TView is constrained to IViewFor<TViewModel>, and TViewModel must stay on the method because the receiver "
         + "does not mention it. An extension block cannot hold a constraint that refers to a method type parameter.")]
-public static class ViewForExtensions
+public static partial class ViewForExtensions
 {
     /// <summary>Binds the specified ViewModel property validation to the View property.</summary>
     /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
@@ -31,18 +31,16 @@ public static class ViewForExtensions
     /// <param name="viewProperty">View property to bind the validation message.</param>
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelProperty"/> or <paramref name="viewProperty"/> is null.</exception>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDisposable BindValidation<TView, TViewModel, TViewModelProperty, TViewProperty>(
         this TView view,
         TViewModel? viewModel,
         Expression<Func<TViewModel, TViewModelProperty>> viewModelProperty,
         Expression<Func<TView, TViewProperty>> viewProperty)
         where TView : IViewFor<TViewModel>
-        where TViewModel : class, IReactiveObject, IValidatableViewModel
-    {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidation));
-    }
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForProperty(view, viewModelProperty, viewProperty);
 
     /// <summary>Binds the specified ViewModel property validation to the View property.</summary>
     /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
@@ -60,7 +58,8 @@ public static class ViewForExtensions
     /// </param>
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelProperty"/> or <paramref name="viewProperty"/> is null.</exception>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDisposable BindValidation<TView, TViewModel, TViewModelProperty, TViewProperty>(
         this TView view,
         TViewModel? viewModel,
@@ -68,11 +67,8 @@ public static class ViewForExtensions
         Expression<Func<TView, TViewProperty>> viewProperty,
         IValidationTextFormatter<string>? formatter)
         where TView : IViewFor<TViewModel>
-        where TViewModel : class, IReactiveObject, IValidatableViewModel
-    {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidation));
-    }
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForProperty(view, viewModelProperty, viewProperty, formatter);
 
     /// <summary>Binds the overall validation of a ViewModel to a specified View property.</summary>
     /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
@@ -83,17 +79,15 @@ public static class ViewForExtensions
     /// <param name="viewProperty">View property to bind the validation message.</param>
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewProperty"/> is null.</exception>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
         this TView view,
         TViewModel? viewModel,
         Expression<Func<TView, TViewProperty>> viewProperty)
         where TView : IViewFor<TViewModel>
-        where TViewModel : class, IReactiveObject, IValidatableViewModel
-    {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidation));
-    }
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForViewModel<TView, TViewModel, TViewProperty>(view, viewProperty);
 
     /// <summary>Binds the overall validation of a ViewModel to a specified View property.</summary>
     /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
@@ -109,18 +103,16 @@ public static class ViewForExtensions
     /// </param>
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewProperty"/> is null.</exception>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
         this TView view,
         TViewModel? viewModel,
         Expression<Func<TView, TViewProperty>> viewProperty,
         IValidationTextFormatter<string>? formatter)
         where TView : IViewFor<TViewModel>
-        where TViewModel : class, IReactiveObject, IValidatableViewModel
-    {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidation));
-    }
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForViewModel<TView, TViewModel, TViewProperty>(view, viewProperty, formatter);
 
     /// <summary>Binds a <see cref="ValidationHelper" /> from a ViewModel to a specified View property.</summary>
     /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
@@ -132,18 +124,16 @@ public static class ViewForExtensions
     /// <param name="viewProperty">View property to bind the validation message.</param>
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelHelperProperty"/> or <paramref name="viewProperty"/> is null.</exception>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
         this TView view,
         TViewModel? viewModel,
         Expression<Func<TViewModel?, ValidationHelper?>> viewModelHelperProperty,
         Expression<Func<TView, TViewProperty>> viewProperty)
         where TView : IViewFor<TViewModel>
-        where TViewModel : class, IReactiveObject, IValidatableViewModel
-    {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidation));
-    }
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForValidationHelperProperty(view, viewModelHelperProperty, viewProperty);
 
     /// <summary>Binds a <see cref="ValidationHelper" /> from a ViewModel to a specified View property.</summary>
     /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
@@ -160,7 +150,8 @@ public static class ViewForExtensions
     /// </param>
     /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelHelperProperty"/> or <paramref name="viewProperty"/> is null.</exception>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
         this TView view,
         TViewModel? viewModel,
@@ -168,11 +159,8 @@ public static class ViewForExtensions
         Expression<Func<TView, TViewProperty>> viewProperty,
         IValidationTextFormatter<string>? formatter)
         where TView : IViewFor<TViewModel>
-        where TViewModel : class, IReactiveObject, IValidatableViewModel
-    {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidation));
-    }
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForValidationHelperProperty(view, viewModelHelperProperty, viewProperty, formatter);
 
     /// <summary>Binds the specified ViewModel property validation to the View property.</summary>
     /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
@@ -226,7 +214,7 @@ public static class ViewForExtensions
 
         ArgumentExceptionHelper.ThrowIfNull(viewProperty);
 
-        return ValidationBinding.ForProperty(view, viewModelProperty, viewProperty, formatter);
+        return ValidationBinding.ForPropertyUnsafe(view, viewModelProperty, viewProperty, formatter);
     }
 
     /// <summary>Binds the overall validation of a ViewModel to a specified View property.</summary>
@@ -273,7 +261,7 @@ public static class ViewForExtensions
     {
         ArgumentExceptionHelper.ThrowIfNull(viewProperty);
 
-        return ValidationBinding.ForViewModel<TView, TViewModel, TViewProperty>(view, viewProperty, formatter);
+        return ValidationBinding.ForViewModelUnsafe<TView, TViewModel, TViewProperty>(view, viewProperty, formatter);
     }
 
     /// <summary>Binds a <see cref="ValidationHelper" /> from a ViewModel to a specified View property.</summary>
@@ -326,6 +314,6 @@ public static class ViewForExtensions
 
         ArgumentExceptionHelper.ThrowIfNull(viewProperty);
 
-        return ValidationBinding.ForValidationHelperProperty(view, viewModelHelperProperty, viewProperty, formatter);
+        return ValidationBinding.ForValidationHelperPropertyUnsafe(view, viewModelHelperProperty, viewProperty, formatter);
     }
 }

@@ -1,0 +1,52 @@
+{
+  "completed": true,
+  "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generated-capabilities/eng/verification-fixtures/LegacyPeer/frozen/GeneratedValidation.LegacyPeer.Reactive.dll",
+  "sha256": "e7733f3fef73582ac9a9453906ff360f564d0d3c1cfd8ae0afc6d04034a4917b",
+  "assembly": "GeneratedValidation.LegacyPeer.Reactive",
+  "assemblyReferences": [
+    {
+      "name": "System.Runtime",
+      "version": "10.0.0.0"
+    },
+    {
+      "name": "System.Linq.Expressions",
+      "version": "10.0.0.0"
+    },
+    {
+      "name": "ReactiveUI.Validation.Reactive",
+      "version": "8.0.0.0"
+    },
+    {
+      "name": "ReactiveUI.Reactive",
+      "version": "26.0.0.0"
+    },
+    {
+      "name": "System.ObjectModel",
+      "version": "10.0.0.0"
+    }
+  ],
+  "validationAssembly": "ReactiveUI.Validation.Reactive",
+  "newCapabilityReferences": false,
+  "invocationCount": 1,
+  "callableCount": 1,
+  "calls": [
+    {
+      "method": "GeneratedValidation.LegacyPeer.PeerRules.Rule",
+      "offset": 33,
+      "opcode": "call",
+      "owner": "ReactiveUI.Validation.Reactive.Extensions.ValidatableViewModelExtensions",
+      "target": "ValidationRule",
+      "signatureSha256": "4fcfa8bb8772909418bcad5a7a0fb5f220b1c2c90ace1098f2e154e665d630dd",
+      "typeArgumentsSha256": "6529527fb0fd8c28bcf1670b2f25f250a778a7218b5b9cb85a31a1bc608fa313"
+    },
+    {
+      "method": "GeneratedValidation.LegacyPeer.PeerRules.Callable",
+      "offset": 10,
+      "opcode": "ldftn",
+      "owner": "ReactiveUI.Validation.Reactive.Extensions.ValidatableViewModelExtensions",
+      "target": "ValidationRule",
+      "signatureSha256": "4fcfa8bb8772909418bcad5a7a0fb5f220b1c2c90ace1098f2e154e665d630dd",
+      "typeArgumentsSha256": "6529527fb0fd8c28bcf1670b2f25f250a778a7218b5b9cb85a31a1bc608fa313"
+    }
+  ]
+}

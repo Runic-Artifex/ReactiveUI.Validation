@@ -1,0 +1,527 @@
+{
+  "schema": 1,
+  "status": "source-stage acceptance map; no capability completion claims",
+  "expectedFinalCases": [
+    "bindings-generics-storage-policies",
+    "context-replacement",
+    "domain-presentation-independence",
+    "helper-model-rich-state",
+    "historical-peer-unchanged-original-api",
+    "initial-field-and-text",
+    "latest-requests-owner-scheduling",
+    "nested-null-and-replacement",
+    "nested-target-handoff",
+    "nullable-output-stack-snapshots",
+    "peer-generated-registered-callers",
+    "precompiled-fresh-expressions-callables",
+    "property-state-membership",
+    "real-producer-commands-collections-oaph",
+    "removed-pending-row-cancellation",
+    "rows-owned-observable-results",
+    "rules-generics-private-captures-indices",
+    "selected-static-access-owner-replay",
+    "stable-rows-source-ownership",
+    "static-factory-raw-nullable-projections",
+    "typed-formatter-resolver-lifetimes",
+    "typed-providers-components-host-adapter",
+    "virtual-error-hook-order-and-disposal"
+  ],
+  "pendingFixtureOwners": {},
+  "sameBinaryMatrix": {
+    "flavors": [
+      "Primitives",
+      "Reactive"
+    ],
+    "stages": [
+      "managed",
+      "full-trim",
+      "native"
+    ],
+    "rids": [
+      "linux-x64",
+      "win-x64"
+    ],
+    "positiveBuildsPerRid": 6
+  },
+  "inventoryRequirement": "All 57 normal method definitions require actual Generated calls. Preserve the frozen 29 original identities separately: 4 Expression predicates + 14 Expression extension bindings + 11 static factories (28 Expression selectors and one selector-free factory). Also verify all 28 Func counterparts: 4 predicates + 14 extension bindings + 10 selector-taking static factories. RuntimeRegistered and RuntimeSafe rows never satisfy either Generated inventory.",
+  "rows": [
+    {
+      "id": "C01",
+      "requirement": "early safe-metadata `RUVG001` false positive",
+      "runtimeCases": [
+        "initial-field-and-text",
+        "real-producer-commands-collections-oaph"
+      ],
+      "focusedSuites": "AccessBridgeCompilerTests, CompilerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "C02",
+      "requirement": "open method/type parameters rejected",
+      "runtimeCases": [
+        "rules-generics-private-captures-indices",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "AccessBridgeCompilerTests, CompilerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "C03",
+      "requirement": "inaccessible/private nested types and members",
+      "runtimeCases": [
+        "selected-static-access-owner-replay",
+        "rules-generics-private-captures-indices",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "AccessBridgeCompilerTests, CompilerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "C04",
+      "requirement": "anonymous/file-local result shapes",
+      "runtimeCases": [
+        "rules-generics-private-captures-indices",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "AccessBridgeCompilerTests, CompilerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "C05",
+      "requirement": "readonly/init-only target restriction",
+      "runtimeCases": [
+        "selected-static-access-owner-replay"
+      ],
+      "focusedSuites": "AccessBridgeCompilerTests, CompilerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "C06",
+      "requirement": "preserve closed accessible generic and internal types",
+      "runtimeCases": [
+        "selected-static-access-owner-replay",
+        "rules-generics-private-captures-indices"
+      ],
+      "focusedSuites": "AccessBridgeCompilerTests, CompilerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S01",
+      "requirement": "casts/conversions rejected",
+      "runtimeCases": [
+        "rules-generics-private-captures-indices",
+        "bindings-generics-storage-policies",
+        "selected-static-access-owner-replay"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S02",
+      "requirement": "fields rejected",
+      "runtimeCases": [
+        "rules-generics-private-captures-indices",
+        "selected-static-access-owner-replay",
+        "typed-providers-components-host-adapter"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S03",
+      "requirement": "computed/captured/method expressions rejected",
+      "runtimeCases": [
+        "rules-generics-private-captures-indices",
+        "precompiled-fresh-expressions-callables"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S04",
+      "requirement": "indexers rejected",
+      "runtimeCases": [
+        "rules-generics-private-captures-indices",
+        "bindings-generics-storage-policies",
+        "historical-peer-unchanged-original-api"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S05",
+      "requirement": "selector variables/parameters/factories rejected",
+      "runtimeCases": [
+        "rules-generics-private-captures-indices",
+        "precompiled-fresh-expressions-callables",
+        "historical-peer-unchanged-original-api"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S06",
+      "requirement": "indirect normal delegates rejected",
+      "runtimeCases": [
+        "precompiled-fresh-expressions-callables",
+        "historical-peer-unchanged-original-api",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S07",
+      "requirement": "precompiled normal binaries throw",
+      "runtimeCases": [
+        "historical-peer-unchanged-original-api"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S08",
+      "requirement": "non-INPC/platform/provider sources excluded",
+      "runtimeCases": [
+        "typed-providers-components-host-adapter",
+        "rules-generics-private-captures-indices",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S09",
+      "requirement": "concrete struct views/chain owners excluded",
+      "runtimeCases": [
+        "selected-static-access-owner-replay",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S10",
+      "requirement": "generated calls emitted by peers lack interception",
+      "runtimeCases": [
+        "peer-generated-registered-callers"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "S11",
+      "requirement": "ref-struct/stack-local lifetime constraint",
+      "runtimeCases": [
+        "nullable-output-stack-snapshots",
+        "selected-static-access-owner-replay"
+      ],
+      "focusedSuites": "SemanticPlannerTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, RuntimeDispatchPolicyCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "P01",
+      "requirement": "Reactive field-produced properties invisible",
+      "runtimeCases": [
+        "real-producer-commands-collections-oaph"
+      ],
+      "focusedSuites": "ProducerCompilerTests, ProducerXamlCompilerTests, ProducerInteropCompilerTests, PlatformProducerCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "P02",
+      "requirement": "generated notification interfaces invisible",
+      "runtimeCases": [
+        "real-producer-commands-collections-oaph"
+      ],
+      "focusedSuites": "ProducerCompilerTests, ProducerXamlCompilerTests, ProducerInteropCompilerTests, PlatformProducerCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "P03",
+      "requirement": "generated commands invisible",
+      "runtimeCases": [
+        "real-producer-commands-collections-oaph"
+      ],
+      "focusedSuites": "ProducerCompilerTests, ProducerXamlCompilerTests, ProducerInteropCompilerTests, PlatformProducerCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "P04",
+      "requirement": "generated collections/derived lists invisible",
+      "runtimeCases": [
+        "real-producer-commands-collections-oaph",
+        "stable-rows-source-ownership"
+      ],
+      "focusedSuites": "ProducerCompilerTests, ProducerXamlCompilerTests, ProducerInteropCompilerTests, PlatformProducerCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "P05",
+      "requirement": "preserve declared partial properties and Binding OAPH",
+      "runtimeCases": [
+        "real-producer-commands-collections-oaph"
+      ],
+      "focusedSuites": "ProducerCompilerTests, ProducerXamlCompilerTests, ProducerInteropCompilerTests, PlatformProducerCompilerTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "P06",
+      "requirement": "XAML-produced controls and provider capability",
+      "runtimeCases": [
+        "typed-providers-components-host-adapter"
+      ],
+      "focusedSuites": "ProducerCompilerTests, ProducerXamlCompilerTests, ProducerInteropCompilerTests, PlatformProducerCompilerTests",
+      "additionalEvidence": "Actual MAUI/Avalonia producer/framework compiler contracts; no UI native host claim."
+    },
+    {
+      "id": "P07",
+      "requirement": "projection/ordering/version drift",
+      "runtimeCases": [
+        "real-producer-commands-collections-oaph"
+      ],
+      "focusedSuites": "ProducerCompilerTests, ProducerXamlCompilerTests, ProducerInteropCompilerTests, PlatformProducerCompilerTests",
+      "additionalEvidence": "Actual incremental edits/reverts/drift/order/compiler controls; unchanged native binary cases do not alone prove incremental behavior."
+    },
+    {
+      "id": "R01",
+      "requirement": "preserve rule metadata and complete states",
+      "runtimeCases": [
+        "helper-model-rich-state",
+        "property-state-membership",
+        "static-factory-raw-nullable-projections",
+        "historical-peer-unchanged-original-api"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "R02",
+      "requirement": "preserve context policy/interface dispatch",
+      "runtimeCases": [
+        "context-replacement",
+        "helper-model-rich-state",
+        "rules-generics-private-captures-indices",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "R03",
+      "requirement": "deliberate null policy differences",
+      "runtimeCases": [
+        "nested-null-and-replacement",
+        "rules-generics-private-captures-indices",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "R04",
+      "requirement": "deliberate initial emission differences",
+      "runtimeCases": [
+        "initial-field-and-text",
+        "rules-generics-private-captures-indices",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "R05",
+      "requirement": "preserve target handoff and typed outputs",
+      "runtimeCases": [
+        "nested-target-handoff",
+        "static-factory-raw-nullable-projections",
+        "selected-static-access-owner-replay",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "R06",
+      "requirement": "preserve reentry/error/disposal ownership",
+      "runtimeCases": [
+        "precompiled-fresh-expressions-callables",
+        "historical-peer-unchanged-original-api",
+        "bindings-generics-storage-policies",
+        "rules-generics-private-captures-indices",
+        "domain-presentation-independence"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "R07",
+      "requirement": "asynchronous/collection lifetime needs explicit policy",
+      "runtimeCases": [
+        "rows-owned-observable-results",
+        "latest-requests-owner-scheduling",
+        "stable-rows-source-ownership",
+        "removed-pending-row-cancellation"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "R08",
+      "requirement": "preserve scheduling and add explicit presentation adaptation",
+      "runtimeCases": [
+        "domain-presentation-independence",
+        "latest-requests-owner-scheduling",
+        "real-producer-commands-collections-oaph"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "R09",
+      "requirement": "virtual error hook previously deferred",
+      "runtimeCases": [
+        "virtual-error-hook-order-and-disposal"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "R10",
+      "requirement": "direct property component remains reflection-only",
+      "runtimeCases": [
+        "typed-providers-components-host-adapter"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "R11",
+      "requirement": "public static binding factories remain reflection-only",
+      "runtimeCases": [
+        "static-factory-raw-nullable-projections"
+      ],
+      "focusedSuites": "CapabilityAccessTests, CapabilityCatalogTests, CapabilityFacadeTests, CapabilityObservationTests, CapabilityOwnershipTests, CapabilityLegacySequenceTests, CapabilityDefaultContextTests, ValidationCapabilityAdapterTests, RuleCapabilityCompilerTests, BindingCapabilitiesCompilerTests, ValidationErrorHookTests",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "A01",
+      "requirement": "SDK nullable bridge and explicit generic source spelling",
+      "runtimeCases": [
+        "nullable-output-stack-snapshots",
+        "static-factory-raw-nullable-projections",
+        "bindings-generics-storage-policies"
+      ],
+      "focusedSuites": "CapabilityCompilerHostTests, compiler configuration tests, package/native/generated Python guard suites, source/PE audit",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "A02",
+      "requirement": "Unsafe/reflection and annotation boundaries",
+      "runtimeCases": [
+        "typed-providers-components-host-adapter",
+        "precompiled-fresh-expressions-callables",
+        "historical-peer-unchanged-original-api",
+        "selected-static-access-owner-replay",
+        "typed-formatter-resolver-lifetimes"
+      ],
+      "focusedSuites": "CapabilityCompilerHostTests, compiler configuration tests, package/native/generated Python guard suites, source/PE audit",
+      "additionalEvidence": "Current reflection observer/setter IL2026 negatives, no falseIL3050; preserve immutable .5 historical controls separately."
+    },
+    {
+      "id": "A03",
+      "requirement": "formatter/DI/provider initialization",
+      "runtimeCases": [
+        "typed-formatter-resolver-lifetimes",
+        "typed-providers-components-host-adapter"
+      ],
+      "focusedSuites": "CapabilityCompilerHostTests, compiler configuration tests, package/native/generated Python guard suites, source/PE audit",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    },
+    {
+      "id": "A04",
+      "requirement": "package-wide AOT contract not yet advertised",
+      "runtimeCases": [
+        "typed-providers-components-host-adapter",
+        "real-producer-commands-collections-oaph"
+      ],
+      "focusedSuites": "CapabilityCompilerHostTests, compiler configuration tests, package/native/generated Python guard suites, source/PE audit",
+      "additionalEvidence": "Actual flagged core PE metadata/public dependency audit and zero-warning complete corpus."
+    },
+    {
+      "id": "A05",
+      "requirement": "compiler/analyzer/configuration/package restrictions",
+      "runtimeCases": [
+        "initial-field-and-text",
+        "real-producer-commands-collections-oaph",
+        "selected-static-access-owner-replay"
+      ],
+      "focusedSuites": "CapabilityCompilerHostTests, compiler configuration tests, package/native/generated Python guard suites, source/PE audit",
+      "additionalEvidence": "Actual package/config/band/runtime/collision negatives, transitive version resolution, all-source semantic dispatch/signatures and no consumer Roslyn graph."
+    },
+    {
+      "id": "A06",
+      "requirement": "preserve current graphs and immutable evidence",
+      "runtimeCases": [
+        "historical-peer-unchanged-original-api",
+        "initial-field-and-text"
+      ],
+      "focusedSuites": "CapabilityCompilerHostTests, compiler configuration tests, package/native/generated Python guard suites, source/PE audit",
+      "additionalEvidence": "Same-source packages and matching restored archive/extracted hashes for both current .30 hosts; historical .5 peer evidence separate."
+    },
+    {
+      "id": "A07",
+      "requirement": "native host versus provider/UI coverage",
+      "runtimeCases": [
+        "typed-providers-components-host-adapter"
+      ],
+      "focusedSuites": "CapabilityCompilerHostTests, compiler configuration tests, package/native/generated Python guard suites, source/PE audit",
+      "additionalEvidence": "Fresh current-host managed/full-trim/native runs; provider/compiler-only platform evidence separately classified."
+    },
+    {
+      "id": "A08",
+      "requirement": "preserve existing OAPH/context/formatter infrastructure",
+      "runtimeCases": [
+        "real-producer-commands-collections-oaph",
+        "context-replacement",
+        "typed-formatter-resolver-lifetimes",
+        "domain-presentation-independence"
+      ],
+      "focusedSuites": "CapabilityCompilerHostTests, compiler configuration tests, package/native/generated Python guard suites, source/PE audit",
+      "additionalEvidence": "Focused positive/negative/behavior checks plus real same-binary managed/full-trim/native execution."
+    }
+  ],
+  "implementedSourceCases": [
+    "initial-field-and-text",
+    "nested-null-and-replacement",
+    "helper-model-rich-state",
+    "context-replacement",
+    "nested-target-handoff",
+    "property-state-membership",
+    "rows-owned-observable-results",
+    "latest-requests-owner-scheduling",
+    "stable-rows-source-ownership",
+    "removed-pending-row-cancellation",
+    "domain-presentation-independence",
+    "nullable-output-stack-snapshots",
+    "typed-formatter-resolver-lifetimes",
+    "precompiled-fresh-expressions-callables",
+    "historical-peer-unchanged-original-api",
+    "static-factory-raw-nullable-projections",
+    "selected-static-access-owner-replay",
+    "typed-providers-components-host-adapter",
+    "rules-generics-private-captures-indices",
+    "real-producer-commands-collections-oaph",
+    "virtual-error-hook-order-and-disposal",
+    "peer-generated-registered-callers",
+    "bindings-generics-storage-policies"
+  ],
+  "pendingScenarioOwners": {},
+  "integratedFixtureOwners": {
+    "rules-generics-private-captures-indices": "generator_runtime",
+    "real-producer-commands-collections-oaph": "generator_rules",
+    "peer-generated-registered-callers": "generator_runtime",
+    "virtual-error-hook-order-and-disposal": "runtime_adapters",
+    "bindings-generics-storage-policies": "generator_bindings"
+  }
+}

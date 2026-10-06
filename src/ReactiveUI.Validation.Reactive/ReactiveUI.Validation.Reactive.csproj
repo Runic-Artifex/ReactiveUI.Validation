@@ -5,6 +5,7 @@
        System.Reactive's scheduler, so it plugs into ReactiveUI.Reactive view models and schedulers. -->
   <PropertyGroup>
     <TargetFrameworks>$(LibraryTargetFrameworks)</TargetFrameworks>
+    <IsAotCompatible Condition="'$(TargetFramework)' == 'net10.0'">true</IsAotCompatible>
     <DefineConstants>$(DefineConstants);REACTIVE_SHIM</DefineConstants>
     <PackageId>Runic.ReactiveUI.Validation.Reactive</PackageId>
     <ValidationNamespaceRoot>ReactiveUI.Validation.Reactive</ValidationNamespaceRoot>

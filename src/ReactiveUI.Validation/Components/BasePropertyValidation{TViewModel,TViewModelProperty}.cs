@@ -16,7 +16,7 @@ namespace ReactiveUI.Validation.Components;
 /// <typeparam name="TViewModel">The type of the view model being validated.</typeparam>
 /// <typeparam name="TViewModelProperty">The type of the view model property being validated.</typeparam>
 [System.Diagnostics.DebuggerDisplay("BasePropertyValidation: {_valueSubject}")]
-public sealed class BasePropertyValidation<TViewModel, TViewModelProperty> : BasePropertyValidation<TViewModel>
+public sealed class BasePropertyValidation<TViewModel, TViewModelProperty> : BasePropertyValidation<TViewModel>, IValidationPathComponent
     where TViewModel : class
 {
     /// <summary>Replays the latest property value to subscribers.</summary>
@@ -25,19 +25,66 @@ public sealed class BasePropertyValidation<TViewModel, TViewModelProperty> : Bas
     /// <summary>The connected observable that multicasts property value changes.</summary>
 #if REACTIVE_SHIM
     // The Reactive leaf imports ReactiveUI.Primitives.Reactive in place of ReactiveUI.Primitives, where this type lives.
-    private readonly ReactiveUI.Primitives.ConnectableSignal<TViewModelProperty?> _valueConnectedObservable;
+    private readonly ReactiveUI.Primitives.ConnectableSignal<TViewModelProperty?>? _valueConnectedObservable;
 #else
-    private readonly ConnectableSignal<TViewModelProperty?> _valueConnectedObservable;
+    private readonly ConnectableSignal<TViewModelProperty?>? _valueConnectedObservable;
 #endif
 
     /// <summary>The function that produces validation text from the property value and validity.</summary>
-    private readonly Func<TViewModelProperty?, bool, IValidationText> _message;
+    private readonly Func<TViewModelProperty?, bool, IValidationText>? _message;
 
     /// <summary>The function that determines whether the property value is valid.</summary>
-    private readonly Func<TViewModelProperty?, bool> _isValidFunc;
+    private readonly Func<TViewModelProperty?, bool>? _isValidFunc;
+
+    /// <summary>The direct typed component, when constructed without an expression.</summary>
+    private readonly SelectorValidation<TViewModel, TViewModelProperty?>? _typed;
 
     /// <summary>Composite disposable for lifecycle management.</summary>
     private readonly CompositeDisposable _disposables = [];
+
+    /// <summary>Initializes a new instance of the <see cref="BasePropertyValidation{TViewModel,TViewModelProperty}"/> class.</summary>
+    /// <param name="viewModel">The borrowed model.</param>
+    /// <param name="selector">The typed value, dependency, and metadata plan.</param>
+    /// <param name="isValidFunc">Determines validity.</param>
+    /// <param name="message">The invalid-state text.</param>
+    public BasePropertyValidation(
+        TViewModel viewModel,
+        ValidationSelector<TViewModel, TViewModelProperty?> selector,
+        Func<TViewModelProperty?, bool> isValidFunc,
+        string message)
+        : this(viewModel, selector, isValidFunc, (_, valid) => valid ? ValidationText.Empty : ValidationText.Create(message))
+    {
+    }
+
+    /// <summary>Initializes a new instance of the <see cref="BasePropertyValidation{TViewModel,TViewModelProperty}"/> class.</summary>
+    /// <param name="viewModel">The borrowed model.</param>
+    /// <param name="selector">The typed value, dependency, and metadata plan.</param>
+    /// <param name="isValidFunc">Determines validity.</param>
+    /// <param name="message">Produces invalid-state text.</param>
+    public BasePropertyValidation(
+        TViewModel viewModel,
+        ValidationSelector<TViewModel, TViewModelProperty?> selector,
+        Func<TViewModelProperty?, bool> isValidFunc,
+        Func<TViewModelProperty?, string> message)
+        : this(viewModel, selector, isValidFunc, (value, valid) => valid ? ValidationText.None : ValidationText.Create(message(value)))
+    {
+        ArgumentExceptionHelper.ThrowIfNull(message);
+    }
+
+    /// <summary>Initializes a new instance of the <see cref="BasePropertyValidation{TViewModel,TViewModelProperty}"/> class.</summary>
+    /// <param name="viewModel">The borrowed model.</param>
+    /// <param name="selector">The typed value, dependency, and metadata plan.</param>
+    /// <param name="isValidFunc">Determines validity.</param>
+    /// <param name="messageFunc">Produces the complete state text.</param>
+    public BasePropertyValidation(
+        TViewModel viewModel,
+        ValidationSelector<TViewModel, TViewModelProperty?> selector,
+        Func<TViewModelProperty?, bool> isValidFunc,
+        Func<TViewModelProperty?, bool, string> messageFunc)
+        : this(viewModel, selector, isValidFunc, (value, valid) => ValidationText.Create(messageFunc(value, valid)))
+    {
+        ArgumentExceptionHelper.ThrowIfNull(messageFunc);
+    }
 
     /// <summary>Initializes a new instance of the <see cref="BasePropertyValidation{TViewModel, TProperty1}"/> class.</summary>
     /// <param name="viewModel">ViewModel instance.</param>
@@ -113,17 +160,79 @@ public sealed class BasePropertyValidation<TViewModel, TViewModelProperty> : Bas
             .Multicast(_valueSubject);
     }
 
+    /// <summary>Initializes a new instance of the <see cref="BasePropertyValidation{TViewModel,TViewModelProperty}"/> class.</summary>
+    /// <param name="viewModel">The borrowed model.</param>
+    /// <param name="selector">The typed observation descriptor.</param>
+    /// <param name="isValidFunc">The predicate.</param>
+    /// <param name="message">The complete text projection.</param>
+    private BasePropertyValidation(
+        TViewModel viewModel,
+        ValidationSelector<TViewModel, TViewModelProperty?> selector,
+        Func<TViewModelProperty?, bool> isValidFunc,
+        Func<TViewModelProperty?, bool, IValidationText> message)
+    {
+        ArgumentExceptionHelper.ThrowIfNull(viewModel);
+        ArgumentExceptionHelper.ThrowIfNull(isValidFunc);
+        _typed = new(viewModel, selector, value =>
+        {
+            var valid = isValidFunc(value);
+            return new ValidationState(valid, message(value, valid));
+        });
+    }
+
+    /// <inheritdoc/>
+    public override int PropertyCount => _typed?.PropertyCount ?? base.PropertyCount;
+
+    /// <inheritdoc/>
+    public override IEnumerable<string> Properties => _typed?.Properties ?? base.Properties;
+
+    /// <inheritdoc/>
+    public IReadOnlyList<ValidationPath> ValidationPaths
+    {
+        get
+        {
+            if (_typed is not null)
+            {
+                return _typed.ValidationPaths;
+            }
+
+            List<ValidationPath> paths = [];
+            foreach (var name in Properties)
+            {
+                paths.Add(ValidationPath.Legacy(name));
+            }
+
+            return paths;
+        }
+    }
+
+    /// <inheritdoc/>
+    public IObservable<IReadOnlyList<ValidationPath>> ValidationPathsChanged => _typed?.ValidationPathsChanged ?? Observable.Return(ValidationPaths);
+
+    /// <inheritdoc/>
+    public override bool ContainsPropertyName(string propertyName, bool exclusively = false) =>
+        _typed?.ContainsPropertyName(propertyName, exclusively) ?? base.ContainsPropertyName(propertyName, exclusively);
+
+    /// <inheritdoc/>
+    public bool ContainsPath(ValidationPath path, bool exclusively) => _typed?.ContainsPath(path, exclusively)
+        ?? (path.IsLegacy && ContainsPropertyName(path.DisplayPath, exclusively));
+
     /// <inheritdoc />
     /// <summary>Get the validation change observable.</summary>
     /// <returns>An observable sequence of <see cref="IValidationState"/> representing validation changes.</returns>
     protected override IObservable<IValidationState> GetValidationChangeObservable()
     {
-        _disposables.Add(_valueConnectedObservable.Connect());
+        if (_typed is not null)
+        {
+            return _typed.ValidationStatusChange;
+        }
+
+        _disposables.Add(_valueConnectedObservable!.Connect());
         return _valueSubject
             .Select(value =>
             {
-                var isValid = _isValidFunc(value);
-                return new ValidationState(isValid, _message(value, isValid));
+                var isValid = _isValidFunc!(value);
+                return new ValidationState(isValid, _message!(value, isValid));
             })
             .DistinctUntilChanged(new ValidationStateComparer());
     }
@@ -133,10 +242,13 @@ public sealed class BasePropertyValidation<TViewModel, TViewModelProperty> : Bas
     {
         base.Dispose(disposing);
 
-        if (disposing)
+        if (!disposing)
         {
-            ReleaseSubscriptions();
+            return;
         }
+
+        _typed?.Dispose();
+        ReleaseSubscriptions();
     }
 
     /// <summary>Disconnects the property observable, then releases the subject that replays its value.</summary>

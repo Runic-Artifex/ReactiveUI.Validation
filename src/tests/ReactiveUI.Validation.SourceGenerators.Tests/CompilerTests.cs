@@ -20,6 +20,21 @@ public sealed class CompilerTests
     /// <summary>The emitted model fixture type name.</summary>
     private const string ModelTypeName = "Model";
 
+    /// <summary>The trusted fixture entry method.</summary>
+    private const string FixtureMethodName = "Check";
+
+    /// <summary>The Primitives ReactiveUI namespace.</summary>
+    private const string PrimitivesNamespace = "ReactiveUI";
+
+    /// <summary>The System.Reactive ReactiveUI namespace.</summary>
+    private const string ReactiveNamespace = "ReactiveUI.Reactive";
+
+    /// <summary>The Primitives Validation namespace.</summary>
+    private const string PrimitivesValidationNamespace = "ReactiveUI.Validation";
+
+    /// <summary>The System.Reactive Validation namespace.</summary>
+    private const string ReactiveValidationNamespace = "ReactiveUI.Validation.Reactive";
+
     /// <summary>The final dispatch diagnostic identifier.</summary>
     private const string MissingDispatchId = "RUVG005";
 
@@ -36,8 +51,8 @@ public sealed class CompilerTests
     [SuppressMessage("Security", "SES1402", Justification = "Only hard-coded compiler test sources and trusted runtime references are emitted into this in-memory test assembly.")]
     public async Task AllPredicateShapesCompileAndExecute(bool reactive)
     {
-        var root = reactive ? "ReactiveUI.Validation.Reactive" : "ReactiveUI.Validation";
-        var ui = reactive ? "ReactiveUI.Reactive" : "ReactiveUI";
+        var root = reactive ? ReactiveValidationNamespace : PrimitivesValidationNamespace;
+        var ui = reactive ? ReactiveNamespace : PrimitivesNamespace;
         var source = $$"""
             using System;
             using {{ui}};
@@ -66,14 +81,14 @@ public sealed class CompilerTests
         await Assert.That(await result.Compilation.WithAnalyzers([new ValidationDispatchAnalyzer()]).GetAnalyzerDiagnosticsAsync()).IsEmpty();
         await Assert.That(result.Diagnostics).IsEmpty();
         await Assert.That(result.Compilation.GetDiagnostics().Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Warning)).IsEmpty();
-        await Assert.That(result.Generated).Contains("GeneratedValidationObservation.Observe");
+        await Assert.That(result.Generated).Contains("ValidationRuntime.RegisterRule");
         await Assert.That(result.Generated).Contains("Address.Name");
         await Assert.That(result.Generated).DoesNotContain("WhenAnyValue");
         await using var stream = new MemoryStream();
         var emit = result.Compilation.Emit(stream);
         await Assert.That(string.Join("\n", emit.Diagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))).IsEmpty();
         var assembly = System.Reflection.Assembly.Load(stream.ToArray());
-        await Assert.That((bool)assembly.GetType(ModelTypeName)!.GetMethod("Check")!.Invoke(null, null)!).IsTrue();
+        await Assert.That((bool)assembly.GetType(ModelTypeName)!.GetMethod(FixtureMethodName)!.Invoke(null, null)!).IsTrue();
     }
 
     /// <summary>Uses the constrained interface context even when the model shadows its name.</summary>
@@ -85,8 +100,8 @@ public sealed class CompilerTests
     [SuppressMessage("Security", "SES1402", Justification = "Only hard-coded compiler test sources and trusted runtime references are emitted into this in-memory test assembly.")]
     public async Task ExplicitInterfaceContextAndPrivateShadowAreSupported(bool reactive)
     {
-        var root = reactive ? "ReactiveUI.Validation.Reactive" : "ReactiveUI.Validation";
-        var ui = reactive ? "ReactiveUI.Reactive" : "ReactiveUI";
+        var root = reactive ? ReactiveValidationNamespace : PrimitivesValidationNamespace;
+        var ui = reactive ? ReactiveNamespace : PrimitivesNamespace;
         var source = $$"""
             using System;
             using {{ui}};
@@ -126,10 +141,58 @@ public sealed class CompilerTests
         var emit = result.Compilation.Emit(stream);
         await Assert.That(string.Join("\n", emit.Diagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))).IsEmpty();
         var assembly = System.Reflection.Assembly.Load(stream.ToArray());
-        await Assert.That((bool)assembly.GetType(ModelTypeName)!.GetMethod("Check")!.Invoke(null, null)!).IsTrue();
+        await Assert.That((bool)assembly.GetType(ModelTypeName)!.GetMethod(FixtureMethodName)!.Invoke(null, null)!).IsTrue();
     }
 
-    /// <summary>Rejects unsupported selectors at their source call sites.</summary>
+    /// <summary>Executes finite stored selectors while keeping each closed generic rule current.</summary>
+    /// <param name="reactive">Whether to use the System.Reactive flavor.</param>
+    /// <returns>The asynchronous test.</returns>
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task FiniteStoredSelectorsCompileAndNotify(bool reactive)
+    {
+        var ui = reactive ? ReactiveNamespace : PrimitivesNamespace;
+        var root = reactive ? ReactiveValidationNamespace : PrimitivesValidationNamespace;
+        var source = $$"""
+            using System;
+            using System.Linq.Expressions;
+            using {{ui}};
+            using {{root}}.Abstractions;
+            using {{root}}.Contexts;
+            using {{root}}.Extensions;
+            public sealed class Model : ReactiveObject, IValidatableViewModel
+            {
+                private static readonly Expression<Func<Model,string?>> FieldSelector = value => value.Name;
+                private static Expression<Func<Model,string?>> PropertySelector => value => value.Name;
+                private static Expression<Func<Model,string?>> FactorySelector() => value => value.Name;
+                public string? Name { get; set => this.RaiseAndSetIfChanged(ref field, value); }
+                public IValidationContext ValidationContext { get; } = new ValidationContext();
+                public static bool Check()
+                {
+                    var model = new Model();
+                    Expression<Func<Model,string?>> local = value => value.Name;
+                    using var one = model.ValidationRule(local, value => value == "ok", "bad");
+                    using var two = model.ValidationRule(FieldSelector, value => value == "ok", "bad");
+                    using var three = model.ValidationRule(PropertySelector, value => value == "ok", "bad");
+                    using var four = model.ValidationRule(FactorySelector(), value => value == "ok", "bad");
+                    var initial = !one.IsValid && !two.IsValid && !three.IsValid && !four.IsValid;
+                    model.Name = "ok";
+                    var changed = one.IsValid && two.IsValid && three.IsValid && four.IsValid;
+                    model.Name = "bad";
+                    return initial && changed && !one.IsValid && !two.IsValid && !three.IsValid && !four.IsValid;
+                }
+            }
+            """;
+        using var host = CapabilityCompilerHost.Create(reactive);
+        var result = await host.RunAsync(source);
+        await Assert.That(result.GeneratorDiagnostics).IsEmpty();
+        await Assert.That(result.CompilationDiagnostics.Where(static diagnostic => diagnostic.Severity is DiagnosticSeverity.Error or DiagnosticSeverity.Warning)).IsEmpty();
+        await Assert.That(await result.GetDispatchDiagnosticsAsync()).IsEmpty();
+        await Assert.That(result.ExecuteBoolean(ModelTypeName, FixtureMethodName)).IsTrue();
+    }
+
+    /// <summary>Rejects selectors without declared finite provenance or change sources.</summary>
     /// <param name="selector">The unsupported selector source.</param>
     /// <param name="diagnosticId">The required error identifier.</param>
     /// <returns>The asynchronous test.</returns>
@@ -156,6 +219,7 @@ public sealed class CompilerTests
                 public void Attach()
                 {
                     Expression<Func<Model,string?>> selector = x => x.Name;
+                    selector = DateTime.UtcNow.Ticks == 0 ? selector : x => x.Name;
                     this.ValidationRule({{selector}}, x => false, "bad");
                 }
             }
@@ -319,60 +383,88 @@ public sealed class CompilerTests
         await Assert.That(await result.Compilation.WithAnalyzers([new ValidationDispatchAnalyzer()]).GetAnalyzerDiagnosticsAsync()).IsEmpty();
     }
 
-    /// <summary>Rejects closed call types that generated namespace code cannot access.</summary>
+    /// <summary>Executes a private model through its legal partial lexical host.</summary>
     /// <returns>The asynchronous test.</returns>
     [Test]
-    public async Task InaccessibleModelTypeIsDiagnosed()
+    public async Task PrivateModelInPartialHostCompilesAndNotifies()
     {
         const string source = """
             using ReactiveUI;
             using ReactiveUI.Validation.Abstractions;
             using ReactiveUI.Validation.Contexts;
             using ReactiveUI.Validation.Extensions;
-            public static class Holder
+            public static partial class Holder
             {
-                private sealed class Model : ReactiveObject, IValidatableViewModel
+                public static bool Check() => Model.Check();
+                private sealed partial class Model : ReactiveObject, IValidatableViewModel
                 {
-                    public string? Name { get; set; }
+                    public string? Name { get; set => this.RaiseAndSetIfChanged(ref field, value); }
                     public IValidationContext ValidationContext { get; } = new ValidationContext();
-                    public void Attach() => this.ValidationRule(x => x.Name, x => false, "bad");
+                    public static bool Check()
+                    {
+                        var model = new Model();
+                        using var rule = model.ValidationRule(x => x.Name, x => x == "ok", "bad");
+                        var initial = !rule.IsValid;
+                        model.Name = "ok";
+                        var changed = rule.IsValid;
+                        rule.Dispose();
+                        model.Name = "detached";
+                        return initial && changed && model.ValidationContext.Validations.Count == 0;
+                    }
                 }
             }
             """;
-        var result = Generate(source);
-        await Assert.That(result.Diagnostics.Single().Id).IsEqualTo("RUVG002");
-        await Assert.That(result.Diagnostics.Single().Location.SourceTree!.FilePath).IsEqualTo(CallerPath);
+        using var host = CapabilityCompilerHost.Create(reactive: false);
+        var result = await host.RunAsync(source);
+        await Assert.That(result.GeneratorDiagnostics).IsEmpty();
+        await Assert.That(result.CompilationDiagnostics.Where(static diagnostic => diagnostic.Severity is DiagnosticSeverity.Error or DiagnosticSeverity.Warning)).IsEmpty();
+        await Assert.That(await result.GetDispatchDiagnosticsAsync()).IsEmpty();
+        await Assert.That(result.ExecuteBoolean("Holder", FixtureMethodName)).IsTrue();
     }
 
-    /// <summary>Rejects open generic containing types before emitting namespace code.</summary>
+    /// <summary>Executes an open generic partial host through its original API slots.</summary>
     /// <returns>The asynchronous test.</returns>
     [Test]
-    public async Task GenericContainingTypeIsDiagnosed()
+    public async Task GenericPartialContainingTypeCompilesAndNotifies()
     {
         const string source = """
             using ReactiveUI;
             using ReactiveUI.Validation.Abstractions;
             using ReactiveUI.Validation.Contexts;
             using ReactiveUI.Validation.Extensions;
-            public class Outer<T>
+            public partial class Outer<T>
             {
-                public sealed class Model : ReactiveObject, IValidatableViewModel
+                public sealed partial class Model : ReactiveObject, IValidatableViewModel
                 {
-                    public string? Name { get; set; }
+                    public string? Name { get; set => this.RaiseAndSetIfChanged(ref field, value); }
                     public IValidationContext ValidationContext { get; } = new ValidationContext();
-                    public void Attach() => this.ValidationRule(x => x.Name, x => false, "bad");
+                    public static bool Check()
+                    {
+                        var model = new Model();
+                        using var rule = model.ValidationRule(x => x.Name, x => x == "ok", "bad");
+                        var initial = !rule.IsValid;
+                        model.Name = "ok";
+                        return initial && rule.IsValid;
+                    }
                 }
             }
+            public static class Fixture
+            {
+                public static bool Check() => Outer<string>.Model.Check() && Outer<int>.Model.Check();
+            }
             """;
-        var result = Generate(source);
-        await Assert.That(result.Diagnostics.Single().Id).IsEqualTo("RUVG002");
-        await Assert.That(result.Generated).IsEmpty();
+        using var host = CapabilityCompilerHost.Create(reactive: false);
+        var result = await host.RunAsync(source);
+        await Assert.That(result.GeneratorDiagnostics).IsEmpty();
+        await Assert.That(result.CompilationDiagnostics.Where(static diagnostic => diagnostic.Severity is DiagnosticSeverity.Error or DiagnosticSeverity.Warning)).IsEmpty();
+        await Assert.That(await result.GetDispatchDiagnosticsAsync()).IsEmpty();
+        await Assert.That(result.ExecuteBoolean("Fixture", FixtureMethodName)).IsTrue();
     }
 
-    /// <summary>Rejects a selector whose property exists only in another generator's output.</summary>
+    /// <summary>Rejects missing final dispatch when a peer emits an undeclared late property.</summary>
     /// <returns>The asynchronous test.</returns>
     [Test]
-    public async Task GeneratedOnlyPropertyRequiresDeclaredContract()
+    public async Task UndeclaredLatePropertyRequiresFinalDispatchContract()
     {
         const string source = """
             using ReactiveUI;
@@ -386,10 +478,48 @@ public sealed class CompilerTests
             }
             """;
         var result = Generate(source, new OrdinaryPropertyGenerator());
-        await Assert.That(result.Diagnostics.Any(static diagnostic => diagnostic.Id == "RUVG001")).IsTrue();
+        await Assert.That(result.Diagnostics).IsEmpty();
         await Assert.That(result.Compilation.GetDiagnostics().Any(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)).IsFalse();
         var finalDiagnostics = await result.Compilation.WithAnalyzers([new ValidationDispatchAnalyzer()]).GetAnalyzerDiagnosticsAsync();
         await Assert.That(finalDiagnostics.Any(static diagnostic => diagnostic.Id == MissingDispatchId)).IsTrue();
+        await Assert.That(finalDiagnostics.Single(static diagnostic => diagnostic.Id == MissingDispatchId).GetMessage()).Contains("Unsafe");
+    }
+
+    /// <summary>Rejects retaining borrowed ref-struct storage through a deferred snapshot callback.</summary>
+    /// <param name="reactive">Whether the caller uses the System.Reactive flavor.</param>
+    /// <returns>The asynchronous genuine compiler-negative assertions.</returns>
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task SnapshotStorageCannotEscapeIntoDeferredCallback(bool reactive)
+    {
+        var root = reactive ? ReactiveValidationNamespace : PrimitivesValidationNamespace;
+        var source = $$"""
+            using System;
+            using {{root}}.Capabilities;
+            public ref struct Packet(ReadOnlySpan<char> text)
+            {
+                public ReadOnlySpan<char> Text = text;
+            }
+            public static class Fixture
+            {
+                public static int Read()
+                {
+                    var packet = new Packet("borrowed");
+                    Func<int> retained = () => ValidationSnapshot.Read(in packet,
+                        static (scoped in Packet value) => value.Text.Length);
+                    return retained();
+                }
+            }
+            """;
+        using var host = CapabilityCompilerHost.Create(reactive);
+        var result = await host.RunAsync(source);
+        await Assert.That(result.GeneratorDiagnostics).IsEmpty();
+        var errors = result.CompilationDiagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error).ToArray();
+        await Assert.That(errors.Length).IsEqualTo(1);
+        await Assert.That(errors[0].Id).IsEqualTo("CS8175");
+        await Assert.That(source.Substring(errors[0].Location.SourceSpan.Start, errors[0].Location.SourceSpan.Length)).IsEqualTo("packet");
+        await Assert.That(result.CompilationDiagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Warning)).IsEmpty();
     }
 
     /// <summary>Runs the generator over a real-package caller compilation.</summary>
@@ -399,9 +529,7 @@ public sealed class CompilerTests
     /// <returns>The final compilation and generation evidence.</returns>
     private static CompilationResult Generate(string source, IIncrementalGenerator? extraGenerator = null, bool includeValidationGenerator = true)
     {
-        var references = Directory.GetFiles(AppContext.BaseDirectory, "*.dll")
-            .Concat(((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!).Split(Path.PathSeparator))
-            .Distinct().Select(static path => MetadataReference.CreateFromFile(path));
+        var references = CompilerTestReferences.CreateDefault();
         var compilation = CSharpCompilation.Create(
             $"GeneratedTest{Guid.NewGuid():N}",
             [CSharpSyntaxTree.ParseText(source, ParseOptions, CallerPath)],

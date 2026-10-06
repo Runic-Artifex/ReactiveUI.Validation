@@ -13,7 +13,7 @@ namespace ReactiveUI.Validation.Extensions;
 #endif
 
 /// <summary>Extensions methods associated to <see cref="IValidatableViewModel"/> instances.</summary>
-public static class ValidatableViewModelExtensions
+public static partial class ValidatableViewModelExtensions
 {
     /// <summary>Provides RegisterValidation extension members for <paramref name="viewModel"/>.</summary>
     /// <param name="viewModel">The view model that owns the validation context.</param>
@@ -50,14 +50,22 @@ public static class ValidatableViewModelExtensions
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="message"/> is empty.</exception>
-        /// <remarks>Requires the Runic Validation generator. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
+        /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
         public ValidationHelper ValidationRule<TViewModelProp>(
             Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
             Func<TViewModelProp?, bool> isPropertyValid,
             string message)
         {
-            _ = viewModel;
-            throw GeneratedValidationObservation.RequiresGenerator(nameof(ValidationRule));
+            ArgumentExceptionHelper.ThrowIfNull(viewModel);
+            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
+            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
+            ArgumentExceptionHelper.ThrowIfNullOrEmpty(message);
+            var selector = ValidationRuntime.ResolveSelector(viewModel, viewModelProperty, ValidationPlanRole.RuleValue, string.Empty);
+            return ValidationRuntime.RegisterRule(viewModel, viewModel.ValidationContext, selector, value =>
+            {
+                var valid = isPropertyValid(value);
+                return new ValidationState(valid, valid ? ValidationText.Empty : ValidationText.Create(message));
+            });
         }
 
         /// <summary>Setup a validation rule for a specified ViewModel property with dynamic error message.</summary>
@@ -67,14 +75,22 @@ public static class ValidatableViewModelExtensions
         /// <param name="message">Func to define the validation error message based on the viewModelProperty value.</param>
         /// <returns>Returns a <see cref="ValidationHelper"/> object.</returns>
         /// <exception cref="ArgumentNullException">Thrown when any argument is null.</exception>
-        /// <remarks>Requires the Runic Validation generator. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
+        /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use ValidationRuleUnsafe for reflection-based execution.</remarks>
         public ValidationHelper ValidationRule<TViewModelProp>(
             Expression<Func<TViewModel, TViewModelProp?>> viewModelProperty,
             Func<TViewModelProp?, bool> isPropertyValid,
             Func<TViewModelProp?, string> message)
         {
-            _ = viewModel;
-            throw GeneratedValidationObservation.RequiresGenerator(nameof(ValidationRule));
+            ArgumentExceptionHelper.ThrowIfNull(viewModel);
+            ArgumentExceptionHelper.ThrowIfNull(viewModelProperty);
+            ArgumentExceptionHelper.ThrowIfNull(isPropertyValid);
+            ArgumentExceptionHelper.ThrowIfNull(message);
+            var selector = ValidationRuntime.ResolveSelector(viewModel, viewModelProperty, ValidationPlanRole.RuleValue, string.Empty);
+            return ValidationRuntime.RegisterRule(viewModel, viewModel.ValidationContext, selector, value =>
+            {
+                var valid = isPropertyValid(value);
+                return new ValidationState(valid, valid ? ValidationText.None : ValidationText.Create(message(value)));
+            });
         }
 
         /// <summary>Setup a validation rule with a general observable indicating validity and a static error message.</summary>

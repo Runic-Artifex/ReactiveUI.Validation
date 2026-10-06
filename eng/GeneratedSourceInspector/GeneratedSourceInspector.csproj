@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <LangVersion>14.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup><PackageReference Include="Microsoft.CodeAnalysis.CSharp" /></ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../src/ReactiveUI.Validation.SourceGenerators/ValidationRuntimeDispatchPolicy.cs" Link="ValidationRuntimeDispatchPolicy.cs" />
+    <Compile Include="../../src/ReactiveUI.Validation.SourceGenerators/ValidationCallClassifier.cs" Link="ValidationCallClassifier.cs" />
+    <Compile Include="../../src/ReactiveUI.Validation.SourceGenerators/ValidationSelectorSignature.cs" Link="ValidationSelectorSignature.cs" />
+  </ItemGroup>
+</Project>

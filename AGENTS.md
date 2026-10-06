@@ -94,7 +94,7 @@ dotnet test --project tests/ReactiveUI.Validation.Tests/ReactiveUI.Validation.Te
 dotnet test --project tests/ReactiveUI.Validation.Tests/ReactiveUI.Validation.Tests.csproj -- --treenode-filter "/*/*/*/MyTestMethod"
 
 # Run all tests in a specific class
-dotnet test --project tests/ReactiveUI.Validation.Tests/ReactiveUI.Validation.Tests.csproj -- --treenode-filter "/*/*/MyClassName/*"
+dotnet test --project tests/ReactiveUI.Validation.Tests/ReactiveUI.Validation.Tests.csproj -- --treenode-filter "/*/*/*MyClassName/*"
 
 # Run tests in a specific namespace
 dotnet test --project tests/ReactiveUI.Validation.Tests/ReactiveUI.Validation.Tests.csproj -- --treenode-filter "/*/MyNamespace/*/*"
@@ -138,16 +138,28 @@ dotnet run --project tests/ReactiveUI.Validation.Tests/ReactiveUI.Validation.Tes
 
 ### TUnit Treenode-Filter Syntax
 
-The `--treenode-filter` follows the pattern: `/{AssemblyName}/{Namespace}/{ClassName}/{TestMethodName}`
+The `--treenode-filter` follows the logical pattern: `/{AssemblyName}/{Namespace}/{ClassName}/{TestMethodName}`.
+Inspect the discovered paths: the current compiler host's class segment includes
+its namespace. Use a suffix wildcard for class selection rather than assuming
+that segment contains only the simple class name.
 
 **Examples:**
 - Single test: `--treenode-filter "/*/*/*/MyTestMethod"`
-- All tests in class: `--treenode-filter "/*/*/MyClassName/*"`
+- All tests in class: `--treenode-filter "/*/*/*MyClassName/*"`
 - All tests in namespace: `--treenode-filter "/*/MyNamespace/*/*"`
 - Filter by property: `--treenode-filter "/*/*/*/*[Category=Integration]"`
-- Multiple wildcards: `--treenode-filter "/*/*/MyTests*/*"`
+- Multiple wildcards: `--treenode-filter "/*/*/*MyTests*/*"`
 
 **Note:** Use single asterisks (`*`) to match segments. Double asterisks (`/**`) are not supported in treenode-filter.
+
+Before a focused run, use `--list-tests` with the same filter and verify the
+expected cases. The measured SourceGenerators.Tests host lists 279 tests;
+`/*/*/CapabilityCompilerHostTests/*` selects zero, while
+`/*/*/*CapabilityCompilerHostTests/*` selects its six host cases. Record an
+expected minimum count for each acceptance group and check executed/passed
+counters and skipped cases afterward. Zero discovered or executed tests is never
+a passing verification, even if the process exits successfully. Preserve the
+requirement to build current sources; do not use `--no-build` for tests.
 
 ### Key TUnit Command-Line Flags
 

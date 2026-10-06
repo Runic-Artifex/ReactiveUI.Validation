@@ -81,6 +81,34 @@ direnv exec ../runic-sdk python3 eng/verify-packages.py
 
 For other systems, run the same commands directly in the correctly pinned environment. Build current sources before tests; do not use `--no-build` for tests. Packing with `--no-build` is valid only after building the same source/configuration. Review both [Primitives](../src/ReactiveUI.Validation/PublicAPI/net10.0/PublicAPI.txt) and [Reactive](../src/ReactiveUI.Validation.Reactive/PublicAPI/net10.0/PublicAPI.txt) baselines for intentional API changes. The build enforces PublicApiSharp baselines; do not bypass it or blindly regenerate baselines to accept drift.
 
+Focused test evidence must validate discovery and an expected minimum executed
+count, not just exit status. The measured compiler host has 279 discovered tests;
+its namespace-qualified class segment needs
+`--treenode-filter '/*/*/*CapabilityCompilerHostTests/*'` to select all six host
+cases. The simple-class-only spelling selects zero. List with the same filter,
+inspect the selected cases, then build/run and check passed/failed/skipped
+counters. Zero discovered or executed tests is never accepted verification;
+update group expectations deliberately when the corpus changes. See the
+[focused command recipe](../CONTRIBUTING.md).
+
+The generated-capability compiler host retains producer and executable fixture
+assemblies for the test process lifetime. It caches only assemblies from each
+exact verified package/path/content cohort, with immutable dependency directories;
+each host still creates fresh generators, suppressors and an independent driver.
+Host disposal releases compilation graphs. Each executed fixture has its own
+noncollectible load context so edited compilations with the same assembly name
+execute their current bytes. The finite test corpus bounds these retained
+assemblies, and process exit releases them; no compilation or source text is kept
+in the assembly cache. This follows the [locked Roslyn analyzer loader's lifetime](https://github.com/dotnet/roslyn/blob/35d9211b841e7613c1d2f8f5af6d628ace696c4c/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalyzerAssemblyLoader.Core.cs#L179).
+
+This policy avoids collectible unload/address reuse under the locked CLR, whose
+installed CoreLib contains the [generic dispatch cache sentinel defect](https://github.com/dotnet/runtime/pull/132859).
+Two retained full-test crashes showed native/type-confusion failures at different
+fixtures; that defect's causal connection to those crashes remains unproven.
+Collectible plugin loading is not a validation product contract. The compiler
+fixture policy preserves every assertion and does not replace package, trimming
+or static NativeAOT acceptance.
+
 The package verifier expects exactly one current package per core flavor in `artifacts/packages`. Before packing a different version, move useful prior outputs to a separate retained location or remove only disposable task-owned outputs. Never mix old/new packages as evidence of the current build. Preserve the verified dependency feed and useful caches. Exercise representative external consumers for overload, namespace, scheduler or dependency changes.
 
 Ordinary, native and generated package evidence must identify the current source, pinned SDK, exact input package hashes and restored matching dependency cohort. Use an isolated XML NuGet configuration and gate-owned cache; a global cached package with the same ID/version is not proof that the selected bytes were exercised. Validate restored graphs and bytes before executing consumers. A rerun must invalidate previous success before prerequisite checks, retain failure/partial evidence, and mark completion only after all required checks pass. Preserve logs and graphs in CI failure artifacts. Artifact upload/download verification must bind the transferred pair to the bytes accepted by consumers.
@@ -98,16 +126,22 @@ AndroidX and native samples remain in [the platform solution](../src/ReactiveUI.
 
 ## Generated and Unsafe API boundary
 
-The generator/API split is implemented and verified at
+The initial generator/API split was implemented and verified at
 `2550376b230ccfb78beb8d3b4ced8866b65d809e`, and remains **UNRELEASED** until
 publication. The [verification record](upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
 separates this tested source from the later documentation record and historical
 releases. Preserve [RUV-018](fork-differences.md#unreleased-generated-api-contract)
 in monthly merges: inline supported lambda calls use generated direct operations;
-explicit `Unsafe` calls own the reflection/trimming boundary. Normal ungenerated
-calls must throw with an actionable message. Do not restore hidden reflection
-fallbacks to retain binary behavior; document that precompiled consumers need
-recompilation or an explicit Unsafe migration.
+explicit `Unsafe` calls own the reflection/trimming boundary. The expanded
+[capability implementation](generated-capabilities-progress.md) adds typed plans
+and explicit finite registered compatibility dispatch. Normal calls without
+interception or a matching supplied/registered typed plan must still throw
+actionably. Recognize deliberate `ValidationRuntimeDispatchAttribute` contracts
+without weakening final ordinary-call checks. Do not restore hidden reflection.
+Precompiled callers can use a registered preserved-ABI facade; fresh-expression,
+capture, scope/ambiguity and native-link proof is required. Recompilation, supplied
+observables and explicit Unsafe migration remain alternatives. An old native
+executable cannot acquire new DLL behavior by package replacement.
 
 Both branded core packages must carry the same Validation analyzer DLL and their
 matching flavor-named `buildTransitive` interceptor allowlist props. Verify actual
@@ -119,7 +153,11 @@ failure cleanup without owning models, contexts or supplied sources. Require
 actual-package generated consumers with warning-as-error managed/trim/native
 analysis and execution on each claimed host. Earlier green release gates prove
 their pinned revision only. Keep accurate RUC warnings on Unsafe/reflection
-operations; do not infer whole-package `IsAotCompatible` or platform support.
+operations. The source-landed .NET 10 `IsAotCompatible` flag requires the full
+current surface/dependency audit and strict flagged-package gates; the flag alone
+is not acceptance or UI platform support. Earlier unset-flag audit records remain
+historical. No expanded capability row is complete before its required code,
+permanent regression, behavior and applicable package/native proofs.
 
 This boundary does not authorize a dependency update: retain the authorized matching
 DynamicData 10.0.0-runic.30 packages, their hashes and ReactiveUI 26.0.1 pins.

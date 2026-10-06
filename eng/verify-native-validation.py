@@ -125,6 +125,17 @@ def guard_consumer_sources(folder):
             raise ValueError(f"IL severity override forbidden: {path}")
 
 
+def strict_positive_publish_flags(stage):
+    """Keep both positive publish modes on the locked SDK analysis policy."""
+    if stage not in {"trimmed", "native"}:
+        raise ValueError("Strict positive publish requires a trimmed or native stage")
+    flags = ["-p:PublishTrimmed=true", "-p:TrimMode=full",
+             f"-p:PublishAot={'true' if stage == 'native' else 'false'}"]
+    if stage == "native":
+        flags.append("-p:IlcSingleThreaded=true")
+    return flags
+
+
 def run(command, log, cwd, expected=False):
     print(f"Running {' '.join(map(str, command))}", flush=True)
     with log.open("w") as output:
@@ -277,10 +288,7 @@ def main():
                     if stage in {"trimmed", "native"}:
                         rid = args.rid
                         command += ["-r", rid, "--self-contained", "true", "-o", publish,
-                                    "-p:PublishTrimmed=true", "-p:TrimMode=full",
-                                    f"-p:PublishAot={'true' if stage == 'native' else 'false'}"]
-                        if stage == "native":
-                            command += ["-p:IlcSingleThreaded=true"]
+                                    *strict_positive_publish_flags(stage)]
                     code, content = run(command, output / f"{stem}.build.log", folder, expected=kind == "baseline")
                     assets = json.loads((project.parent / "obj/project.assets.json").read_text())
                     verify_native_graph(assets, reactive, cohort_pins, version, rid)

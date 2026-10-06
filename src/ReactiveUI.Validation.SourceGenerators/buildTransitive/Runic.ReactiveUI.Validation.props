@@ -2,4 +2,38 @@
   <PropertyGroup>
     <InterceptorsNamespaces>$(InterceptorsNamespaces);ReactiveUI.Validation.Generated</InterceptorsNamespaces>
   </PropertyGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="ReactiveUIValidationReactiveProducerVersion" />
+    <CompilerVisibleProperty Include="ReactiveUIValidationProducerProjectionEnabled" />
+    <CompilerVisibleProperty Include="ReactiveUIValidationBindingProducerVersion" />
+    <CompilerVisibleProperty Include="ReactiveUIValidationAvaloniaProducerVersion" />
+    <CompilerVisibleProperty Include="ReactiveUIValidationMauiProducerVersion" />
+    <CompilerVisibleProperty Include="PublishAot" />
+    <CompilerVisibleProperty Include="IsAotCompatible" />
+    <!-- The locked SDK's ILLink.Analyzers.props already exposes EnableAotAnalyzer. -->
+  </ItemGroup>
+  <!-- Versions come from restored analyzer asset paths, not a caller's guessed PackageReference. -->
+  <!-- The wrapper runs Core before its own BeforeTargets hooks; resolve before Core captures property values. -->
+  <Target Name="ResolveValidationProducerProfiles" BeforeTargets="GenerateMSBuildEditorConfigFileCore" DependsOnTargets="ResolveLockFileAnalyzers">
+    <ItemGroup>
+      <_ValidationReactiveProducer Include="@(Analyzer)" Condition="$([System.String]::Copy('%(Analyzer.FullPath)').ToLowerInvariant().Contains('reactiveui.sourcegenerators/')) Or $([System.String]::Copy('%(Analyzer.FullPath)').ToLowerInvariant().Contains('reactiveui.sourcegenerators\'))">
+        <ResolvedVersion>$([System.Text.RegularExpressions.Regex]::Replace('%(Analyzer.FullPath)', '^.*[\\/]reactiveui\.sourcegenerators[\\/]([^\\/]+)[\\/].*$', '$1', System.Text.RegularExpressions.RegexOptions.IgnoreCase))</ResolvedVersion>
+      </_ValidationReactiveProducer>
+      <_ValidationBindingProducer Include="@(Analyzer)" Condition="$([System.String]::Copy('%(Analyzer.FullPath)').ToLowerInvariant().Contains('reactiveui.binding.sourcegenerators'))">
+        <ResolvedVersion>$([System.Text.RegularExpressions.Regex]::Replace('%(Analyzer.FullPath)', '^.*[\\/]reactiveui\.binding(?:\.reactive)?[\\/]([^\\/]+)[\\/].*$', '$1', System.Text.RegularExpressions.RegexOptions.IgnoreCase))</ResolvedVersion>
+      </_ValidationBindingProducer>
+      <_ValidationAvaloniaProducer Include="@(Analyzer)" Condition="$([System.String]::Copy('%(Analyzer.FullPath)').ToLowerInvariant().Contains('avalonia.generators'))">
+        <ResolvedVersion>$([System.Text.RegularExpressions.Regex]::Replace('%(Analyzer.FullPath)', '^.*[\\/]avalonia[\\/]([^\\/]+)[\\/].*$', '$1', System.Text.RegularExpressions.RegexOptions.IgnoreCase))</ResolvedVersion>
+      </_ValidationAvaloniaProducer>
+      <_ValidationMauiProducer Include="@(Analyzer)" Condition="$([System.String]::Copy('%(Analyzer.FullPath)').ToLowerInvariant().Contains('microsoft.maui.controls.sourcegen'))">
+        <ResolvedVersion>$([System.Text.RegularExpressions.Regex]::Replace('%(Analyzer.FullPath)', '^.*[\\/]microsoft\.maui\.controls\.(?:sourcegen|build\.tasks)[\\/]([^\\/]+)[\\/].*$', '$1', System.Text.RegularExpressions.RegexOptions.IgnoreCase))</ResolvedVersion>
+      </_ValidationMauiProducer>
+    </ItemGroup>
+    <PropertyGroup>
+      <ReactiveUIValidationReactiveProducerVersion>@(_ValidationReactiveProducer-&gt;'%(ResolvedVersion)' -&gt; Distinct())</ReactiveUIValidationReactiveProducerVersion>
+      <ReactiveUIValidationBindingProducerVersion>@(_ValidationBindingProducer-&gt;'%(ResolvedVersion)' -&gt; Distinct())</ReactiveUIValidationBindingProducerVersion>
+      <ReactiveUIValidationAvaloniaProducerVersion>@(_ValidationAvaloniaProducer-&gt;'%(ResolvedVersion)' -&gt; Distinct())</ReactiveUIValidationAvaloniaProducerVersion>
+      <ReactiveUIValidationMauiProducerVersion>@(_ValidationMauiProducer-&gt;'%(ResolvedVersion)' -&gt; Distinct())</ReactiveUIValidationMauiProducerVersion>
+    </PropertyGroup>
+  </Target>
 </Project>

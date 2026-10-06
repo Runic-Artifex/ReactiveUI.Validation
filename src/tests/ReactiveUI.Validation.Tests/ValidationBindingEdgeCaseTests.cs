@@ -29,15 +29,15 @@ public class ValidationBindingEdgeCaseTests
     [Test]
     public async Task ForPropertyNullViewShouldThrow() => await Assert.That(static () => ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
             null!,
-            vm => vm.Name,
-            v => v.NameErrorLabel)).Throws<ArgumentNullException>();
+            static vm => vm.Name,
+            static v => v.NameErrorLabel)).Throws<ArgumentNullException>();
 
     /// <summary>Verifies that ForProperty with action throws when view is null.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
     [Test]
     public async Task ForPropertyActionNullViewShouldThrow() => await Assert.That(static () => ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
             null!,
-            vm => vm.Name,
+            static vm => vm.Name,
             static (_, _) => { },
             SingleLineFormatter.Default)).Throws<ArgumentNullException>();
 
@@ -46,15 +46,15 @@ public class ValidationBindingEdgeCaseTests
     [Test]
     public async Task ForValidationHelperPropertyNullViewShouldThrow() => await Assert.That(static () => ValidationBinding.ForValidationHelperProperty<TestView, TestViewModel, string>(
             null!,
-            vm => vm!.NameRule,
-            v => v.NameErrorLabel)).Throws<ArgumentNullException>();
+            static vm => vm!.NameRule,
+            static v => v.NameErrorLabel)).Throws<ArgumentNullException>();
 
     /// <summary>Verifies that ForValidationHelperProperty with action throws when view is null.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
     [Test]
     public async Task ForValidationHelperPropertyActionNullViewShouldThrow() => await Assert.That(static () => ValidationBinding.ForValidationHelperProperty<TestView, TestViewModel, string>(
             null!,
-            vm => vm!.NameRule,
+            static vm => vm!.NameRule,
             static (_, _) => { },
             SingleLineFormatter.Default)).Throws<ArgumentNullException>();
 
@@ -71,7 +71,7 @@ public class ValidationBindingEdgeCaseTests
     [Test]
     public async Task ForViewModelViewPropertyNullViewShouldThrow() => await Assert.That(static () => ValidationBinding.ForViewModel<TestView, TestViewModel, string>(
             null!,
-            v => v.NameErrorLabel)).Throws<ArgumentNullException>();
+            static v => v.NameErrorLabel)).Throws<ArgumentNullException>();
 
     /// <summary>Verifies that Dispose works on a ValidationBinding.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
@@ -88,8 +88,8 @@ public class ValidationBindingEdgeCaseTests
 
         var binding = ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
             view,
-            vm => vm.Name,
-            v => v.NameErrorLabel);
+            static vm => vm.Name,
+            static v => v.NameErrorLabel);
 
         await Assert.That(view.NameErrorLabel).IsNotEmpty();
 
@@ -276,7 +276,7 @@ public class ValidationBindingEdgeCaseTests
 
         using var binding = ValidationBinding.ForValidationHelperProperty<TestView, TestViewModel, string>(
             view,
-            vm => vm!.NameRule,
+            static vm => vm!.NameRule,
             (state, formatted) => states.Add(state),
             formatter);
 

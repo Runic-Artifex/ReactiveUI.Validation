@@ -11,6 +11,7 @@
     <IlcGenerateCompleteTypeMetadata>false</IlcGenerateCompleteTypeMetadata>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>$(MSBuildProjectDirectory)/obj/generated</CompilerGeneratedFilesOutputPath>
+    <DefineConstants>$(DefineConstants);GENERATED_GATE_$(GeneratedVerificationStage)</DefineConstants>
   </PropertyGroup>
   <ItemGroup><Compile Include="../*.cs" Link="%(Filename)%(Extension)" /></ItemGroup>
 </Project>

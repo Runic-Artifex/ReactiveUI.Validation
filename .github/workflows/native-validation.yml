@@ -42,10 +42,8 @@ jobs:
             vswhere="/c/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
             "$vswhere" -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           fi
-      - name: Test strict verifier guards
-        run: python -B -m unittest discover -s eng -p test_verify_native_validation.py -v
-      - name: Test generated acceptance guards
-        run: python -B -m unittest discover -s eng -p test_verify_generated_validation.py -v
+      - name: Test all package, native and generated acceptance guards
+        run: python -B -m unittest discover -s eng -p 'test_verify_*.py' -v
       - name: Restore SHA-verified DynamicData pair
         run: python eng/restore-fork-dependencies.py
       - name: Download the same-SHA core package pair
@@ -100,4 +98,24 @@ jobs:
             artifacts/verification/generated-gates/*.log
             artifacts/verification/generated-gates/*.json
             artifacts/verification/generated-gates/*-generated/**/*.cs
+            artifacts/verification/generated-gates/*-inputs/**/*.cs
+            artifacts/verification/generated-gates/*-inputs/**/*.csproj
+            artifacts/verification/generated-gates/*-inputs/**/*.json
+            artifacts/verification/generated-gates/*-inputs/**/*.txt
+            artifacts/verification/generated-gates/*-inputs/**/*.props
+            artifacts/verification/generated-gates/*-inputs/**/*.targets
+            artifacts/verification/generated-gates/*-inputs/**/*.editorconfig
+            artifacts/verification/generated-gates/*-inputs/**/*.globalconfig
+            artifacts/verification/generated-gates/*-inputs/GeneratedValidation.*.dll
+            artifacts/verification/generated-gates/*-runtime/GeneratedValidation.*
+            artifacts/verification/generated-gates/*-inputs/*-compiler.rsp
+            artifacts/verification/generated-gates/*-inputs/*-Configuration.*.dll
+            artifacts/verification/generated-gates/*.compiler-input.txt
+            artifacts/verification/generated-gates/GeneratedValidation.Precompiled.*.dll
+            artifacts/verification/generated-gates/GeneratedValidation.LegacyPeer.*.dll
+            artifacts/verification/generated-gates/GeneratedValidation.ExpressionParams.*.dll
+            artifacts/verification/generated-gates/GeneratedValidation.ExpressionParams.*.pdb
+            artifacts/verification/generated-gates/Runic.Validation.PeerGeneratedCaller.dll
+            artifacts/verification/generated-gates/MetadataInspector.dll
+            artifacts/verification/generated-gates/historical-peer.source.cs
           retention-days: 14
