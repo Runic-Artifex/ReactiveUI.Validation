@@ -1,6 +1,6 @@
 # Building the Runic fork
 
-For upstream syncs, urgent ports and releases, follow the
+For upstream syncs, the monthly upstream review, urgent ports and releases, follow the
 [maintenance policy](docs/maintenance.md). Update the
 [fork difference register](docs/fork-differences.md) when adding, changing or
 retiring an adaptation. The generated validation surface is described in the
@@ -23,6 +23,9 @@ cd ..
 python3 eng/verify-packages.py
 python3 -B -m unittest discover -s eng -p 'test_verify_*.py'
 python3 -B -m unittest discover -s eng/release -p test_release_assets.py
+node eng/upstream/test-collect-inventory.mjs
+node eng/upstream/test-prepare-review.mjs
+node eng/upstream/test-review-issue.mjs
 ```
 
 The bootstrap downloads both `Runic.DynamicData` 10.0.0-runic.30 flavors from

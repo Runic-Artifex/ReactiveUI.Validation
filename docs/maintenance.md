@@ -3,7 +3,7 @@
 This policy follows the [Runic DynamicData maintenance policy](https://github.com/Runic-Artifex/DynamicData/blob/main/docs/maintenance.md),
 adapted to this repository. The [fork difference register](fork-differences.md)
 lists the adaptations and regressions to preserve; the
-[upstream inventory](upstream/README.md) catalogs upstream issues and PRs.
+[upstream assessment](upstream/README.md) summarizes upstream issues and PRs.
 
 ## Repository and integration ownership
 
@@ -21,24 +21,31 @@ issues, PRs, comments or contributions upstream.
 
 ## Monthly upstream review
 
-Review upstream monthly, sooner for urgent correctness or security fixes. The
-[preparation workflow](../.github/workflows/upstream-review.yml) collects inputs;
-selection, implementation and integration remain human decisions.
+The [upstream review workflow](../.github/workflows/upstream-review.yml) runs on
+the first of each month and on demand (optionally pinned to an upstream SHA). It
+collects the upstream issue/PR inventory with the [eng/upstream](../eng/upstream)
+scripts, compares it with the previous `upstream-review` issue (for the first
+review, with the fork's upstream baseline: the newest upstream merge, otherwise
+the inherited merge base `cde3062`), uploads `inventory.json`, `manifest.json`
+and `summary.md` as the `upstream-review-YYYY-MM-<run>` workflow artifact, and
+opens or updates the `Upstream review YYYY-MM` issue with the summary. It
+commits nothing, pushes no branches and never merges upstream; the inventory is
+never committed. Read the issue, file or update fork issues for upstream work
+worth adopting, sync if warranted, then close the issue. Review sooner for
+urgent correctness or security fixes. The workflow's fixtures run in CI:
 
-Preparation pins Runic `main` and one fetched upstream commit, collects a fresh
-**unassessed** issue/PR inventory and computes a virtual merge without checking
-out or executing upstream code. The inherited baseline `cde3062` is not evidence
-that a later merge happened; ambiguous ancestry stays explicit. Review branches
-are immutable and identified by month and both pins; a repeated run recovers the
-matching branch rather than rewriting it. If the restricted `GITHUB_TOKEN`
-cannot create a PR, the run keeps the branch and prints a manual compare URL.
-Token-created PRs do not trigger CI; dispatch verification explicitly.
-Preparation never merges into `main`, publishes packages or contacts upstream.
+```sh
+node eng/upstream/test-collect-inventory.mjs
+node eng/upstream/test-prepare-review.mjs
+node eng/upstream/test-review-issue.mjs
+```
+
+To sync:
 
 1. Fetch `origin` and `upstream`. Start from `origin/main` in a clean checkout or
-   worktree. Record the Runic base, the previous integrated upstream SHA and the date.
-2. Inspect upstream commits since that point, including changes already ported
-   selectively. Pick one reviewed upstream commit and record its full SHA.
+   worktree.
+2. Inspect upstream commits since the baseline (listed in the review issue),
+   including changes already ported selectively, and pick one upstream commit.
 3. Create `sync/upstream/YYYY-MM` from the Runic base and merge the pinned commit
    with a real merge. Review clean merges as well as conflicts: an upstream build
    change can silently restore targets, package IDs, namespaces or workflows.
@@ -46,9 +53,7 @@ Preparation never merges into `main`, publishes packages or contacts upstream.
    Update the register when a difference is added, changed or retired. Preserve
    both flavors and both .NET 10 API baselines.
 5. Run the gates below. Record the inputs, accepted/deferred changes, conflict
-   decisions and verification in the sync PR description. A no-change review
-   still records its pinned input. A deferred merge does not advance the
-   integrated upstream point.
+   decisions and verification in the sync PR description.
 6. Integrate the tested branch into `main` without squashing. If `main` moved,
    merge it into the sync branch and rerun affected checks. Remove task-owned
    branches and worktrees afterwards.
