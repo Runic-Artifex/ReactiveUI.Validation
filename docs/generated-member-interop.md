@@ -1,5 +1,12 @@
 # ReactiveUI generated-member interoperability investigation
 
+**Current implementation follow-up:** the [capability design](generated-validation-design.md)
+records source-landed versioned private producer projection, final member checks
+and typed/provider alternatives. The [43-row ledger](generated-capabilities-progress.md)
+keeps whole actual-producer/platform and package/native acceptance pending. The
+investigation below remains historical `.5`/`.10` evidence, not verification of
+current `.30` source. No package release or native UI proof is claimed.
+
 This 2026-10-06 investigation compares actual ReactiveUI generation patterns with Validation's
 existing generated API. It starts from Validation documentation/source
 `4ca1ee98dd04a8998be3da54da2595cc735cf4a3`; it does not implement interoperability,
@@ -160,7 +167,11 @@ Post-initialization output has no such inputs either. Reworking the producer to
 consume a separate declarative input would be a different contract, not an
 ordering fix for existing model source.
 
-## Recommended bounded stages
+## Historical recommended bounded stages
+
+These investigation-stage recommendations are superseded by the mandatory
+[complete capability plan](generated-capabilities-plan.md); they do not defer
+the additional producer, access, selector or compatibility rows.
 
 1. Refine unresolved-call candidate classification before adding projection.
    The command-metadata failure comes from accepting any normal-stub candidate

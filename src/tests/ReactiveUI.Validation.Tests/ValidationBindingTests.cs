@@ -465,7 +465,7 @@ public class ValidationBindingTests
 
         _ = ValidationBinding.ForProperty<TestView, TestViewModel, string?, string?>(
             view,
-            viewModel => viewModel!.Name,
+            static viewModel => viewModel!.Name,
             (_, errorText) => view.NameErrorLabel = errorText.FirstOrDefault(static msg => !string.IsNullOrEmpty(msg)) ?? string.Empty,
             SingleLineFormatter.Default);
 
@@ -499,7 +499,7 @@ public class ValidationBindingTests
 
         _ = ValidationBinding.ForValidationHelperProperty<TestView, TestViewModel, string>(
             view,
-            viewModel => viewModel!.NameRule,
+            static viewModel => viewModel!.NameRule,
             (_, errorText) => view.NameErrorLabel = errorText,
             SingleLineFormatter.Default);
 

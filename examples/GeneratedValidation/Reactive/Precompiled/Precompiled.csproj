@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>GeneratedValidation.Precompiled.Reactive</AssemblyName>
+    <DefineConstants>$(DefineConstants);REACTIVE_SHIM</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../PrecompiledCaller.cs" Link="PrecompiledCaller.cs" />
+    <PackageReference Include="Runic.ReactiveUI.Validation.Reactive" Version="$(ValidationVersion)" />
+    <PackageReference Include="ReactiveUI.Reactive" Version="26.0.1" />
+    <PackageReference Include="Runic.DynamicData.Reactive" Version="10.0.0-runic.30" />
+  </ItemGroup>
+</Project>

@@ -170,12 +170,14 @@ public sealed class BindingCompilerTests
         public sealed class Cleanup(Action dispose) : IDisposable { public void Dispose() => dispose(); }
         public static class Fixture
         {
+            public static System.Linq.Expressions.Expression<Func<T,TValue>> Opaque<T,TValue>(System.Linq.Expressions.Expression<Func<T,TValue>> expression) => expression;
             public static Presentation? Project(IValidationState state) => state.IsValid ? null : new Presentation(((RichState)state).Revision);
             public static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
             public static bool Check()
             {
                 {{body}}
             }
+            {{members}}
         }
         """;
 
@@ -217,8 +219,8 @@ public sealed class BindingCompilerTests
         await Assert.That(Errors(result.Compilation)).IsEmpty();
         await Assert.That(Warnings(result.Compilation)).IsEmpty();
         await Assert.That(await DispatchErrors(result.Compilation)).IsEmpty();
-        await Assert.That(result.Generated).Contains("ObserveReference");
-        await Assert.That(result.Generated).Contains("BindToTarget");
+        await Assert.That(result.Generated).Contains("ValidationRuntime.ObserveView");
+        await Assert.That(result.Generated).Contains("ValidationTarget");
         await Assert.That(result.Generated).DoesNotContain("WhenAnyValue");
         await Assert.That(result.Generated).DoesNotContain("Unsafe");
         await Assert.That(result.Generated).DoesNotContain("Reflection");
@@ -291,7 +293,8 @@ public sealed class BindingCompilerTests
         await Assert.That(Errors(result.Compilation)).IsEmpty();
         await Assert.That(Warnings(result.Compilation)).IsEmpty();
         await Assert.That(await DispatchErrors(result.Compilation)).IsEmpty();
-        await Assert.That(result.Generated).Contains($"ObserveReference<global::{(reactive ? "ReactiveUI.Validation.Reactive" : "ReactiveUI.Validation")}.Contexts.IValidationContext>");
+        await Assert.That(result.Generated).Contains("ValidationRuntime.ObserveViewState<");
+        await Assert.That(result.Generated).Contains($"global::{(reactive ? "ReactiveUI.Validation.Reactive" : "ReactiveUI.Validation")}.Contexts.IValidationContext");
         await using var stream = new MemoryStream();
         var emitted = result.Compilation.Emit(stream);
         await Assert.That(string.Join("\n", emitted.Diagnostics.Where(static diagnostic => diagnostic.Severity == DiagnosticSeverity.Error))).IsEmpty();
@@ -316,8 +319,9 @@ public sealed class BindingCompilerTests
         var result = Generate(Source(reactive, body));
         var diagnostic = result.Diagnostics.Single(static diagnostic => diagnostic.Id == "RUVG006");
         await Assert.That(diagnostic.Severity).IsEqualTo(DiagnosticSeverity.Error);
-        await Assert.That(diagnostic.GetMessage()).Contains("reference type ownership contract");
-        await Assert.That(diagnostic.GetMessage()).Contains("interface-typed boxed view");
+        await Assert.That(diagnostic.GetMessage()).Contains("unowned copy");
+        await Assert.That(diagnostic.GetMessage()).Contains("ValidationCell");
+        await Assert.That(diagnostic.GetMessage()).Contains("ValidationLens");
         await Assert.That(result.Generated).IsEmpty();
         await Assert.That(Errors(result.Compilation)).IsEmpty();
         await Assert.That(Warnings(result.Compilation)).IsEmpty();
@@ -366,25 +370,22 @@ public sealed class BindingCompilerTests
     [Test]
     [Arguments(false, "view.BindValidationState(model, helper, Project, static value => { });", "helper")]
     [Arguments(false, "view.BindValidationState(model, x => x.Rule, target, Project);", "target")]
-    [Arguments(false, "view.BindValidationState(model, x => x.Rule, x => x.Plain!.Panel!.Status, Project);", "x => x.Plain!.Panel!.Status")]
     [Arguments(false, "view.BindValidationState<View, Model, object>(model, x => x.Rule, x => x.Message, static state => (object)\"x\");", "x => x.Message")]
     [Arguments(false, "view.BindValidationState(model, x => x.Rule, x => x.Initial, static state => \"x\");", "x => x.Initial")]
     [Arguments(true, "view.BindValidationState(model, helper, Project, static value => { });", "helper")]
     [Arguments(true, "view.BindValidationState(model, x => x.Rule, target, Project);", "target")]
-    [Arguments(true, "view.BindValidationState(model, x => x.Rule, x => x.Plain!.Panel!.Status, Project);", "x => x.Plain!.Panel!.Status")]
     [Arguments(true, "view.BindValidationState<View, Model, object>(model, x => x.Rule, x => x.Message, static state => (object)\"x\");", "x => x.Message")]
     [Arguments(true, "view.BindValidationState(model, x => x.Rule, x => x.Initial, static state => \"x\");", "x => x.Initial")]
     public async Task UnsupportedBindingsProduceActionableSelectorDiagnostics(bool reactive, string call, string selector)
     {
-        var body = $$"""
-            var model = new Model();
-            var view = new View { ViewModel = model };
-            System.Linq.Expressions.Expression<Func<Model,ValidationHelper?>> helper = x => x.Rule;
-            System.Linq.Expressions.Expression<Func<View,Presentation?>> target = x => x.Status;
-            {{call}}
-            return true;
+        var members = $$"""
+            public static void Reject(Model model, View view, System.Linq.Expressions.Expression<Func<Model,ValidationHelper?>> helper,
+                System.Linq.Expressions.Expression<Func<View,Presentation?>> target)
+            {
+                {{call}}
+            }
             """;
-        var source = Source(reactive, body);
+        var source = Source(reactive, "return true;", members);
         var result = Generate(source);
         var diagnostic = result.Diagnostics.Single(static diagnostic => diagnostic.Id == "RUVG006");
         await Assert.That(diagnostic.Severity).IsEqualTo(DiagnosticSeverity.Error);
@@ -393,17 +394,99 @@ public sealed class BindingCompilerTests
         await Assert.That(result.Generated).IsEmpty();
     }
 
+    /// <summary>Executes finite callable aliases without losing helper replacement or cleanup.</summary>
+    /// <param name="reactive">Whether the fixture uses the System.Reactive flavor.</param>
+    /// <returns>The asynchronous compiler and runtime assertions.</returns>
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task FiniteCallableHelperAndTargetAliasesExecute(bool reactive)
+    {
+        const string body = """
+            var model = new Model();
+            var states = new Current(new RichState(false, "first", 1));
+            using var rule = model.AddObservableRule(states, new[] { "Name" });
+            model.Rule = rule;
+            var view = new View { ViewModel = model };
+            var helper = Opaque<Model,ValidationHelper?>(x => x.Rule);
+            var target = Opaque<View,Presentation?>(x => x.Status);
+            using var binding = view.BindValidationState(model, helper, target, Project);
+            Require(view.Status?.Revision == 1, "finite callable aliases preserve actual initial state");
+            states.Set(new RichState(false, "next", 2));
+            Require(view.Status?.Revision == 2, "finite aliases observe the current helper");
+            model.Rule = null;
+            Require(view.Status is null, "missing helper clears the alias target");
+            model.Rule = rule;
+            Require(view.Status?.Revision == 2, "replacement restores the helper current state");
+            binding.Dispose();
+            states.Set(new RichState(false, "detached", 3));
+            Require(view.Status?.Revision == 2, "disposed aliases stop writes");
+            return true;
+            """;
+        await AssertCompiledBehaviorAsync(reactive, body);
+    }
+
+    /// <summary>Resolves non-notifying target references on domain updates without inventing replacement notifications.</summary>
+    /// <param name="reactive">Whether the fixture uses the System.Reactive flavor.</param>
+    /// <returns>The asynchronous compiler and runtime assertions.</returns>
+    [Test]
+    [Arguments(false)]
+    [Arguments(true)]
+    public async Task NonNotifyingTargetsResolveOnDomainUpdates(bool reactive)
+    {
+        const string body = """
+            var model = new Model();
+            var states = new Current(new RichState(false, "first", 1));
+            using var rule = model.AddObservableRule(states, new[] { "Name" });
+            model.Rule = rule;
+            var original = new Panel();
+            var view = new View { ViewModel = model, Plain = new Plain { Panel = original } };
+            using var binding = view.BindValidationState(model, x => x.Rule, x => x.Plain!.Panel!.Status, Project);
+            Require(original.Status?.Revision == 1, "plain target receives actual initial state");
+            var replacement = new Panel();
+            view.Plain!.Panel = replacement;
+            Require(replacement.Status is null, "plain references do not promise undeclared notifications");
+            states.Set(new RichState(false, "next", 2));
+            Require(replacement.Status?.Revision == 2 && original.Status?.Revision == 1, "domain update writes only the current target");
+            view.Plain.Panel = null;
+            states.Set(new RichState(false, "missing", 3));
+            view.Plain.Panel = new Panel();
+            states.Set(new RichState(false, "restored", 4));
+            Require(view.Plain.Panel.Status?.Revision == 4 && replacement.Status?.Revision == 2, "missing target does not retain a stale owner");
+            binding.Dispose();
+            states.Set(new RichState(false, "detached", 5));
+            Require(view.Plain.Panel.Status?.Revision == 4, "disposal stops plain target writes");
+            return true;
+            """;
+        await AssertCompiledBehaviorAsync(reactive, body);
+    }
+
+    /// <summary>Compiles and executes an ordinary both-flavor caller with the real packaged producer driver.</summary>
+    /// <param name="reactive">Whether the caller uses the System.Reactive flavor.</param>
+    /// <param name="body">The executable consumer assertions.</param>
+    /// <returns>The asynchronous compiler, dispatch, and runtime assertions.</returns>
+    private static async Task AssertCompiledBehaviorAsync(bool reactive, string body)
+    {
+        using var host = CapabilityCompilerHost.Create(reactive);
+        var result = await host.RunAsync(Source(reactive, body));
+        await Assert.That(result.GeneratorDiagnostics).IsEmpty();
+        await Assert.That(result.CompilationDiagnostics.Where(static diagnostic => diagnostic.Severity is DiagnosticSeverity.Warning or DiagnosticSeverity.Error)).IsEmpty();
+        await Assert.That(await result.GetDispatchDiagnosticsAsync()).IsEmpty();
+        await Assert.That(result.ExecuteBoolean(FixtureTypeName, FixtureMethodName)).IsTrue();
+    }
+
     /// <summary>Builds ordinary notifying application types whose getters and setters are statically accessible.</summary>
     /// <param name="reactive">Whether the fixture uses the System.Reactive flavor.</param>
     /// <param name="body">The application check body.</param>
+    /// <param name="members">Additional externally callable fixture members.</param>
     /// <returns>The complete consumer source.</returns>
-    private static string Source(bool reactive, string body)
+    private static string Source(bool reactive, string body, string members = "")
     {
         var root = reactive ? "ReactiveUI.Validation.Reactive" : "ReactiveUI.Validation";
         var ui = reactive ? "ReactiveUI.Reactive" : "ReactiveUI";
         var binding = reactive ? "ReactiveUI.Binding.Reactive" : "ReactiveUI.Binding";
         return ConsumerTemplate.Replace("{{ui}}", ui).Replace("{{binding}}", binding)
-            .Replace("{{root}}", root).Replace("{{body}}", body);
+            .Replace("{{root}}", root).Replace("{{body}}", body).Replace("{{members}}", members);
     }
 
     /// <summary>Runs the installed generator against producer DLL references and returns the resulting compilation.</summary>
@@ -411,9 +494,7 @@ public sealed class BindingCompilerTests
     /// <returns>The generated source and semantic compilation.</returns>
     private static CompilationResult Generate(string source)
     {
-        var references = Directory.GetFiles(AppContext.BaseDirectory, "*.dll")
-            .Concat(((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!).Split(Path.PathSeparator))
-            .Distinct().Select(static path => MetadataReference.CreateFromFile(path));
+        var references = CompilerTestReferences.CreateDefault();
         var compilation = CSharpCompilation.Create(
             $"GeneratedBindingTest{Guid.NewGuid():N}",
             [CSharpSyntaxTree.ParseText(source, ParseOptions, "BindingCaller.cs")],

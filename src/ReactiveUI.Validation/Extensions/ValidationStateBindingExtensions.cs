@@ -13,7 +13,7 @@ namespace ReactiveUI.Validation.Extensions;
 
 /// <summary>Binds validation states to typed presentation values.</summary>
 [SuppressMessage("Design", "SST1703:Use extension block", Justification = "The receiver constraint refers to the method's inferred view model type.")]
-public static class ValidationStateBindingExtensions
+public static partial class ValidationStateBindingExtensions
 {
     /// <summary>Binds a helper's validity and text to a typed view property.</summary>
     /// <typeparam name="TView">View type.</typeparam>
@@ -29,7 +29,7 @@ public static class ValidationStateBindingExtensions
     /// <remarks>
     /// A null model or helper produces <see cref="ValidationState.Valid"/>. Assignments run on the source notification thread.
     /// </remarks>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationStateUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationStateUnsafe for reflection-based execution.</remarks>
     public static IValidationBinding BindValidationState<TView, TViewModel, TOut>(
         this TView view,
         TViewModel? viewModel,
@@ -39,8 +39,10 @@ public static class ValidationStateBindingExtensions
         where TView : IViewFor<TViewModel>
         where TViewModel : class, IReactiveObject, IValidatableViewModel
     {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationState));
+        ArgumentExceptionHelper.ThrowIfNull(converter);
+        ArgumentExceptionHelper.ThrowIfNull(viewProperty);
+        var target = ValidationRuntime.ResolveTarget<TView, TOut, TOut>(view, viewProperty, string.Empty);
+        return target.Bind(view).Bind(ValidationRuntime.ObserveModelHelper(view, helperProperty).Select(converter));
     }
 
     /// <summary>Projects a helper's validity and text into a typed callback value.</summary>
@@ -57,7 +59,7 @@ public static class ValidationStateBindingExtensions
     /// <remarks>
     /// A null model or helper produces <see cref="ValidationState.Valid"/>. Callbacks run on the source notification thread.
     /// </remarks>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationStateUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationStateUnsafe for reflection-based execution.</remarks>
     public static IValidationBinding BindValidationState<TView, TViewModel, TOut>(
         this TView view,
         TViewModel? viewModel,
@@ -67,8 +69,9 @@ public static class ValidationStateBindingExtensions
         where TView : IViewFor<TViewModel>
         where TViewModel : class, IReactiveObject, IValidatableViewModel
     {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationState));
+        ArgumentExceptionHelper.ThrowIfNull(converter);
+        ArgumentExceptionHelper.ThrowIfNull(onNext);
+        return ValidationRuntime.Bind(ValidationRuntime.ObserveModelHelper(view, helperProperty).Select(converter), onNext);
     }
 
     /// <summary>Binds all matching property rule states to a typed view property.</summary>
@@ -87,7 +90,7 @@ public static class ValidationStateBindingExtensions
     /// <remarks>
     /// A null model or no matching rules produces an empty list. Active rules must each emit an initial state; no synthetic valid state is inserted. Assignments run on the source notification thread.
     /// </remarks>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationStateUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationStateUnsafe for reflection-based execution.</remarks>
     public static IValidationBinding BindValidationState<TView, TViewModel, TProperty, TOut>(
         this TView view,
         TViewModel? viewModel,
@@ -98,8 +101,10 @@ public static class ValidationStateBindingExtensions
         where TView : IViewFor<TViewModel>
         where TViewModel : class, IReactiveObject, IValidatableViewModel
     {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationState));
+        ArgumentExceptionHelper.ThrowIfNull(converter);
+        ArgumentExceptionHelper.ThrowIfNull(viewProperty);
+        var target = ValidationRuntime.ResolveTarget<TView, TOut, TOut>(view, viewProperty, string.Empty);
+        return target.Bind(view).Bind(ValidationRuntime.ObserveModelProperty(view, modelProperty, strict, ValidationInitialSequence.Actual).Select(converter));
     }
 
     /// <summary>Projects all matching property rule states into a typed callback value.</summary>
@@ -118,7 +123,7 @@ public static class ValidationStateBindingExtensions
     /// <remarks>
     /// A null model or no matching rules produces an empty list. Active rules must each emit an initial state; no synthetic valid state is inserted. Callbacks run on the source notification thread.
     /// </remarks>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationStateUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationStateUnsafe for reflection-based execution.</remarks>
     public static IValidationBinding BindValidationState<TView, TViewModel, TProperty, TOut>(
         this TView view,
         TViewModel? viewModel,
@@ -129,8 +134,9 @@ public static class ValidationStateBindingExtensions
         where TView : IViewFor<TViewModel>
         where TViewModel : class, IReactiveObject, IValidatableViewModel
     {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationState));
+        ArgumentExceptionHelper.ThrowIfNull(converter);
+        ArgumentExceptionHelper.ThrowIfNull(onNext);
+        return ValidationRuntime.Bind(ValidationRuntime.ObserveModelProperty(view, modelProperty, strict, ValidationInitialSequence.Actual).Select(converter), onNext);
     }
 
     /// <summary>Binds a helper's validity and text to a typed view property.</summary>

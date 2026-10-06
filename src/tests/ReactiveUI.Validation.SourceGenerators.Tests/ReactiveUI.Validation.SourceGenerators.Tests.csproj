@@ -7,7 +7,13 @@
     <ProjectReference Include="../../ReactiveUI.Validation.SourceGenerators/ReactiveUI.Validation.SourceGenerators.csproj" />
     <ProjectReference Include="../../ReactiveUI.Validation/ReactiveUI.Validation.csproj" />
     <ProjectReference Include="../../ReactiveUI.Validation.Reactive/ReactiveUI.Validation.Reactive.csproj" />
+    <ProjectReference Include="../../../eng/PeerGeneratedCaller/PeerGeneratedCaller.csproj" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <None Include="../../../eng/verification-fixtures/original-normal-api.json" Link="Fixtures/original-normal-api.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../../eng/verification-fixtures/ProducerInteropScenario.cs" Link="Fixtures/ProducerInteropScenario.cs" CopyToOutputDirectory="PreserveNewest"
+          Condition="Exists('$(MSBuildProjectDirectory)/../../../eng/verification-fixtures/ProducerInteropScenario.cs')" />
+    <ProjectReference Include="../PlatformProducerInputs/PlatformProducerInputs.csproj" ReferenceOutputAssembly="false" BuildReference="false"
+                      Condition="Exists('$(MSBuildProjectDirectory)/../PlatformProducerInputs/PlatformProducerInputs.csproj')" />
   </ItemGroup>
   <!-- This project exercises our analyzer with an explicit Roslyn driver. Both
        runtime flavors bring differently compiled Binding analyzers with the same
@@ -16,5 +22,14 @@
     <ItemGroup>
       <Analyzer Remove="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'ReactiveUI.Binding.SourceGenerators' or '%(Analyzer.Filename)' == 'ReactiveUI.SourceGenerators.Roslyn'" />
     </ItemGroup>
+  </Target>
+  <Target Name="CaptureCapabilityCompilerInputs" AfterTargets="Build">
+    <MakeDir Directories="$(TargetDir)CompilerHostInputs" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/../../ReactiveUI.Validation/obj/project.assets.json" DestinationFiles="$(TargetDir)CompilerHostInputs/Primitives.assets.json" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/../../ReactiveUI.Validation.Reactive/obj/project.assets.json" DestinationFiles="$(TargetDir)CompilerHostInputs/Reactive.assets.json" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/../PlatformProducerInputs/obj/project.assets.json" DestinationFiles="$(TargetDir)CompilerHostInputs/Platforms.assets.json"
+          Condition="Exists('$(MSBuildProjectDirectory)/../PlatformProducerInputs/obj/project.assets.json')" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/../PlatformProducerInputs/immutable-inputs.json" DestinationFiles="$(TargetDir)CompilerHostInputs/Platforms.immutable-inputs.json"
+          Condition="Exists('$(MSBuildProjectDirectory)/../PlatformProducerInputs/immutable-inputs.json')" />
   </Target>
 </Project>

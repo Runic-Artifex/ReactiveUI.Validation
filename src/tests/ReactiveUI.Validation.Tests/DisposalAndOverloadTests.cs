@@ -15,6 +15,9 @@ namespace ReactiveUI.Validation.Tests;
 /// <summary>Tests for the finalizer path of the dispose pattern and for the overloads that supply defaults.</summary>
 public class DisposalAndOverloadTests
 {
+    /// <summary>A property value accepted by the required-name rule.</summary>
+    private const string ValidName = "valid";
+
     /// <summary>A validation message used by the rules in these tests.</summary>
     private const string NameRequiredMessage = "Name is required.";
 
@@ -36,28 +39,80 @@ public class DisposalAndOverloadTests
         await Assert.That(validation.IsValid).IsFalse();
     }
 
-    /// <summary>Verifies that Dispose(false) on a validation binding leaves the binding updating the view.</summary>
+    /// <summary>Verifies that Dispose(false) on the legacy concrete binding leaves the view updating.</summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    /// <remarks>The normal factory returns <see cref="IValidationBinding"/> and may use a generated implementation.</remarks>
     [Test]
     public async Task ValidationBindingDisposeFromFinalizerKeepsBinding()
     {
-        var viewModel = new TestViewModel { Name = "valid" };
+        using var viewModel = new TestViewModel { Name = ValidName };
         var view = new TestView(viewModel);
         _ = viewModel.ValidationRuleUnsafe(
             static vm => vm.Name,
             static name => !string.IsNullOrEmpty(name),
             NameRequiredMessage);
 
-        var binding = (ValidationBinding)ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
+        var binding = (ValidationBinding)ValidationBinding.ForPropertyUnsafe<TestView, TestViewModel, string?, string>(
             view,
             static vm => vm.Name,
             static v => v.NameErrorLabel);
 
-        binding.Dispose(false);
-        viewModel.Name = string.Empty;
+        try
+        {
+            binding.Dispose(false);
+            viewModel.Name = string.Empty;
 
-        await Assert.That(view.NameErrorLabel).IsEqualTo(NameRequiredMessage);
-        binding.Dispose();
+            await Assert.That(view.NameErrorLabel).IsEqualTo(NameRequiredMessage);
+            binding.Dispose();
+            viewModel.Name = ValidName;
+            await Assert.That(view.NameErrorLabel).IsEqualTo(NameRequiredMessage);
+            await Assert.That(viewModel.ValidationContext.IsValid).IsTrue();
+        }
+        finally
+        {
+            binding.Dispose();
+        }
+    }
+
+    /// <summary>Verifies that normal binding disposal stops view updates and preserves borrowed rule sources.</summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+    [Test]
+    public async Task NormalPropertyBindingDisposalStopsUpdatesAndPreservesValidation()
+    {
+        using var viewModel = new TestViewModel();
+        using var replacement = new TestViewModel();
+        using var states = new BehaviorSubject<IValidationState>(ValidationState.Valid);
+        using var replacementStates = new BehaviorSubject<IValidationState>(ValidationState.Valid);
+        using var rule = viewModel.AddObservableRule(states, [nameof(TestViewModel.Name)]);
+        using var replacementRule = replacement.AddObservableRule(replacementStates, [nameof(TestViewModel.Name)]);
+        var view = new TestView(viewModel);
+        var binding = ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
+            view,
+            static model => model.Name,
+            static current => current.NameErrorLabel);
+
+        try
+        {
+            await Assert.That(view.NameErrorLabel).IsEqualTo(string.Empty);
+            states.OnNext(new ValidationState(false, NameRequiredMessage));
+            await Assert.That(view.NameErrorLabel).IsEqualTo(NameRequiredMessage);
+
+            binding.Dispose();
+            binding.Dispose();
+            states.OnNext(ValidationState.Valid);
+            view.ViewModel = replacement;
+            replacementStates.OnNext(new ValidationState(false, SecondMessage));
+
+            await Assert.That(view.NameErrorLabel).IsEqualTo(NameRequiredMessage);
+            await Assert.That(viewModel.ValidationContext.IsValid).IsTrue();
+            await Assert.That(replacement.ValidationContext.IsValid).IsFalse();
+            await Assert.That(states.HasObservers).IsTrue();
+            await Assert.That(replacementStates.HasObservers).IsTrue();
+        }
+        finally
+        {
+            binding.Dispose();
+        }
     }
 
     /// <summary>Verifies that the parameterless constructor and the parameterless RaiseErrorsChanged work together.</summary>
@@ -155,7 +210,7 @@ public class DisposalAndOverloadTests
         subscription.Dispose();
         var countAfterDisposal = notifications;
 
-        viewModel.Name = "valid";
+        viewModel.Name = ValidName;
         rule.Dispose();
 
         await Assert.That(notifications).IsEqualTo(countAfterDisposal);

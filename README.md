@@ -36,21 +36,22 @@ The implemented generated/Unsafe split makes inline-lambda predicate `Validation
 `BindValidation`, `BindValidationContext` and `BindValidationState` calls the
 primary generated surface. The matching core package embeds the Validation
 analyzer and interceptor allowlist props; consuming projects must retain those
-assets and recompile their call sites. Supported calls generate direct property
-observation and typed assignment. Unsupported selectors produce build errors.
-A normal call left unintercepted throws, including a previously compiled call;
-there is no reflection fallback. Generated normal property text bindings expose
+assets and recompile their call sites. The expanded implementation also provides
+typed selectors/targets, finite owner-scoped plan registration and deliberately
+registered normal dispatch for stored selectors, delegates and compiled peers.
+Unregistered normal calls fail actionably; there is no reflection fallback.
+Generated normal property text bindings expose
 actual initial invalid text immediately; explicit Unsafe property callbacks
 retain the legacy synthetic empty-list prelude.
 
 Use `ValidationRuleUnsafe`, `BindValidationUnsafe`,
 `BindValidationContextUnsafe` or `BindValidationStateUnsafe` when deliberately
-using runtime expressions. Those methods retain trimming warnings. Supplied
+choosing reflected runtime expressions. Those methods retain trimming warnings. Supplied
 observable/metadata rule overloads and the explicit observable APIs remain
 available. See the [migration and examples](docs/examples/generated-validation.md)
 and [generator contract](docs/generated-validation-design.md).
 
-This change is implemented and verified at source
+The earlier restricted split was verified at source
 `2550376b230ccfb78beb8d3b4ced8866b65d809e`, and remains **UNRELEASED** until
 publication. Local and [Linux/Windows CI](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109)
 pass 683 tests; actual-package generated consumers pass managed, full trimming
@@ -58,7 +59,14 @@ and NativeAOT on Linux/Windows x64 with zero positive warnings/errors. The
 [verification record](docs/upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
 keeps tested source and local/CI package hashes separate. Published releases and
 their historical behavior remain unchanged; this later documentation record is
-not the tested package source.
+not the tested package source. The [expanded capability plan](docs/generated-capabilities-plan.md)
+and [ledger](docs/generated-capabilities-progress.md) record the current source
+implementation and focused managed checks. Its integrated compiler, actual-package
+and Linux/Windows trim/native acceptance remain pending; no new capability row
+is complete or package published. Typed factories cover legal private/generic
+access, explicit notifications, captures and stable struct/immutable storage;
+known producer projection uses versioned final-member contracts rather than
+generator ordering. These source-stage contracts do not expand UI host support.
 
 ---
 

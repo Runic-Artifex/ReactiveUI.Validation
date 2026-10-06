@@ -1,14 +1,12 @@
 // Copyright (c) 2019-2026 ReactiveUI and Contributors. All rights reserved.
 // ReactiveUI and Contributors licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
-
-using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace ReactiveUI.Validation.SourceGenerators;
 
 /// <summary>Validates semantic contracts and emits compiler-safe C# syntax.</summary>
@@ -22,49 +20,33 @@ internal static class GeneratorHelpers
         SymbolDisplayFormat.FullyQualifiedFormat.WithMiscellaneousOptions(
             SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier | SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers));
 
+    /// <summary>Formats a payload using only the original interceptor generic slots.</summary>
+    /// <param name="site">The call site.</param>
+    /// <param name="type">The exact payload type.</param>
+    /// <returns>The legal method-local type name.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static string MethodTypeName(CallSite site, ITypeSymbol type) => GenericInterceptorEmitter.PayloadType(site, type);
+
     /// <summary>Escapes a C# string literal.</summary>
     /// <param name="value">The string to escape.</param>
     /// <returns>A quoted literal.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static string Quote(string value) => SymbolDisplay.FormatLiteral(value, true);
 
-    /// <summary>Formats a concrete static interceptor signature.</summary>
+    /// <summary>Formats a legal interceptor with the original API arity.</summary>
     /// <param name="site">The intercepted call.</param>
     /// <returns>A method declaration without a body.</returns>
-    internal static string MethodHeader(CallSite site)
-    {
-        var text = new StringBuilder($"internal static {TypeName(site.Method.ReturnType)} Intercept{site.Id}(");
-        for (var index = 0; index < site.Method.Parameters.Length; index++)
-        {
-            var parameter = site.Method.Parameters[index];
-            if (index > 0)
-            {
-                _ = text.Append(", ");
-            }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static string MethodHeader(CallSite site) => GenericInterceptorEmitter.MethodHeader(site);
 
-            if (index == 0 && site.Method.IsExtensionMethod)
-            {
-                _ = text.Append("this ");
-            }
-
-            if (parameter.RefKind != RefKind.None)
-            {
-                _ = text.Append(parameter.RefKind.ToString().ToLowerInvariant()).Append(' ');
-            }
-
-            _ = text.Append(TypeName(parameter.Type)).Append(" @").Append(parameter.Name);
-        }
-
-        return text.Append(')').ToString();
-    }
-
-    /// <summary>Checks a type and all its constructed arguments for generated access.</summary>
+    /// <summary>Checks a type and all constructed arguments for namespace access.</summary>
     /// <param name="compilation">The caller compilation.</param>
     /// <param name="type">The referenced type.</param>
-    /// <returns>Whether namespace-level generated code can use the type.</returns>
+    /// <returns>Whether namespace-level generated code can use the closed type.</returns>
+    [SuppressMessage("Style", "SST1442", Justification = "This recursive type proof independently rejects open, anonymous, file-local and inaccessible shapes.")]
     internal static bool IsAccessibleType(Compilation compilation, ITypeSymbol type)
     {
-        if (type is ITypeParameterSymbol || type.TypeKind is TypeKind.Error or TypeKind.Dynamic)
+        if (type is ITypeParameterSymbol || type.TypeKind is TypeKind.Error or TypeKind.Dynamic || type is INamedTypeSymbol { IsAnonymousType: true } or INamedTypeSymbol { IsFileLocal: true })
         {
             return false;
         }
@@ -79,183 +61,61 @@ internal static class GeneratorHelpers
             return false;
         }
 
-        return type is not INamedTypeSymbol named || NamedArgumentsAccessible(compilation, named);
+        return type is not INamedTypeSymbol named
+            || ((named.ContainingType is null || IsAccessibleType(compilation, named.ContainingType)) && named.TypeArguments.All(argument => IsAccessibleType(compilation, argument)));
     }
 
-    /// <summary>Reads a literal selector and validates its notification contracts.</summary>
+    /// <summary>Plans a literal or statically proven stored semantic selector.</summary>
     /// <param name="site">The original call.</param>
     /// <param name="expression">The selector argument.</param>
-    /// <param name="selector">The validated path.</param>
-    /// <param name="reason">The unsupported contract explanation.</param>
-    /// <param name="requireNotification">Whether every owner must notify changes.</param>
-    /// <returns>Whether the selector can be generated.</returns>
-    internal static bool TrySelector(CallSite site, ExpressionSyntax expression, out Selector? selector, out string reason, bool requireNotification = true)
-    {
-        selector = null;
-        var body = LambdaBody(expression);
-        if (body is null)
-        {
-            reason = "Supply an inline property-selector lambda; runtime expression variables and statement bodies need an explicit observable.";
-            return false;
-        }
+    /// <param name="selector">The validated operation/dependency plan.</param>
+    /// <param name="reason">The required explicit typed route.</param>
+    /// <param name="requireNotification">Whether ordinary observable lowering is required.</param>
+    /// <returns>Whether the automatic selector has a sound plan.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static bool TrySelector(CallSite site, ExpressionSyntax expression, out Selector? selector, out string reason, bool requireNotification = true) =>
+        SemanticSelectorPlanner.TryCreate(site, expression, out selector, out reason, requireNotification);
 
-        var properties = ImmutableArray.CreateBuilder<IPropertySymbol>();
-        body = Unwrap(body);
-        while (body is MemberAccessExpressionSyntax member)
-        {
-            if (!TryProperty(site, member, out var property))
-            {
-                reason = "Every segment must be an accessible readable instance property. Generated-only members, indexers and private getters need an explicit observable.";
-                return false;
-            }
-
-            properties.Insert(0, property!);
-            body = Unwrap(member.Expression);
-        }
-
-        var parameter = body is IdentifierNameSyntax identifier ? site.Model.GetSymbolInfo(identifier).Symbol as IParameterSymbol : null;
-        if (properties.Count == 0 || !IsSelectedParameter(site, expression, parameter))
-        {
-            reason = "Selectors must read a path from their lambda parameter. Calls, indexers, conversions and captured objects need an explicit observable.";
-            return false;
-        }
-
-        if (requireNotification && !ValidateOwners(parameter!.Type, properties, out reason))
-        {
-            return false;
-        }
-
-        selector = new(properties.ToImmutable());
-        reason = string.Empty;
-        return true;
-    }
-
-    /// <summary>Checks enclosing generic types and all constructed type arguments.</summary>
-    /// <param name="compilation">The caller compilation.</param>
-    /// <param name="named">The constructed named type.</param>
-    /// <returns>Whether every containing type and argument can be generated.</returns>
-    private static bool NamedArgumentsAccessible(Compilation compilation, INamedTypeSymbol named)
-    {
-        if (named.ContainingType is not null && !IsAccessibleType(compilation, named.ContainingType))
-        {
-            return false;
-        }
-
-        foreach (var argument in named.TypeArguments)
-        {
-            if (!IsAccessibleType(compilation, argument))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /// <summary>Requires the selector's own parameter rather than a captured outer parameter.</summary>
+    /// <summary>Plans structural metadata using only the operations needed to acquire current keys.</summary>
     /// <param name="site">The original call.</param>
-    /// <param name="expression">The selector syntax.</param>
-    /// <param name="parameter">The path's root parameter symbol.</param>
-    /// <returns>Whether the root belongs to this selector.</returns>
-    private static bool IsSelectedParameter(CallSite site, ExpressionSyntax expression, IParameterSymbol? parameter)
+    /// <param name="expression">The property metadata selector.</param>
+    /// <param name="selector">The metadata plan.</param>
+    /// <param name="reason">The typed metadata factory alternative.</param>
+    /// <returns>Whether structural metadata can be emitted without reading the selected leaf.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static bool TryMetadataSelector(CallSite site, ExpressionSyntax expression, out Selector? selector, out string reason) =>
+        SemanticSelectorPlanner.TryCreate(site, expression, out selector, out reason, false, true);
+
+    /// <summary>Plans legal typed storage assignment with outward struct write-back.</summary>
+    /// <param name="site">The original call.</param>
+    /// <param name="expression">The target selector.</param>
+    /// <param name="access">The typed writable lens.</param>
+    /// <param name="reason">The explicit replacement/storage alternative.</param>
+    /// <param name="requireObservableStorageSafety">Whether notification replay needs proven origin-aware storage.</param>
+    /// <returns>Whether ordinary typed assignment is legal.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static bool TryAccessPlan(CallSite site, ExpressionSyntax expression, out AccessPlan? access, out string reason, bool requireObservableStorageSafety = true)
     {
-        var declared = Unwrap(expression) switch
+        if (!SemanticSelectorPlanner.TryAccess(site, expression, out access, out reason))
         {
-            SimpleLambdaExpressionSyntax simple => site.Model.GetDeclaredSymbol(simple.Parameter),
-            ParenthesizedLambdaExpressionSyntax parenthesized => site.Model.GetDeclaredSymbol(parenthesized.ParameterList.Parameters[0]),
-            _ => null,
-        };
-        return parameter is not null && SymbolEqualityComparer.Default.Equals(declared, parameter);
-    }
-
-    /// <summary>Reads a single-parameter expression-bodied literal lambda.</summary>
-    /// <param name="expression)">The expression) contract to inspect.</param>
-    /// <returns>The checked semantic result.</returns>
-    private static ExpressionSyntax? LambdaBody(ExpressionSyntax expression) => Unwrap(expression) switch
-    {
-        SimpleLambdaExpressionSyntax simple => simple.Body as ExpressionSyntax,
-        ParenthesizedLambdaExpressionSyntax parenthesized when parenthesized.ParameterList.Parameters.Count == 1 => parenthesized.Body as ExpressionSyntax,
-        _ => null,
-    };
-
-    /// <summary>Validates and formats the original compilation contract.</summary>
-    /// <param name="site">The site contract to inspect.</param>
-    /// <param name="member">The member contract to inspect.</param>
-    /// <param name="property">The property contract to inspect.</param>
-    /// <returns>The checked semantic result.</returns>
-    private static bool TryProperty(CallSite site, MemberAccessExpressionSyntax member, out IPropertySymbol? property)
-    {
-        property = site.Model.GetSymbolInfo(member).Symbol as IPropertySymbol;
-        return property is { IsStatic: false, IsIndexer: false, GetMethod: not null }
-            && site.Model.Compilation.IsSymbolAccessibleWithin(property.GetMethod, site.Model.Compilation.Assembly)
-            && IsAccessibleType(site.Model.Compilation, property.Type);
-    }
-
-    /// <summary>Validates and formats the original compilation contract.</summary>
-    /// <param name="root">The root contract to inspect.</param>
-    /// <param name="properties">The properties contract to inspect.</param>
-    /// <param name="reason">The reason contract to inspect.</param>
-    /// <returns>The checked semantic result.</returns>
-    private static bool ValidateOwners(ITypeSymbol root, ImmutableArray<IPropertySymbol>.Builder properties, out string reason)
-    {
-        for (var index = 0; index < properties.Count; index++)
-        {
-            var owner = index == 0 ? root : properties[index - 1].Type;
-            if (index > 0 && !owner.IsReferenceType)
-            {
-                reason = "Observed intermediate parents must be reference types. Supply an explicit observable for value-type chains.";
-                return false;
-            }
-
-            if (Notifies(owner))
-            {
-                continue;
-            }
-
-            reason = $"The owner of '{properties[index].Name}' must implement INotifyPropertyChanged. Supply an explicit observable for non-notifying nodes.";
             return false;
         }
 
-        reason = string.Empty;
+        if (requireObservableStorageSafety && access!.RequiresCopyBack)
+        {
+            reason = "Observable struct storage requires an authored origin-aware ValidationTarget or owned ValidationCell/ValidationLens; "
+                + "opaque setters cannot distinguish peer writes, normalization and external replacement.";
+            access = null;
+            return false;
+        }
+
+        if (TryMetadataSelector(site, expression, out var selector, out _))
+        {
+            access!.Dependencies = selector!.Dependencies;
+            access.TargetPath = selector.PathPlans.FirstOrDefault();
+            access.ReadSelector = selector;
+        }
+
         return true;
-    }
-
-    /// <summary>Validates and formats the original compilation contract.</summary>
-    /// <param name="owner">The owner contract to inspect.</param>
-    /// <returns>The checked semantic result.</returns>
-    private static bool Notifies(ITypeSymbol owner)
-    {
-        foreach (var contract in owner.AllInterfaces)
-        {
-            if (contract.ToDisplayString() == "System.ComponentModel.INotifyPropertyChanged")
-            {
-                return true;
-            }
-        }
-
-        return owner.ToDisplayString() == "System.ComponentModel.INotifyPropertyChanged";
-    }
-
-    /// <summary>Validates and formats the original compilation contract.</summary>
-    /// <param name="expression">The expression contract to inspect.</param>
-    /// <returns>The checked semantic result.</returns>
-    private static ExpressionSyntax Unwrap(ExpressionSyntax expression)
-    {
-        while (true)
-        {
-            if (expression is ParenthesizedExpressionSyntax parenthesized)
-            {
-                expression = parenthesized.Expression;
-                continue;
-            }
-
-            if (expression is PostfixUnaryExpressionSyntax suppression && suppression.IsKind(SyntaxKind.SuppressNullableWarningExpression))
-            {
-                expression = suppression.Operand;
-                continue;
-            }
-
-            return expression;
-        }
     }
 }

@@ -14,8 +14,10 @@ investigations. The strict
 explicit safe subset; it retains warning-as-error analysis and exact flavor,
 version and source checks. The generated/Unsafe API split is implemented and verified,
 but **UNRELEASED** until publication; see the [generator contract](docs/generated-validation-design.md)
-and [migration recipe](docs/examples/generated-validation.md). No blanket package
-NativeAOT compatibility or retained UI-platform support is implied.
+and [migration recipe](docs/examples/generated-validation.md). The expanded
+[capability ledger](docs/generated-capabilities-progress.md) tracks new typed,
+registered and producer routes separately; final flagged-package/native acceptance
+is pending. No retained UI-platform support is implied.
 
 Use .NET SDK 10.0.401, pinned in the root `global.json`, and Python 3 for the
 dependency bootstrap. On the Runic desktop, reuse the locked development shell
@@ -51,6 +53,20 @@ exposes `DynamicData.IObservableList`. Review API baseline changes explicitly.
 Use TUnit assertions and deterministic scheduling for regressions. Build before
 testing; the commands above compile current sources.
 
+For focused compiler-host checks, the current TUnit class segment is namespace
+qualified. Use a suffix wildcard and inspect discovery before accepting a run:
+
+```sh
+dotnet run --project tests/ReactiveUI.Validation.SourceGenerators.Tests/ReactiveUI.Validation.SourceGenerators.Tests.csproj -c Release -- --treenode-filter '/*/*/*CapabilityCompilerHostTests/*' --list-tests
+dotnet run --project tests/ReactiveUI.Validation.SourceGenerators.Tests/ReactiveUI.Validation.SourceGenerators.Tests.csproj -c Release -- --treenode-filter '/*/*/*CapabilityCompilerHostTests/*' --report-trx
+```
+
+The measured current host lists 279 tests, with six selected by this class
+filter; omitting its leading class wildcard selects zero. Set the expected
+minimum for the group, then verify executed/passed and skipped counts in the
+report. Zero discovery/execution is never a pass. These commands run from `src`
+and build current sources; do not add `--no-build` for tests.
+
 The retained `ReactiveUI.Validation.Platforms.slnx` includes AndroidX projects
 and desktop samples. It requires additional workloads/platform tools and is
 outside this fork's core CI and release scope. AndroidX package IDs are branded
@@ -82,7 +98,10 @@ The core packages embed `ReactiveUI.Validation.SourceGenerators.dll` under
 Those props add `ReactiveUI.Validation.Generated` to `InterceptorsNamespaces`.
 Build with the pinned SDK 10.0.401/C#14 (actual Roslyn 5.9.0); inspect a packed
 consumer's analyzer inputs and imported props when diagnosing missing generation. The normal
-expression APIs require recompilation with these assets. Do not exclude
+expression calls require recompilation with these assets for interception.
+Explicit finite registered compatibility dispatch is a separate typed runtime
+contract for stored/delegate/precompiled callers, with preserved ABI and owned
+registration leases. Do not exclude
 `analyzers` or `buildTransitive` assets from a project that uses them. No separate
 Validation generator package reference is needed.
 
@@ -91,7 +110,9 @@ inspect emitted direct getters, notification sources, full paths and setters.
 Generated output must not call expression APIs, `WhenAnyValueUnsafe` or the
 Validation `Unsafe` methods, or assume Binding will process newly emitted calls.
 Retain actionable diagnostic errors for unsupported inputs and tests that
-uninstrumented normal calls throw. Explicit Unsafe calls retain their warning
+unregistered normal calls fail, registered fresh-expression/capture/ambiguity
+routes execute safely, and ordinary missing dispatch remains a build error.
+Explicit Unsafe calls retain their warning
 contract. Check null/default semantics, synchronous subscription handoff and
 initial-failure cleanup, source replacement, strict matching, complete custom
 states and subscription ownership. The realistic GeneratedValidation consumers

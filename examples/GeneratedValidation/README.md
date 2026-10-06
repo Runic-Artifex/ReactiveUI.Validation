@@ -7,7 +7,7 @@ packed Runic Validation pair. They do not reference production projects or add a
 separate generator package: the analyzer and transitive interceptor namespace
 allowlist must arrive inside each shipping package.
 
-The seven reported cases cover initially invalid single fields; all four predicate
+The original cases cover initially invalid single fields; all four predicate
 rule, six text binding, four selected-context binding and four typed-state binding
 overloads; nested nullable address paths; view model, helper and context
 replacement/null/disposal; typed rich/null output; original boxed struct state
@@ -22,11 +22,39 @@ result delivery. Disposing a removed row releases the validation subscription an
 late results cannot affect current membership. The generator does not infer
 cancellation, launch asynchronous work, or own the application's request lifetime.
 
-`Negative.cs` contains isolated compile-negative configurations for stored
-expression variables, computed selectors, indexers, observed nonnotifying and
-struct owners, and a nested writable target with a nonnotifying parent. Unsupported calls must emit actionable generator
-errors recommending an explicit observable boundary or deliberate `Unsafe` API.
-Each negative configuration is compiled separately in a fresh consumer folder.
+The expanded corpus includes explicit latest-request cancellation and owner delivery,
+row leases and source replacement, domain/presentation scheduling, nullable output
+factories and synchronous stack snapshots. It also defines all eleven static
+binding factories, ordered raw/custom nullable formatter projections, typed
+formatter registrations, selected init/readonly/private access, immutable storage
+alternatives, direct typed component constructors and custom observation providers.
+These source fixtures are acceptance inputs; their presence is not proof of a
+completed package or native run.
+
+Each flavor also builds a separate precompiled caller DLL against the actual
+package before compiling the application. The application consumes its binary
+reference. The peer creates fresh expressions with different current receivers
+and live typed captures and exposes a real normal API method group. Runtime cases
+require finite registration, reject ambiguity and missing/unregistered plans, and
+check detached callback lifetimes. Compiler replay records these calls as explicit
+`RuntimeRegistered` dispatch; they do not satisfy the normal generated inventory.
+
+The historical ABI lane compiles a second pair of peer DLLs against the audited
+`2550376` package pair (`8.1.0-runic.0.790.17.15.10`, DynamicData `.5`) and retains them unchanged. Only that
+historical compilation excludes the old Validation analyzer so its IL retains the
+original API invocation and method group. The current host supplies the finite
+typed catalog and links those unchanged binaries into every managed, trimmed and
+native consumer. The gate checks their source, compiler manifest, baseline package
+hashes and actual original-call IL separately from the current-package peer. This
+fixture closes historical ABI acceptance only after those application runs pass.
+
+`Negative.cs` contains six genuine compile-negative configurations: an opaque
+runtime selector without deliberate registration, unmarked init/readonly targets,
+a getter-only target without a writable descriptor, an invalid output-to-storage
+assignment, and a concrete value-copy view without stable reference ownership.
+They require actionable typed selector/target or registered alternatives. The
+current Validation Unsafe observer and Binding reflection-only setter separately
+require precise `IL2026` and reject invented `IL3050`. Every configuration gets a fresh consumer folder.
 
 From the repository root, with the pinned SDK/native toolchain loaded:
 
@@ -39,12 +67,12 @@ Use `win-x64` only on Windows x64. Without `--package-feed`, the gate packs the
 current source itself. The strict gate requires a clean committed checkout and
 packages recording that exact HEAD, verifies SHA-256 package bytes before and
 after restore, checks every neutral/RID target for exact flavor versions, rejects
-upstream DynamicData and System.Reactive in Primitives, verifies emitted
-interceptors, and builds/publishes/runs managed, fully trimmed and NativeAOT
+upstream DynamicData and System.Reactive in Primitives, replays exact compiler inputs and final semantic dispatch for all 29 shipping
+normal overload definitions, and builds/publishes/runs managed, fully trimmed and NativeAOT
 consumers with warnings as errors and no suppressions. Native binaries also
 assert dynamic code is unavailable. It retains logs, graphs and a source/package
-report and validated emitted interceptor sources with SHA-256 hashes and typed
-overload inventory under `artifacts/verification/generated-gates`; task-owned temporary
+report, every Validation-owned emitted source, exact original source/analyzer/reference
+hashes, generic/hosted declaration signatures, and typed overload inventory under `artifacts/verification/generated-gates`; task-owned temporary
 consumers are removed automatically while its package cache is reused.
 
 The CI native matrix executes all three modes on Linux x64 and Windows x64 using
@@ -53,3 +81,13 @@ at the release SHA. These workflow requirements are not evidence of a completed
 run; verification records must identify the executed source and package bytes.
 The historical `NativeValidation` corpus and immutable-release expectations remain
 separate.
+
+The same application also links the maintained rule, real producer, error-hook and
+generated-peer scenarios from `eng/verification-fixtures`. The gate builds the
+private `PeerGeneratedCaller` analyzer once and records its bytes and emitted
+caller source. Direct example builds require that tool DLL through
+`PeerGeneratedCallerAnalyzerPath`; it is an analyzer input and never a runtime
+reference. The 43-row acceptance map requires all 23 final application cases,
+while actual platform producer/UI contracts remain separate compiler evidence.
+SDK compiler replay retains the effective CoreCompile warning defaults and rejects
+any additions to the three verified .NETCoreApp defaults (1701, 1702, 8002).

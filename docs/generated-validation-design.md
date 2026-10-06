@@ -1,290 +1,268 @@
-# Generated validation and explicit Unsafe APIs
+# Generated validation, typed plans and explicit Unsafe APIs
 
-Implementation decision **2026-10-06**, implemented and verified at tested source
-`2550376b230ccfb78beb8d3b4ced8866b65d809e`. The change remains **UNRELEASED**
-until publication. This replaces the earlier recommendation to defer a Validation
-generator and prefer attributes on partial methods. The primary surface preserves
-supported inline-lambda calls. Local strict package gates and all four
-[Linux/Windows CI jobs](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109)
-pass; the [verification record](upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
-separates tested source and local/CI package identities from this later
-documentation record and immutable historical releases.
+The generated/Unsafe split remains **UNRELEASED**. Expanded capability source is
+integrated for verification at `ccd5aad`; the [43-row plan](generated-capabilities-plan.md)
+and [completion ledger](generated-capabilities-progress.md) separate landed code,
+focused checks and outstanding integrated/package acceptance. No new capability
+row is complete. Later documentation commits are not tested package source.
 
-## Normal calls require generation
+The earlier restricted split was verified at
+`2550376b230ccfb78beb8d3b4ced8866b65d809e`, with all four Linux/Windows CI jobs
+passing. Its [immutable evidence](upstream/evidence/generated-api-implementation.json)
+and [review](upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
+remain proof for that source and historical package cohort, not the expanded
+implementation. Published releases are unchanged.
 
-Four predicate `ValidationRule` overloads (default/explicit context and
-constant/delegate message) and the six `BindValidation`, four
-`BindValidationContext` and four `BindValidationState` expression overloads
-have normal generated entry points. Their bodies throw if a call was not
-intercepted. They have matching explicit `Unsafe` methods containing the
-reflection-based implementation with its `RequiresUnreferencedCode` warnings.
-There is no hidden Unsafe fallback. Supplied-observable and metadata-only rule
-overloads, plus the explicit observable APIs, retain their runtime contract.
+## Generated, typed and registered routes
 
-This is a binary behavior change. An already compiled caller cannot gain an
-interceptor when its referenced package is replaced: recompile supported call
-sites with the matching core package's analyzer/build assets, or rebuild calls
-against the explicit Unsafe API. Disabling analyzers, stripping package build
-assets or calling the normal method indirectly does not select runtime
-reflection.
+Four normal predicate `ValidationRule` overloads, fourteen expression binding
+extension overloads and eleven static `ValidationBinding.For*` factories lower
+through typed access, observation and assignment plans. Eligible source calls
+receive interceptors. Explicit typed factories have real callable bodies when
+interception cannot represent the required access or lifetime.
 
-The same analyzer DLL is embedded in both branded core packages under
-`analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll`.
-`buildTransitive/Runic.ReactiveUI.Validation.props` and
-`buildTransitive/Runic.ReactiveUI.Validation.Reactive.props` respectively add
-`ReactiveUI.Validation.Generated` to `InterceptorsNamespaces`. No separate
-Validation generator package is required. The supported compiler cohort is SDK
-10.0.401, C#14 and Roslyn 5.9.0. Use exactly one matching
-Validation/ReactiveUI/ DynamicData flavor. Primitives uses
-`ReactiveUI.Validation.*` and `DynamicData`; Reactive uses
-`ReactiveUI.Validation.Reactive.*`, `DynamicData.Reactive` and the
-System.Reactive scheduler/observable cohort.
+Normal CLR facades also support deliberately registered runtime dispatch.
+`ValidationPlanRegistry` has finite capacity, owner attachment and registration
+leases. `IValidationPlanProvider` uses original API generic slots and role-specific
+`ValidationPlanRequest`; it does not discover members. New source callers opt in
+with `ValidationRuntimeDispatchAttribute`, a compiler-visible contract rather
+than warning suppression. An unregistered normal call still fails actionably.
+There is no hidden reflection fallback.
+
+Explicit `ValidationRuleUnsafe`, `BindValidationUnsafe`,
+`BindValidationContextUnsafe`, `BindValidationStateUnsafe` and static factory
+Unsafe routes retain reflected observation/assignment and accurate
+`RequiresUnreferencedCode`. Supplied-observable/metadata-only rules and explicit
+observable APIs retain their safe runtime contract.
+
+## Compiler and package delivery
+
+Both branded core packages embed the analyzer under
+`analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll` and
+matching `buildTransitive` props allowlisting `ReactiveUI.Validation.Generated`.
+Retain these assets when recompiling normal calls. No separate Validation
+generator package is needed. The compiler cohort is SDK 10.0.401/C#14/Roslyn 5.9.
+Keep one ReactiveUI 26.0.1 flavor and released DynamicData `.30` counterpart.
+Primitives uses `ReactiveUI.Validation.Capabilities`; Reactive uses
+`ReactiveUI.Validation.Reactive.Capabilities` and its matching scheduler cohort.
+
+Generic interceptor methods preserve original arity/constraints inside a
+nongeneric containing type. Legal lexical partial bridges or typed providers
+handle private/open generic contexts. A caller host alone cannot supply hidden
+generic arguments absent from the original receiver/arguments. Nonpartial,
+external, anonymous/file-local or otherwise unnameable contexts have authored
+typed factory routes; generation does not erase every type into `object`.
+
+For C#14 extension-form calls, constraints come from the bound logical extension
+declaration and map by ordinal to its CLR shim's original generic slots. This
+avoids copying the synthesized shim's incorrect `notnull` metadata described in
+[Roslyn #79896](https://github.com/dotnet/roslyn/issues/79896), while preserving
+genuine declared constraints and CLR signature arity. Static-form calls retain
+the constraint contract of the static method that the compiler actually bound.
 
 ## Observable extension compatibility correction
 
-The locked SDK's actual compiler is Roslyn 5.9.0
-(`5.9.0-1.26423.113`). Generator/driver references and the analyzer asset path are
-aligned with that compiler, replacing the initial 5.0 tooling assumption from
-older investigation material. Historical proof inputs retain their dated identity.
-
-The same compiler reports CS8714 for certain nullable-generic calls through
-C#14's synthesized static bridge for the six safe observable methods. The
-observable rule and binding APIs therefore use traditional `this` extension
-methods. Their CLR signatures and runtime semantics remain compatible, and
-ordinary calls with inferred type arguments are unchanged. Explicit generic
-source binding syntax changes from
-`sources.BindObservableValidationState<TOut>(...)` to
-`sources.BindObservableValidationState<TSource, TOut>(...)`; the property-state
-binding requires the same two explicit type arguments. Prefer inference when
-possible. `AddObservableRule<TValue>(...)` keeps its single explicit type
-argument.
-
-The narrowly scoped SST1703 exception in those two observable extension files is
-justified by the reproduced compiler bridge error. It does not suppress trimming
-or NativeAOT diagnostics or introduce tuple-based workarounds. Both flavor API
-baselines track this correction. The final core gate passes 683 tests (323 per
-library flavor plus 37 compiler-fixture tests); the 14 generated-runtime
-infrastructure tests per flavor are included in that library count. Builds and
-emitted source have zero warnings/errors at the tested source. Identical
-direct-static nullable caller sources change from eight CS8714 errors before
-correction to zero warnings/errors afterward; inferred calls already passed.
-Proof/source/log inputs are retained under
-`artifacts/verification/generator-nullability`, including `results.json`. Final
-clean-source local and Linux/Windows core/package/native CI gates pass as recorded
-in the [structured evidence](upstream/evidence/generated-api-implementation.json).
+The six safe observable APIs keep traditional `this` extensions for the measured
+nullable-generic CS8714 C#14 static-bridge bug. CLR signatures and inferred calls
+remain compatible. Explicit observable binding calls use `<TSource, TOut>`;
+`AddObservableRule<TValue>` retains its arity. `ValidationOutput<TOutput>.FromStates`
+and `FromPropertyStates` add output-first factories with source inference. The
+scoped SST1703 exception does not suppress IL warnings. Historical before/after
+nullable proof retains its original source/compiler identity.
 
 ## Selector and assignment support
 
-Selectors must be inline simple/property-chain lambdas over user-declared,
-readable instance properties accessible to the emitted code. A notification
-source requires reference-type owners implementing `INotifyPropertyChanged` at
-every observed chain segment. Generated code attaches notifications, reads
-direct getters initially and on matching or empty property-name notifications,
-switches nested subscriptions on replacement, and detaches on disposal. It
-emits direct runtime operations, never fresh `WhenAnyValue` calls for Binding
-to intercept later. Metadata-only property selectors need a readable full path
-but no notification source/getter execution.
+The semantic planner separates readable operations, notification dependencies,
+path metadata and writable storage. Property/field paths, conversions, computed
+expressions and index arguments use typed getters. A conversion has no inferred
+inverse setter. Opaque method effects, silent owners and unknown notification
+providers need explicit typed dependencies, manual invalidation or a snapshot.
+The implementation cannot infer nonexistent notifications; legacy struct boxing
+was not mutation of the caller's original struct.
 
-A null intermediate owner emits `default` for the selected value. Reference
-and nullable values therefore emit null; nonnullable value types emit their
-default value. Predicates and message delegates must define what that value
-means. A missing address does not retain the previous postcode. This fixed
-rule-source policy is distinct from a null binding model/helper/context, whose
-aggregate projection is valid and property projection is empty.
+`ValidationSelector<TSource,TValue>` binds to `ValidationAccessPlan<TValue>`.
+`ValidationRead<TValue>` carries value, owner availability and current paths in
+one snapshot: a present null leaf differs from a missing parent.
+`ValidationDependency.Create` accepts a reference owner getter and typed
+subscription callback; property/collection adapters are explicit. Cold
+`CreateObservation` factories provide per-subscription caches. `AfterRead`
+handles dependencies on owners cached by that read. Metadata-only binding
+selection uses a separate path reader without executing the selected leaf getter.
+Structural path changes count even when values compare equal, with old/new error
+display-path notification.
 
-A binding view's static type must be a reference type implementing
-`INotifyPropertyChanged`. Concrete struct view receivers produce `RUVG006`:
-boxing the notification owner and capturing setter copies would lose stable
-ownership/mutation. A stable boxed view referenced through a supported notifying
-view interface remains valid. Both shapes have compiler regressions in both
-flavors; this reference-ownership guard is recorded in final source `2550376`.
+`ValidationPath.Legacy(fullPath)` deliberately selects complete ordinal display
+name membership, including a structural counterpart with that exact name.
+When both paths are Structural, member/index/conversion and comparer-domain
+identity remains authoritative. This compatibility membership rule does not
+change structural equality/hashing or make suffixes such as `Name` match
+`Address.Name`. Choose Legacy only when name-based compatibility is intended.
 
-Writable accessible view properties support typed output, including bool,
-enums and nullable custom structs; text targets must accept a string. Nested
-target chains require reference-type intermediate parents and
-`INotifyPropertyChanged` on observed owners; the final property has an
-accessible ordinary non-init setter. Parent replacement replays the latest
-projected output to the new target. A null target skips assignment while
-retaining the latest value for a later replacement; model/rule changes
-continue to update that cached value. A leaf owner that is only assigned need
-not notify. For unsupported target shapes, use a callback with an explicit
-application-owned target replacement stream, or explicitly choose Unsafe.
+`ValidationTarget<TSource,TOut>` binds to `ValidationWritePlan<TOut>` with stable
+reference/slot identity and a typed assignment. Null targets skip assignment and
+cache latest output. Declared replacement notifications immediately replay it,
+including for references that compare equal. Each new domain output also refreshes
+the current target and dependency owners through the same owned engine, so a
+silent replacement receives that new output. This does not fabricate an event or
+replay an old output into a silently replaced target. `ValidationCell<T>` owns mutable structs or
+immutable roots by reference. `ValidationLens<TStorage,TValue>` reads current
+storage and supplies complete replacement/write-back. Root stack structs cannot
+be retained by a by-value binding; cells/lenses or synchronous
+`ValidationSnapshot.Read`/`Validate` provide usable alternatives. Ref-struct
+snapshots borrow storage synchronously without creating subscriptions.
 
-Private/inaccessible or open generic model/view/output call types are outside
-the initial scope. A call inside a private or generic containing host can
-still work when every type named by the generated call is accessible and
-closed. Internal types in the same consumer assembly are supported. No hosted
-partial implementation or attribute API is shipped. Members that exist only in
-another generator's output are not automatically discovered from the original
-compilation. The [generated-member interoperability investigation](generated-member-interop.md)
-compares declared partial properties, actual producer output and private semantic
-projection without changing this shipped support boundary.
+Private/protected ordinary access is checked in its original legal context.
+A readable public getter does not make its protected setter legal through a
+base-typed receiver. Supply a typed setter in a legal derived context when needed.
+`GeneratedValidationAccessAttribute` selects actual property/field/accessor
+storage for static compatibility bridges, including existing init setters and
+named readonly fields. It never infers a getter-only backing field. .NET 10
+accessor bridges preserve exact declaring types, generic positions and constraints.
+`UnsafeAccessorType` can erase an inaccessible reference owner with a nameable
+byref field value; inaccessible byref field value types and value-type owners
+require legal lexical getters/lenses or replacement. Managed static bridge proof
+is separate from pending automatic/package/native acceptance.
 
-| Diagnostic | Meaning and action |
+Accessor flow metadata is part of the contract: effective property/field/
+getter-return MaybeNull/NotNull postconditions must survive exact read bridges,
+separately from setter AllowNull/DisallowNull input, including Nullable<T> values.
+The latest 29-case accessor and 80-case binding managed proofs cover these
+contracts; actual-package/full-trim/native acceptance remains pending. An authored
+typed getter in a legal C# context does not create an invented nonnull guarantee.
+
+Shared storage uses `ValidationStoragePolicy` and disposable
+`ValidationWriteReceipt` instances. Custom bound plans attach
+`ValidationDependency.Writer(receipt)` for queued-failure cleanup. Peer writes
+are serialized on the source owner and read current storage before copy-back;
+direct mutation during replacement construction is a conflict. This does not
+promise arbitrary concurrent mutation. Final cross-binding and missing-owner
+Suppress acceptance is tracked separately in the ledger.
+
+## Runtime selectors, captures and precompiled consumers
+
+Sound finite source provenance can be generated. Mutable runtime selection,
+method groups and precompiled calls use typed factories or explicit catalog/
+provider dispatch. Instance registration identifies one expression. Structural
+pattern registration matches fresh expressions against predeclared operations,
+then binds the current receiver and supplied typed arguments. Registration is
+bounded/scoped; ambiguity fails deterministically.
+
+Finite provenance must prove actual dispatch and final storage. A static
+abstract/virtual interface selector factory can execute another implementation;
+a readonly selector field can be reassigned or escaped from its static
+constructor. The generator cannot substitute a convenient source body/initializer
+for those runtime values. An implicit `in` argument can also expose a mutable
+local selector without an `in` token at the call. These runtime choices use typed
+factory/provider/catalog routes. Constructed generic fixed definitions preserve
+their actual operator/conversion, checked/lifted/reference-equality semantics,
+`nameof(T)` constant and finite block returns. The 70-case planner/boundary/generic
+managed proof covers these distinctions; package/native acceptance is separate.
+
+Finite generated plans use catalog-preferred fallback: a matching explicit plan
+wins, and only genuine lookup absence selects the compiled typed descriptor.
+Ambiguity, mismatched or invalid matched plans and factory failures propagate;
+fallback never masks them. Opaque runtime choices still require registration.
+
+Optional/default/params index arguments are admitted by the locked compiler.
+Omitted enum and nullable-enum defaults retain their exact implicit-conversion
+operation and typed cast. Reordered named arguments in an expression tree are
+rejected by C#14 with CS9307. The executable alternative is an authored `Func`
+getter with typed access/dependencies and metadata; its argument keys/evaluation
+order remain explicit. It is not an expression-tree interception claim.
+
+`ValidationExpressionPattern` inspects finite expression structure and opaque
+member identities. It never compiles/evaluates trees, reads closure fields using
+reflection or constructs arbitrary generic types. Private compiler-generated
+captures need a legal typed extractor, explicit closure binding or a peer-exported
+provider/argument contract. Unknown captures fail actionably; shape matching
+must never freeze the first invocation's receiver/capture.
+
+Package replacement cannot add interceptors to old IL. Registered normal facades
+can serve unchanged precompiled managed callers through preserved CLR signatures;
+fresh-expression ABI and native-link acceptance remain pending. An already built
+native executable cannot acquire this behavior by replacing a managed DLL.
+Recompilation, typed registration, supplied observables and deliberate Unsafe
+migration are distinct choices.
+
+## Known producer interoperability
+
+Ordinary generators do not consume peers' normal source output; fixed post-init
+attributes/helpers can be visible. Bundling analyzers creates no ordering. The
+frontend uses a private, never-emitted declaration projection for exact
+[profiles](../src/ReactiveUI.Validation.SourceGenerators/Producers/ProducerProfiles.md):
+SourceGenerators 4.2.0, Binding 9.1.0, Avalonia 12.1.3 and MAUI 10.0.110.
+Real producers own implementations, notifications, initialization and validity
+diagnostics. Final checks compare actual nullability, accessibility, member/
+accessor/storage and generic/inheritance contracts, not just matching names.
+
+Declared partial Reactive/OAPH properties need no prediction. Known field,
+interface, command, collection and marked XAML projection has focused
+producer/platform compiler proof recorded in the ledger; actual-package and
+host acceptance remains pending. WPF/WinUI declarations
+present before Csc are used directly. MAUI/Avalonia named fields need exact
+AdditionalTexts/build metadata. WinForms profiles do not invent `IViewFor<T>`
+where producers emit nongeneric `IViewFor`; `ValidationViewAdapter<TOwner,TModel>`
+supplies a typed model route. Compiler/provider integration is not native UI
+execution or an advertised platform expansion. The
+[interop investigation](generated-member-interop.md) preserves historical `.5`
+measurements separately.
+
+| Diagnostic | Current action |
 | --- | --- |
-| `RUVG001` (error) | Unsupported call or selector: stored expression, method/indexer/cast/computed selector, unsupported notification contract. Use a supported inline path, explicit observable API/callback, or deliberately choose Unsafe. |
-| `RUVG002` (error) | Call types cannot be named by emitted code, including inaccessible/open generic types. Move the call to a supported accessible closed shape or use explicit observables/Unsafe. |
-| `RUVG003` (error) | The compiler cannot provide an encoded interception location. Use the pinned compiler and inspect the actual analyzer/build configuration. |
-| `RUVG004` (error) | The required runtime generation contract is missing. Use the matching core runtime package containing the generated observation support and safe observable APIs, with its bundled analyzer. |
-| `RUVG005` (error) | A normal invocation still lacks generated interception in the final compilation. Retain analyzer/props, declare selectors in original source, or use explicit observables/Unsafe. This check also covers calls and members introduced by other generators. |
-| `RUVG006` (error) | Unsupported binding receiver/selector/target: require a notifying reference-type view (a stable interface-typed box is supported), use an inline readable source path and an accessible ordinary setter with supported notifying reference parents, or an explicit callback/Unsafe. |
-| `RUVG007` (error) | A normal method is referenced indirectly as a method group/delegate. Use a direct inline call, an explicit observable API, or an explicit Unsafe delegate. `nameof` references remain allowed. |
+| RUVG001 / RUVG006 | Selection/dependency/storage cannot be generated: supply the indicated typed selector, target or provider. |
+| RUVG002 | No legal accessible/generic bridge: use a legal lexical/provider/factory route. |
+| RUVG003 / RUVG004 | Interception location or runtime contract mismatch: inspect compiler and matching analyzer/runtime assets. |
+| RUVG005 / RUVG007 | Final normal call/reference lacks interception or explicit runtime-dispatch opt-in. Register deliberately; `nameof` remains allowed. |
+| RUVG008 | Actual producer contract differs from projection; correct profile/input. No fake declaration is emitted. |
+| RUVG009 / RUVG010 | Unsupported/missing resolved profile or malformed/unresolved marked XAML; use supported metadata or typed descriptors. |
 
-Unsafe calls and safe supplied-observable/metadata rule overloads are not
-intercepted. Unsupported normal calls are build errors, not warnings that can
-silently choose reflection. A final-compilation dispatch analyzer checks
-resolved normal invocations after all generators run, including generated
-source, using the compiler's interceptor lookup. Other generators' output and
-indirect method references cannot silently bypass the normal generation
-requirement. Removing or suppressing that analyzer does not add runtime
-fallback: the normal body still throws. Generator diagnostics do not prove
-native support; that requires actual-package publish and execution evidence.
+`ReactiveUIValidationProducerProjectionEnabled=false` disables prediction,
+not final dispatch guards. Declared/typed routes remain available. Analyzer
+removal neither installs reflection nor supplies a missing registration.
 
-## Runtime semantics and ownership
+## State, lifetime and acceptance
 
-Generated rules register through `AddObservableRule`: full ordinal root paths,
-initial values, preserved complete states and captured registration context.
-`Address.Postcode` differs from `Postcode`. Empty metadata means a model-wide
-rule; multi-property metadata belongs to one component and is not equivalent
-to two separate rules. Exact-path matching applies in both modes; `strict:
-true` additionally includes only a rule exclusively associated with that one
-path. Invalid/empty/whitespace path segments remain rejected by the runtime
-API.
+Rules preserve complete states, full paths and captured registration context.
+Default context respects `IValidatableViewModel` and explicit typed default-context
+provider selection. Selected contexts dispatch through validation interfaces,
+so shadow members do not replace that contract. Helper disposal removes its
+component, not borrowed context/model/source ownership. Blocking/advisory contexts
+stay independent; replacement does not transfer existing registrations.
 
-Default context access resolves through `IValidatableViewModel.ValidationContext`,
-including explicit interface implementations and private shadows. Selected
-contexts are observed through `IValidationContext`, with
-`IValidationComponent.ValidationStatusChange` dispatched through its interface,
-so concrete subtype shadows do not alter the selected state contract.
-A helper removes its component from the captured context and disposes that
-component's subscriptions. It owns neither the context nor a supplied
-observable object. Blocking and advisory contexts stay independent. Replacing
-a model's context property does not transfer existing registrations. Advisory
-state does not automatically become command admission or default
-`HasErrors`/`GetErrors`.
+Normal presentation defaults to actual initial states. Explicit
+`ValidationInitialSequence.LegacyEmpty`/`LegacyValid` select compatibility preludes
+without manufacturing raw domain validity. `ValidationMissingOwnerPolicy`
+exposes DefaultValue/Suppress/Fallback; present null leaves remain present.
+Bindings preserve strict full-path membership, complete custom states,
+source-thread callbacks, replacement replay and owned failure cleanup.
+`ValidationAsync`, `ValidationCollection`, `ValidationRowLease` and explicit
+scheduling adapters supply async/collection ownership policies; generation
+cannot infer network cancellation or application admission.
 
-Generated bindings follow the view's current model and the selected
-helper/context, detaching old selections. Null aggregate selections emit
-`ValidationState.Valid`; null/empty property selections emit an empty list.
-Typed/context property bindings seed actual membership and wait for active
-rules' own initial states, without inserting a synthetic valid state.
-Generated normal property text bindings expose actual initial rule states
-immediately and omit the legacy synthetic empty-list prelude for active rules.
-Explicit Unsafe property callbacks retain that legacy prelude. This
-intentional migration difference changes the initial emission sequence, not
-current rule validity. Projection delegates see complete custom
-`IValidationState` objects, including boxed structs and their
-code/severity/revision; generation must not rebuild states from text or filter
-metadata changes solely by validity/text. Ordinary aggregate context states
-retain their aggregation contract.
+Completion requires code, permanent positive/negative and behavior tests, and
+applicable actual-package managed/full-trim/native execution on Linux/Windows x64.
+The .NET 10 `IsAotCompatible` flag is source-landed; final flagged-package audit
+and host acceptance remain pending. Accurate Unsafe warnings remain. See the
+[migration recipes](examples/generated-validation.md),
+[capability ledger](generated-capabilities-progress.md) and
+[NativeAOT evidence](aot-and-generators.md). Earlier green gates certify only
+their exact source/package bytes.
 
-Binding disposal detaches subscriptions, without disposing selected models,
-helpers, contexts or rules. Callback/setter execution follows the source
-thread; UI dispatch belongs at the presentation boundary. Domain
-validity/membership remain synchronous on the serialized model owner. This
-promises no arbitrary concurrent mutation.
+## Historical annotation proof
 
-Notification sources own event registrations and refresh the complete
-descriptor chain through a serialized pending-refresh drain. They attach
-before initial getter delivery, rebind after reentrant replacement/null,
-reject stale generation notifications and detach all registrations on disposal
-or initial getter/callback failure. Value observations use default equality;
-model/helper/context and target reference selections use identity so an
-equal-comparing replacement is followed.
+The retained [managed annotation proof](../investigations/BindingGenerators/evidence/interceptor-annotation-proof.txt)
+at SDK 10.0.401/C#14 and ILLink 10.0.12 intercepts a synthetic annotated call with
+an unannotated safe body, executes `safe-interceptor`, and still reports IL2026
+and IL3050 at the original call. Its warning severity was lowered for inspection;
+no native binary was published. The [source bundle](../investigations/BindingGenerators/evidence/interceptor-annotation-proof-sources.json)
+remains immutable. This explains the explicit Unsafe annotation boundary:
+interception alone cannot erase warnings on an annotated public entry point.
+The older deferred partial-method recommendation is superseded, while its dated
+rationale and evidence remain historical.
 
-Nested-target binding support separately installs pending owned slots for its
-target and validation subscriptions before synchronous delivery. If reentry
-replaces/nulls/disposes their owner, an obsolete returned handle is disposed
-instead of overwriting the current selection. Initial failures clean up
-installed subscriptions/registrations and retain the original error; if
-cleanup also fails, its error is reported alongside the original. A
-caller-supplied source that throws before returning a handle still owns its
-own failure-cleanup contract.
-
-Asynchronous requests, cancellation, row identity and runtime collection
-membership remain application responsibilities. Safe observable rule
-registration is the supported path for those runtime inputs. A generator
-cannot infer request ownership from a literal property selector.
-
-## Realistic consumers and acceptance
-
-The [GeneratedValidation recipe](examples/generated-validation.md) and
-[corpus](../examples/GeneratedValidation/Program.cs) cover initial
-property/text updates, nested null/replacement, model/helper rich-state
-replacement, independent contexts, property membership/strictness, nested
-target handoff and row-owned observable results in both flavors. This is
-separate from the immutable NativeValidation release corpus and its
-caller-written adapters.
-
-Required gates inspect emitted direct notification/getter/setter operations,
-absence of Unsafe/expression calls, exact branded/flavor/version package
-graphs, negative diagnostic IDs/locations and ungenerated normal-stub
-failures. Preserve synchronous handoff/null/disposal/error cleanup, full
-metadata/strictness, custom-state identity, typed nullable output, membership
-and formatter behavior. The package gate verifies all 18 distinct normal
-overload shapes, analyzer/props assets and the absence of Roslyn/compiler
-runtime dependencies. Six isolated negative build configurations cover
-stored/computed/indexed rule selectors, nonnotifying nested targets and rule
-parents, and notifying struct chain owners, in each flavor. Packaged consumers
-must publish with warning-as-error policy and execute under managed, full
-trimming and actual NativeAOT on each claimed host. Record exact source,
-package hashes and executed platform separately; do not reuse old release
-results for changed generated code.
-
-No blanket `IsAotCompatible`, all-reflection-removed, retained UI-platform or
-bridge/browser claim follows. Explicit Unsafe APIs and some retained runtime
-components remain reflection boundaries. Preserve producer analysis and their
-accurate warnings. The released DynamicData 10.0.0-runic.30 and ReactiveUI
-26.0.1 cohort remains pinned; no sibling source adoption is required.
-
-## Historical annotation proof and superseded alternatives
-
-The [managed compiler
-proof](../investigations/BindingGenerators/evidence/interceptor-annotation-proof.txt)
-at SDK 10.0.401/C#14 with ILLink 10.0.12 intercepted a synthetic
-RDC/RUC-annotated `UnsafeApi.Read` with an unannotated method and executed
-`safe-interceptor`. The original call still produced IL2026 and IL3050. The
-proof changed warning severity to permit inspection, without suppression, and
-published no native binary. It remains historical evidence explaining why
-simply intercepting an annotated expression API does not remove caller
-warnings.
-
-The new split instead moves actual reflection to explicit annotated Unsafe
-methods and leaves normal generated-only stubs unannotated. This changes the
-public contract and requires both API baselines to be reviewed; it does not
-erase the proof or alter its immutable source/evidence.
-
-The prior future partial-method/attribute recommendation is superseded for
-this implementation. Explicit observables remain a supported runtime surface;
-a later attribute API would be a separate scoped feature. Inaccessible/open
-generic call types, other generators' output and additional target shapes
-require their own implementation/diagnostics/acceptance before being
-advertised.
-
-Roslyn's [interceptor
-design](https://github.com/dotnet/roslyn/blob/main/docs/features/interceptors.md)
-and [encoded location
-API](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.csharp.csharpextensions.getinterceptablelocation?view=roslyn-dotnet-5.0.0)
-underlie the call substitution. Its [generator pipeline
-design](https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.md)
-explains why generated Validation operations must not depend on another
-generator processing newly emitted calls. The existing [Binding
-output](../investigations/BindingGenerators/evidence/Primitives/WhenAnyValueDispatch.g.cs.txt)
-and [released OAPH
-IL](../investigations/BindingGenerators/evidence/released-oaph-il.txt) remain
-dated evidence about their original cohort, not generated Validation support.
-
-To reproduce only the historical managed annotation proof, extract the [source
-bundle](../investigations/BindingGenerators/evidence/interceptor-annotation-proof-sources.json)
-into a task-owned directory and reuse the locked environment:
-
-```sh
-direnv exec "$RUNIC_SDK" dotnet run --project "$PROOF_ROOT/Emitter/Emitter.csproj" \
-  -- "$PROOF_ROOT/Consumer/Program.cs"
-direnv exec "$RUNIC_SDK" dotnet run --project "$PROOF_ROOT/Consumer/Consumer.csproj"
-```
-
-The first command emits the encoded location, the second retains both warnings
-and prints `safe-interceptor`. Keep the source/log and remove task-owned
-temporary outputs after inspection. This reproduction is not a
-generated-package gate.
+Roslyn's [interceptor design](https://github.com/dotnet/roslyn/blob/main/docs/features/interceptors.md)
+and [generator pipeline](https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.md)
+explain original-arity/location and same-input visibility constraints. The
+[historical Binding output](../investigations/BindingGenerators/evidence/Primitives/WhenAnyValueDispatch.g.cs.txt)
+and [released OAPH IL](../investigations/BindingGenerators/evidence/released-oaph-il.txt)
+remain proof for their dated cohorts, not the expanded Validation package.

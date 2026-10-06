@@ -22,7 +22,7 @@ namespace ReactiveUI.Validation.Extensions;
     "SST2309:Do not use optional parameters",
     Justification = "Fixed null formatter and exclusive-property defaults keep this new selected-context surface compact; callers may override either.")]
 [SuppressMessage("Design", "SST1703:Use extension block", Justification = "TViewModel is inferred from a method argument and also constrains the receiver TView.")]
-public static class ValidationContextBindingExtensions
+public static partial class ValidationContextBindingExtensions
 {
     /// <summary>Binds the selected context's aggregate validation text to a string view property.</summary>
     /// <typeparam name="TView">The view type.</typeparam>
@@ -34,7 +34,7 @@ public static class ValidationContextBindingExtensions
     /// <param name="formatter">The text formatter, or null for the registered default.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view or an expression is null.</exception>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
     public static IValidationBinding BindValidationContext<TView, TViewModel>(
         this TView view,
         TViewModel? viewModel,
@@ -44,8 +44,11 @@ public static class ValidationContextBindingExtensions
         where TView : IViewFor<TViewModel>
         where TViewModel : class, IReactiveObject, IValidatableViewModel
     {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationContext));
+        ArgumentExceptionHelper.ThrowIfNull(viewProperty);
+        formatter ??= ValidationTextFormatterResolver.Resolve();
+        var target = ValidationRuntime.ResolveTarget<TView, string, string>(view, viewProperty, string.Empty);
+        var states = ValidationRuntime.ObserveModelContextState(view, contextProperty);
+        return target.Bind(view).Bind(states.Select(state => formatter.Format(state.Text)));
     }
 
     /// <summary>Binds the selected context's validation text for a property to a string view property.</summary>
@@ -61,7 +64,7 @@ public static class ValidationContextBindingExtensions
     /// <param name="strict">Whether to include only rules validating this property exclusively.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view or an expression is null.</exception>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
     public static IValidationBinding BindValidationContext<TView, TViewModel, TProperty>(
         this TView view,
         TViewModel? viewModel,
@@ -73,8 +76,11 @@ public static class ValidationContextBindingExtensions
         where TView : IViewFor<TViewModel>
         where TViewModel : class, IReactiveObject, IValidatableViewModel
     {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationContext));
+        ArgumentExceptionHelper.ThrowIfNull(viewProperty);
+        formatter ??= ValidationTextFormatterResolver.Resolve();
+        var target = ValidationRuntime.ResolveTarget<TView, string, string>(view, viewProperty, string.Empty);
+        var states = ValidationRuntime.ObserveContextProperty(view, contextProperty, viewModelProperty, strict, ValidationInitialSequence.Actual);
+        return target.Bind(view).Bind(states.Select(current => FirstNonEmptyMessage(current, formatter)));
     }
 
     /// <summary>Sends the selected context's aggregate state to an action.</summary>
@@ -86,7 +92,7 @@ public static class ValidationContextBindingExtensions
     /// <param name="action">Receives aggregate validity and text, including a valid state while the selection is null.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view, contextProperty or action is null.</exception>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
     public static IValidationBinding BindValidationContext<TView, TViewModel>(
         this TView view,
         TViewModel? viewModel,
@@ -95,8 +101,9 @@ public static class ValidationContextBindingExtensions
         where TView : IViewFor<TViewModel>
         where TViewModel : class, IReactiveObject, IValidatableViewModel
     {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationContext));
+        ArgumentExceptionHelper.ThrowIfNull(action);
+        var states = ValidationRuntime.ObserveModelContextState(view, contextProperty);
+        return ValidationRuntime.Bind(states, action);
     }
 
     /// <summary>Sends the selected context's states for a property to an action.</summary>
@@ -111,7 +118,7 @@ public static class ValidationContextBindingExtensions
     /// <param name="strict">Whether to include only rules validating this property exclusively.</param>
     /// <returns>A binding that detaches its subscriptions when disposed.</returns>
     /// <exception cref="ArgumentNullException">Thrown when view, an expression or action is null.</exception>
-    /// <remarks>Requires the Runic Validation generator. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationContextUnsafe for reflection-based execution.</remarks>
     public static IValidationBinding BindValidationContext<TView, TViewModel, TProperty>(
         this TView view,
         TViewModel? viewModel,
@@ -122,8 +129,8 @@ public static class ValidationContextBindingExtensions
         where TView : IViewFor<TViewModel>
         where TViewModel : class, IReactiveObject, IValidatableViewModel
     {
-        _ = view;
-        throw GeneratedValidationObservation.RequiresGenerator(nameof(BindValidationContext));
+        ArgumentExceptionHelper.ThrowIfNull(action);
+        return ValidationRuntime.Bind(ValidationRuntime.ObserveContextProperty(view, contextProperty, viewModelProperty, strict, ValidationInitialSequence.Actual), action);
     }
 
     /// <summary>Binds the selected context's aggregate validation text to a string view property.</summary>

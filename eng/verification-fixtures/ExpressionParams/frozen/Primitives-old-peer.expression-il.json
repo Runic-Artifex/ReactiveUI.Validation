@@ -1,0 +1,156 @@
+{
+  "completed": true,
+  "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generated-capabilities/artifacts/verification/expression-params-preservation/Primitives/Peer/bin/Release/net10.0/GeneratedValidation.ExpressionParams.Primitives.dll",
+  "sha256": "d398862ddf17e3ef4440a4de5ae5fcf3c3047c04bc9ab979a2150ad4432edb7d",
+  "assembly": "GeneratedValidation.ExpressionParams.Primitives",
+  "mvid": "056da6ff-f005-45fd-868c-ab9ba77a9387",
+  "methods": [
+    {
+      "method": "System.Runtime.CompilerServices.\u003CValidationInterceptors_g\u003EF8E26D5756BACE61A8C44272EA60753E61731709CBA79A01C0EE1FFE89D156012__InterceptsLocationAttribute..ctor",
+      "token": 100663297,
+      "ilSha256": "034f8efee8a5db60105153bc6a469af0ecc35b8c7517474c2a78a0dde60a7221"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.Intercept0",
+      "token": 100663298,
+      "ilSha256": "9ae33b11bff801db352a441fd38fcdd7afdba6a86cd8be87f7f56addccd67a85"
+    },
+    {
+      "method": "RuleExpressionParamsNegative.Program.Run",
+      "token": 100663299,
+      "ilSha256": "d07d65f8ce879b818ad1576b8fd2e4cad067be47b252dd917a7bb43da77afbaa"
+    },
+    {
+      "method": "RuleExpressionParamsNegative.IndependentModel..ctor",
+      "token": 100663300,
+      "ilSha256": "a0464c476fad1de246bfafed9fcc801e8778749d0c5dfda030ed0893241b9e88"
+    },
+    {
+      "method": "RuleExpressionParamsNegative.IndependentModel.get_Key",
+      "token": 100663301,
+      "ilSha256": "a42b33234bad279ec5d573c04257ab8869486dcf80efe867031389346376ebbe"
+    },
+    {
+      "method": "RuleExpressionParamsNegative.IndependentModel.get_ValidationContext",
+      "token": 100663302,
+      "ilSha256": "55a3235cd35155c73695cbb4414689120dd9100730595500fd62ff8496a09d16"
+    },
+    {
+      "method": "RuleExpressionParamsNegative.IndependentModel.get_Item",
+      "token": 100663303,
+      "ilSha256": "63ad6f77cbd667e455f50f41737aa1d8dc06ad09b86888d0e4742dfe2f4902c5"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec..cctor",
+      "token": 100663304,
+      "ilSha256": "bead504b6c312538dc55c3c72595109a8be865efcc163b9b67bf57eddbed286d"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec..ctor",
+      "token": 100663305,
+      "ilSha256": "c2f18536e96c772f31eb4dcaa39e5189448f184b920ed0622a16826ac507f23e"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec.\u003CIntercept0\u003Eb__0_0",
+      "token": 100663306,
+      "ilSha256": "dae2362c7f186bba491faf3477ec6384aa5d975826f3ebbc16caf9c8a3db10e2"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_0..ctor",
+      "token": 100663307,
+      "ilSha256": "c2f18536e96c772f31eb4dcaa39e5189448f184b920ed0622a16826ac507f23e"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_0.\u003CIntercept0\u003Eb__1",
+      "token": 100663308,
+      "ilSha256": "83f841dfa18f177bf85a5be4e712a37f957e369a659354d156f21b6f4cb1162b"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_1..ctor",
+      "token": 100663309,
+      "ilSha256": "c2f18536e96c772f31eb4dcaa39e5189448f184b920ed0622a16826ac507f23e"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_1.\u003CIntercept0\u003Eb__2",
+      "token": 100663310,
+      "ilSha256": "7d0981a76e7932c6e5ad5c8f8129411648eb1980f2abcc72137c892cf44b8616"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_1.\u003CIntercept0\u003Eb__4",
+      "token": 100663311,
+      "ilSha256": "b9d16bc927ac8343e31a524b0e64b5a6b500429460eafd06ae70ebd8cad886f5"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_1.\u003CIntercept0\u003Eb__5",
+      "token": 100663312,
+      "ilSha256": "484dbabcecf12b74b26736561abec5593de84f0d986d8c2a2252aa28f448af19"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_1.\u003CIntercept0\u003Eb__6",
+      "token": 100663313,
+      "ilSha256": "484dbabcecf12b74b26736561abec5593de84f0d986d8c2a2252aa28f448af19"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_1.\u003CIntercept0\u003Eb__7",
+      "token": 100663314,
+      "ilSha256": "82e157baeaaf3e9f36534701c6dad4e08d38cb31316e674e2aac3c91cd24a708"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_1.\u003CIntercept0\u003Eb__8",
+      "token": 100663315,
+      "ilSha256": "32adcf6f9c6880b24dedf7478a5e96562eecee6af6d3e5ee32091a5cf8d06102"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_1.\u003CIntercept0\u003Eb__10",
+      "token": 100663316,
+      "ilSha256": "b50907a7b5075a2672172d89c7fb24af6666d527c6da3d89f87a80d2bd35a0c9"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_1.\u003CIntercept0\u003Eb__9",
+      "token": 100663317,
+      "ilSha256": "484dbabcecf12b74b26736561abec5593de84f0d986d8c2a2252aa28f448af19"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_2..ctor",
+      "token": 100663318,
+      "ilSha256": "c2f18536e96c772f31eb4dcaa39e5189448f184b920ed0622a16826ac507f23e"
+    },
+    {
+      "method": "ReactiveUI.Validation.Generated.Assembly_GeneratedValidation_ExpressionParams_Primitives_1A1A90D59103D1AF.ValidationInterceptors.\u003C\u003Ec__DisplayClass0_2.\u003CIntercept0\u003Eb__3",
+      "token": 100663319,
+      "ilSha256": "e9e50d153c42764c9ac4ee43b86d4671dcfc958bab98f1b0790a7199aee04bdd"
+    },
+    {
+      "method": "RuleExpressionParamsNegative.Program.\u003C\u003Ec..cctor",
+      "token": 100663320,
+      "ilSha256": "e1d352afdceb6a9cea359f0aa547499bbae4bd80e5aee41a20ced8f820e0b069"
+    },
+    {
+      "method": "RuleExpressionParamsNegative.Program.\u003C\u003Ec..ctor",
+      "token": 100663321,
+      "ilSha256": "c2f18536e96c772f31eb4dcaa39e5189448f184b920ed0622a16826ac507f23e"
+    },
+    {
+      "method": "RuleExpressionParamsNegative.Program.\u003C\u003Ec.\u003CRun\u003Eb__0_1",
+      "token": 100663322,
+      "ilSha256": "cd1fd37e2bc0b6ccde24f87cec15edd5e3f0073fb635d049e42fecfba86aa3ab"
+    }
+  ],
+  "arrayFactories": [
+    {
+      "method": "RuleExpressionParamsNegative.Program.Run",
+      "offset": 149,
+      "opcode": "call",
+      "owner": "System.Linq.Expressions.Expression",
+      "target": "NewArrayInit",
+      "assembly": "System.Linq.Expressions",
+      "returnType": "System.Linq.Expressions.NewArrayExpression",
+      "parameters": [
+        "System.Type",
+        "System.Linq.Expressions.Expression[]"
+      ],
+      "signatureSha256": "5ce67f3eaa269579e5b4ea4195101a0dfe69e543f2f3d8519c7858ac2afda235"
+    }
+  ],
+  "entryCalls": []
+}

@@ -2,8 +2,23 @@
   <PropertyGroup>
     <AssemblyName>GeneratedValidation.Primitives</AssemblyName>
     <DefineConstants>$(DefineConstants);$(NegativeCase)</DefineConstants>
+    <PrecompiledConsumerPath Condition="'$(PrecompiledConsumerPath)' == ''">$(MSBuildThisFileDirectory)Precompiled/bin/Release/net10.0/GeneratedValidation.Precompiled.Primitives.dll</PrecompiledConsumerPath>
+    <LegacyPrecompiledConsumerPath Condition="'$(LegacyPrecompiledConsumerPath)' == ''">$(MSBuildThisFileDirectory)../../../eng/verification-fixtures/LegacyPeer/frozen/GeneratedValidation.LegacyPeer.Primitives.dll</LegacyPrecompiledConsumerPath>
+    <CapabilityFixtureRoot Condition="'$(CapabilityFixtureRoot)' == ''">$(MSBuildThisFileDirectory)../../../eng/verification-fixtures</CapabilityFixtureRoot>
+    <PeerGeneratedCallerAnalyzerPath Condition="'$(PeerGeneratedCallerAnalyzerPath)' == ''">$(MSBuildThisFileDirectory)../../../eng/PeerGeneratedCaller/bin/Release/netstandard2.0/Runic.Validation.PeerGeneratedCaller.dll</PeerGeneratedCallerAnalyzerPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GeneratedValidation.Precompiled.Primitives" HintPath="$(PrecompiledConsumerPath)" />
+    <Reference Include="GeneratedValidation.LegacyPeer.Primitives" HintPath="$(LegacyPrecompiledConsumerPath)" />
+    <Compile Remove="../PrecompiledCaller.cs" />
+    <Compile Remove="Precompiled/**/*.cs" />
+    <Compile Include="$(CapabilityFixtureRoot)/RuleCapabilityScenario.cs" Link="RuleCapabilityScenario.cs" />
+    <Compile Include="$(CapabilityFixtureRoot)/ProducerInteropScenario.cs" Link="ProducerInteropScenario.cs" />
+    <Compile Include="$(CapabilityFixtureRoot)/ErrorHookScenario.cs" Link="ErrorHookScenario.cs" />
+    <Compile Include="$(CapabilityFixtureRoot)/PeerGeneratedCallerScenario.cs" Link="PeerGeneratedCallerScenario.cs" />
+    <Compile Include="$(CapabilityFixtureRoot)/BindingCapabilityScenario.cs" Link="BindingCapabilityScenario.cs" />
+    <Compile Include="$(CapabilityFixtureRoot)/BindingCapabilityScenario.Types.cs" Link="BindingCapabilityScenario.Types.cs" />
+    <Analyzer Include="$(PeerGeneratedCallerAnalyzerPath)" />
     <PackageReference Include="Runic.ReactiveUI.Validation" Version="$(ValidationVersion)" />
     <PackageReference Include="ReactiveUI" Version="26.0.1" />
     <PackageReference Include="Runic.DynamicData" Version="10.0.0-runic.30" />

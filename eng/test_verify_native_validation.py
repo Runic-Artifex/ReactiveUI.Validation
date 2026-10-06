@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import zipfile
 
 
 def load(name, filename):
@@ -98,7 +99,11 @@ class NativeGateTests(unittest.TestCase):
             folder = root / "package/1.0"
             folder.mkdir(parents=True)
             package = folder / "package.1.0.nupkg"
-            package.write_bytes(b"stale package")
+            with zipfile.ZipFile(package, "w") as archive:
+                archive.writestr("lib/net10.0/Package.dll", b"stale package DLL")
+            extracted = folder / "lib/net10.0/Package.dll"
+            extracted.parent.mkdir(parents=True)
+            extracted.write_bytes(b"stale package DLL")
             sha512 = base64.b64encode(hashlib.sha512(package.read_bytes()).digest()).decode()
             assets = {"libraries": {"Package/1.0": {"path": "package/1.0", "sha512": sha512}}, "packageFolders": {str(root): {}}}
             # GeneratorInterop's dated probe imports this native entry point, so

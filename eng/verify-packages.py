@@ -95,7 +95,7 @@ def verify_repository_source(metadata, package, source):
 
 
 def verify_restored_bytes(assets, package_id, version, expected):
-    """Prove NuGet restored the exact input nupkg, never a stale same-version cache entry."""
+    """Bind restored archives and extracted DLLs to the exact verified input bytes."""
     library = assets["libraries"][f"{package_id}/{version}"]
     relative = Path(library["path"])
     candidates = [Path(base) / relative / f"{package_id.lower()}.{version}.nupkg"
@@ -106,6 +106,15 @@ def verify_restored_bytes(assets, package_id, version, expected):
     restored_sha512 = base64.b64encode(hashlib.sha512(present[0].read_bytes()).digest()).decode()
     if library.get("sha512") != restored_sha512:
         raise ValueError(f"Restored {package_id} asset SHA-512 does not bind its package bytes")
+    with zipfile.ZipFile(present[0]) as archive:
+        dlls = sorted(name for name in archive.namelist() if name.casefold().endswith(".dll"))
+        if not dlls:
+            raise ValueError(f"Verified {package_id} archive contains no DLL entries")
+        for name in dlls:
+            extracted = present[0].parent / name
+            archived_hash = hashlib.sha256(archive.read(name)).hexdigest()
+            if not extracted.is_file() or digest(extracted) != archived_hash:
+                raise ValueError(f"Restored {package_id} extracted DLL does not match its verified archive: {name}")
 
 
 def verified_dynamic_data_inputs(pins):

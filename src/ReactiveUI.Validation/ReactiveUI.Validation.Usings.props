@@ -9,6 +9,7 @@
   -->
   <ItemGroup>
     <Using Include="$(ValidationNamespaceRoot).Abstractions" />
+    <Using Include="$(ValidationNamespaceRoot).Capabilities" />
     <Using Include="$(ValidationNamespaceRoot).Collections" />
     <Using Include="$(ValidationNamespaceRoot).Comparators" />
     <Using Include="$(ValidationNamespaceRoot).Components" />

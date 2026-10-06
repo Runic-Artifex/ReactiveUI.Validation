@@ -1,0 +1,26 @@
+{
+  "scope": "Immutable unsupported-runtime negative fixture only. Not an accepted current runtime graph, compatibility peer or shipping package. Never rebuild these files.",
+  "source": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
+  "version": "8.1.0-runic.0.790.17.15.10",
+  "license": "MIT; copyright ReactiveUI and Contributors. See repository LICENSE.",
+  "flavors": {
+    "Primitives": {
+      "file": "ReactiveUI.Validation.dll",
+      "sha256": "053f425e7b2b8ac15f90a165a46a9f0217b63f8f2af643743d6a4d69cadfad4a",
+      "mvid": "bcadc1da-7833-4c74-8927-d188b0e402ac",
+      "sourceArchive": "Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.15.10.nupkg",
+      "sourceArchiveSha256": "b68cfe33d5f1bf4aeee612bd2baaffdb25f1a0a918d6594db65e592a844ac800",
+      "sourceEntry": "lib/net10.0/ReactiveUI.Validation.dll",
+      "bytes": 111616
+    },
+    "Reactive": {
+      "file": "ReactiveUI.Validation.Reactive.dll",
+      "sha256": "718f4181a9791d002f5f5226a24db087d05273486f0d500d57d989837d00eda2",
+      "mvid": "3c0b13ac-c8cd-4246-ad24-95b5359539af",
+      "sourceArchive": "Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.15.10.nupkg",
+      "sourceArchiveSha256": "c1c921c16ee79018fcaa4b881c810f850d3018fde70400064b73a0308bd028e6",
+      "sourceEntry": "lib/net10.0/ReactiveUI.Validation.Reactive.dll",
+      "bytes": 112640
+    }
+  }
+}

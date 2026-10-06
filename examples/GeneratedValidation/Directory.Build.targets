@@ -1,1 +1,63 @@
-<Project />
+<Project>
+  <!-- Retain failure inputs before Csc; SDK final NoWarn additions occur inside CoreCompile. -->
+  <Target Name="CaptureGeneratedValidationCompilerInputBefore" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <_InspectionDefineBefore Include="$(DefineConstants)" />
+      <_InspectionNamespaceBefore Include="$(InterceptorsNamespaces)" />
+      <_InspectionNoWarnBefore Include="$(NoWarn)" />
+      <_InspectionRecordBefore Include="assembly|$(AssemblyName)" />
+      <_InspectionRecordBefore Include="output|$(OutputType)" />
+      <_InspectionRecordBefore Include="language|$(LangVersion)" />
+      <_InspectionRecordBefore Include="nullable|$(Nullable)" />
+      <_InspectionRecordBefore Include="redundantSuppressions|$(_TrimmerShowRedundantSuppressions)" />
+      <_InspectionRecordBefore Include="publishTrimmed|$(PublishTrimmed)" />
+      <_InspectionRecordBefore Include="publishAot|$(PublishAot)" />
+      <_InspectionRecordBefore Include="isAotCompatible|$(IsAotCompatible)" />
+      <_InspectionRecordBefore Include="enableAotAnalyzer|$(EnableAotAnalyzer)" />
+      <_InspectionRecordBefore Include="ilLinkTarget|$(ILLinkTargetsPath)" />
+      <_InspectionRecordBefore Include="profile|Reactive=$(ReactiveUIValidationReactiveProducerVersion)" />
+      <_InspectionRecordBefore Include="profile|Binding=$(ReactiveUIValidationBindingProducerVersion)" />
+      <_InspectionRecordBefore Include="profile|Avalonia=$(ReactiveUIValidationAvaloniaProducerVersion)" />
+      <_InspectionRecordBefore Include="profile|Maui=$(ReactiveUIValidationMauiProducerVersion)" />
+      <_InspectionRecordBefore Include="@(Compile-&gt;'source|%(FullPath)')" />
+      <_InspectionRecordBefore Include="@(Analyzer-&gt;'analyzer|%(FullPath)')" />
+      <_InspectionRecordBefore Include="@(ReferencePathWithRefAssemblies-&gt;'reference|%(FullPath)')" />
+      <_InspectionRecordBefore Include="@(_InspectionDefineBefore-&gt;'define|%(Identity)')" />
+      <_InspectionRecordBefore Include="@(_InspectionNamespaceBefore-&gt;'allowlist|%(Identity)')" />
+      <_InspectionRecordBefore Include="@(_InspectionNoWarnBefore-&gt;'declaredNowarn|%(Identity)')" />
+      <_InspectionRecordBefore Include="@(EditorConfigFiles-&gt;'analyzerConfig|%(FullPath)')" />
+      <_InspectionRecordBefore Include="compilerTarget|$(MSBuildToolsPath)/Roslyn/Microsoft.CSharp.Core.targets" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(MSBuildProjectDirectory)/obj/generated-compiler-input.before.txt" Lines="@(_InspectionRecordBefore)" Overwrite="true" Encoding="UTF-8" />
+  </Target>
+  <!-- Replay verifies this successful-build manifest, including the effective SDK warning defaults. -->
+  <Target Name="CaptureGeneratedValidationCompilerInput" AfterTargets="CoreCompile">
+    <ItemGroup>
+      <_InspectionDefine Include="$(DefineConstants)" />
+      <_InspectionNamespace Include="$(InterceptorsNamespaces)" />
+      <_InspectionNoWarn Include="$(NoWarn)" />
+      <_InspectionRecord Include="assembly|$(AssemblyName)" />
+      <_InspectionRecord Include="output|$(OutputType)" />
+      <_InspectionRecord Include="language|$(LangVersion)" />
+      <_InspectionRecord Include="nullable|$(Nullable)" />
+      <_InspectionRecord Include="redundantSuppressions|$(_TrimmerShowRedundantSuppressions)" />
+      <_InspectionRecord Include="publishTrimmed|$(PublishTrimmed)" />
+      <_InspectionRecord Include="publishAot|$(PublishAot)" />
+      <_InspectionRecord Include="isAotCompatible|$(IsAotCompatible)" />
+      <_InspectionRecord Include="enableAotAnalyzer|$(EnableAotAnalyzer)" />
+      <_InspectionRecord Include="ilLinkTarget|$(ILLinkTargetsPath)" />
+      <_InspectionRecord Include="profile|Reactive=$(ReactiveUIValidationReactiveProducerVersion)" />
+      <_InspectionRecord Include="profile|Binding=$(ReactiveUIValidationBindingProducerVersion)" />
+      <_InspectionRecord Include="profile|Avalonia=$(ReactiveUIValidationAvaloniaProducerVersion)" />
+      <_InspectionRecord Include="profile|Maui=$(ReactiveUIValidationMauiProducerVersion)" />
+      <_InspectionRecord Include="@(Compile-&gt;'source|%(FullPath)')" />
+      <_InspectionRecord Include="@(Analyzer-&gt;'analyzer|%(FullPath)')" />
+      <_InspectionRecord Include="@(ReferencePathWithRefAssemblies-&gt;'reference|%(FullPath)')" />
+      <_InspectionRecord Include="@(_InspectionDefine-&gt;'define|%(Identity)')" />
+      <_InspectionRecord Include="@(_InspectionNamespace-&gt;'allowlist|%(Identity)')" />
+      <_InspectionRecord Include="@(_InspectionNoWarn-&gt;'nowarn|%(Identity)')" />
+      <_InspectionRecord Include="@(EditorConfigFiles-&gt;'analyzerConfig|%(FullPath)')" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(MSBuildProjectDirectory)/obj/generated-compiler-input.txt" Lines="@(_InspectionRecord)" Overwrite="true" Encoding="UTF-8" />
+  </Target>
+</Project>

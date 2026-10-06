@@ -1,0 +1,10 @@
+// Copyright (c) 2026 Runic Artifex. Licensed under the MIT license.
+// Insert this snippet into Negative.Unsupported. Replace the placeholder with
+// the containing type of the actual generated get_Possible UnsafeAccessor whose
+// owner is AccessReadFlowSource, declared return is string, and exact framework
+// return postcondition is MaybeNull. Do not add a Validation call to this probe.
+// The fresh packed-consumer compile must fail only with CS8604 at this argument.
+#if NEGATIVE_MAYBE_NULL_GETTER
+        _ = AccessReadFlowSource.RequireNonNull(
+            __RUNIC_MAYBE_NULL_BRIDGE__.Read(new AccessReadFlowSource()));
+#endif

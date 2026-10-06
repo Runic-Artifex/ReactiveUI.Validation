@@ -34,10 +34,10 @@ public abstract class BasePropertyValidation<TViewModel> : ReactiveObject, IDisp
     private int _isConnected;
 
     /// <inheritdoc/>
-    public int PropertyCount => _propertyNames.Count;
+    public virtual int PropertyCount => _propertyNames.Count;
 
     /// <inheritdoc/>
-    public IEnumerable<string> Properties => _propertyNames.AsEnumerable();
+    public virtual IEnumerable<string> Properties => _propertyNames.AsEnumerable();
 
     /// <inheritdoc />
     public bool IsValid
@@ -84,7 +84,7 @@ public abstract class BasePropertyValidation<TViewModel> : ReactiveObject, IDisp
     }
 
     /// <inheritdoc/>
-    public bool ContainsPropertyName(string propertyName, bool exclusively = false) =>
+    public virtual bool ContainsPropertyName(string propertyName, bool exclusively = false) =>
         exclusively
             ? _propertyNames.Contains(propertyName) && _propertyNames.Count == 1
             : _propertyNames.Contains(propertyName);

@@ -1,13 +1,18 @@
 # NativeAOT and ReactiveUI generators
 
-The implemented and verified **UNRELEASED generated/Unsafe API split** is described
-in the [generator contract](generated-validation-design.md) and
-[migration recipe](examples/generated-validation.md). Supported inline-lambda
-predicate rules and expression bindings generate direct observation/assignment;
-normal unintercepted calls throw. Consumers must recompile with the matching
-core package's embedded analyzer and interceptor allowlist props. Runtime
-expressions require explicit annotated Unsafe methods; no hidden reflection
-fallback is provided. Safe observable APIs remain available.
+The **UNRELEASED generated/Unsafe API split** now has source-landed typed access,
+observation, target/storage and finite registered compatibility routes; see the
+[contract](generated-validation-design.md), [migration recipe](examples/generated-validation.md)
+and [43-row ledger](generated-capabilities-progress.md). Normal calls without
+interception or a matching supplied/registered plan fail actionably. Explicit
+Unsafe owns reflected operations; there is no hidden reflection fallback.
+Safe observable APIs remain available. The .NET 10 AOT flag is source-landed;
+complete surface/dependency audit and strict actual flagged-package managed,
+full-trim and NativeAOT gates remain pending. No expanded row is complete.
+
+The initial restricted split's evidence below is historical and unchanged. It
+does not establish final acceptance of the new typed/producer/catalog surface
+or new UI host support.
 
 At tested source `2550376b230ccfb78beb8d3b4ced8866b65d809e`, the local strict
 Release gate passes **683 tests** (323 per library flavor and 37 compiler-fixture
@@ -31,8 +36,9 @@ retain exact package/source/host identities and emitted-source evidence.
 
 The implementation remains **UNRELEASED** until publication. This later
 documentation record is not the tested/package source. Earlier release gates
-below retain their historical identities. No blanket `IsAotCompatible` or
-whole-library reflection-free contract is declared.
+below retain their historical identities. At `2550376` no `IsAotCompatible`
+flag or whole-library reflection-free contract was declared; the expanded
+source flag and its pending final acceptance are described above.
 
 ## Released runtime evidence (before the generator split)
 
@@ -397,7 +403,8 @@ Use the [explicit observable runtime recipe](examples/native-validation.md) for
 new native consumers. It retains standard context aggregation, captured rule
 ownership, synchronous domain state and matching-flavor imports. For the
 immutable runtime release, expression APIs retain reflective source selection even when they use typed callbacks. On the working branch, supported
-normal calls instead require generation; retained reflection is explicitly
+normal calls instead require interception or an exact supplied/registered typed
+provider/catalog plan; retained reflection is explicitly
 selected with `ValidationRuleUnsafe`, `BindValidationUnsafe`,
 `BindValidationContextUnsafe` or `BindValidationStateUnsafe`. See the
 [migration recipe](examples/generated-validation.md) for precompiled-call and
@@ -429,8 +436,10 @@ public-contract change reviewed in both flavor API baselines.
 
 `IsAotCompatible` enables analyzer/trimmability settings and advertises a library
 compatibility contract. It may coexist with correctly annotated unsafe APIs;
-it is not a promise that every legacy API is safe. This implementation enables
-producer analyzers explicitly without declaring blanket package compatibility.
+it is not a promise that every legacy API is safe. The expanded implementation
+enables this flag only on the two inner .NET 10 core targets. Fresh complete
+flagged-package audit and managed/full-trim/native acceptance remain pending;
+historical unset-flag evidence above is not the current source contract.
 The [official property guidance](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
 describes the settings it enables. Native support remains limited to the safe
 paths, dependency cohort and actual host executions recorded in the review.
@@ -443,8 +452,8 @@ paths, dependency cohort and actual host executions recorded in the review.
 | Explicit observables, delegates and state subscriptions | Released safe console contract | Explicit rules and replacement streams expose ownership and direct callbacks | Both-flavor API review, producer analysis and strict actual-package consumer gates for the recorded host scope. |
 | Binding interceptors in the application | Optional | Generates recognized application observation/binding calls | Compiler/interceptor configuration and generated-output verification; does not replace package-internal calls. |
 | SourceGenerators in the application | Optional | Reduces reactive property, command and notification boilerplate | Select compatible flavor/output, inspect generated code; OAPH/view generation belongs to Binding in the current split. |
-| Validation-specific source generator | [Unreleased primary normal-call implementation](generated-validation-design.md) | Preserves supported inline selectors while emitting direct observations, full metadata and typed assignment | Embedded analyzer/props, recompilation, diagnostic/compilation/flavor checks and current-source strict packaged consumers required. Unsupported normal shapes are errors; ungenerated normal calls throw. |
-| Library `IsAotCompatible` contract | Future support decision | Enables producer analyzers and communicates the compatibility contract | Audit exposed unannotated paths and dependencies, retain warnings on unsafe APIs, verify safe-subset native gates and define platform scope. |
+| Validation-specific source generator and typed plans | [Unreleased normal-call implementation](generated-validation-design.md) | Direct observations/metadata/assignment, plus explicit typed provider/catalog alternatives | Embedded assets, source/ABI/flavor regressions and current strict package gates required. Unintercepted and unregistered normal calls fail; explicit registered mode supplies no reflection fallback. |
+| Library `IsAotCompatible` contract | Source-landed for inner .NET 10 core flavors; final acceptance pending | Enables producer analysis and communicates the compatibility contract | Complete current surface/dependency audit, precise Unsafe warnings and exact flagged-package managed/full-trim/native gates on claimed hosts are mandatory. |
 
 ## Native platform scope
 

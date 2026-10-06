@@ -28,6 +28,9 @@ public class ReactiveValidationObject : ReactiveObject, IValidatableViewModel, I
     /// </summary>
     private readonly HashSet<string> _mentionedPropertyNames = [];
 
+    /// <summary>Remembers each attached component's last display paths to clear replaced metadata.</summary>
+    private readonly Dictionary<IPropertyValidationComponent, string[]> _propertyNamesByComponent = new(ReferenceEqualityComparer.Instance);
+
     /// <summary>Initializes a new instance of the <see cref="ReactiveValidationObject"/> class.</summary>
     protected ReactiveValidationObject()
         : this(null, null)
@@ -142,24 +145,24 @@ public class ReactiveValidationObject : ReactiveObject, IValidatableViewModel, I
     /// </remarks>
     internal void OnValidationStatusChange(IValidationComponent component)
     {
+        if (_disposables.IsDisposed)
+        {
+            return;
+        }
+
         HasErrors = !ValidationContext.GetIsValid();
+        if (_disposables.IsDisposed)
+        {
+            return;
+        }
+
         if (component is IPropertyValidationComponent propertyValidationComponent)
         {
-            foreach (var propertyName in propertyValidationComponent.Properties)
-            {
-                RaiseErrorsChanged(propertyName);
-                _ = _mentionedPropertyNames.Add(propertyName);
-            }
+            NotifyPropertyValidation(propertyValidationComponent);
         }
         else
         {
-            // Non-property components (e.g. cross-field observable validations) don't carry
-            // property names, so re-notify for every property that has been mentioned
-            // previously to ensure the UI refreshes all relevant error indicators.
-            foreach (var propertyName in _mentionedPropertyNames)
-            {
-                RaiseErrorsChanged(propertyName);
-            }
+            NotifyMentionedProperties();
         }
     }
 
@@ -169,8 +172,13 @@ public class ReactiveValidationObject : ReactiveObject, IValidatableViewModel, I
 
     /// <summary>Raises the <see cref="ErrorsChanged"/> event.</summary>
     /// <param name="propertyName">The name of the validated property.</param>
+    /// <remarks>
+    /// Overrides may customize delivery. Call the base implementation to notify
+    /// <see cref="ErrorsChanged"/> subscribers. Validation updates <see cref="HasErrors"/>
+    /// before invoking this hook; the parameterless overload also forwards through it.
+    /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected void RaiseErrorsChanged(string propertyName) =>
+    protected virtual void RaiseErrorsChanged(string propertyName) =>
         ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
 
     /// <summary>Releases the unmanaged resources used by this instance and optionally releases the managed resources.</summary>
@@ -185,6 +193,7 @@ public class ReactiveValidationObject : ReactiveObject, IValidatableViewModel, I
         _disposables.Dispose();
         ValidationContext.Dispose();
         _mentionedPropertyNames.Clear();
+        _propertyNamesByComponent.Clear();
     }
 
     /// <summary>Merges the status changes of every component into one stream that emits the component that changed.</summary>
@@ -199,5 +208,103 @@ public class ReactiveValidationObject : ReactiveObject, IValidatableViewModel, I
         }
 
         return statusChanges.Merge();
+    }
+
+    /// <summary>Notifies the ordered union of a component's previous and current display paths.</summary>
+    /// <param name="component">The attached property component.</param>
+    private void NotifyPropertyValidation(IPropertyValidationComponent component)
+    {
+        List<string> current = [];
+        HashSet<string> names = new(StringComparer.Ordinal);
+        foreach (var propertyName in component.Properties)
+        {
+            if (names.Add(propertyName))
+            {
+                current.Add(propertyName);
+            }
+        }
+
+        if (_disposables.IsDisposed || !IsAttached(component))
+        {
+            return;
+        }
+
+        List<string> notifications = [];
+        names.Clear();
+        if (_propertyNamesByComponent.TryGetValue(component, out var previous))
+        {
+            foreach (var propertyName in previous)
+            {
+                if (names.Add(propertyName))
+                {
+                    notifications.Add(propertyName);
+                }
+            }
+        }
+
+        foreach (var propertyName in current)
+        {
+            if (names.Add(propertyName))
+            {
+                notifications.Add(propertyName);
+            }
+        }
+
+        _propertyNamesByComponent[component] = current.ToArray();
+        _mentionedPropertyNames.UnionWith(notifications);
+        NotifyNames(notifications);
+    }
+
+    /// <summary>Prunes detached components and snapshots mentioned names before any reentrant callbacks.</summary>
+    private void NotifyMentionedProperties()
+    {
+        List<IPropertyValidationComponent> detached = [];
+        foreach (var component in _propertyNamesByComponent.Keys)
+        {
+            if (!IsAttached(component))
+            {
+                detached.Add(component);
+            }
+        }
+
+        foreach (var component in detached)
+        {
+            _ = _propertyNamesByComponent.Remove(component);
+        }
+
+        var names = new string[_mentionedPropertyNames.Count];
+        _mentionedPropertyNames.CopyTo(names);
+        NotifyNames(names);
+    }
+
+    /// <summary>Checks current membership by reference identity without retaining detached components.</summary>
+    /// <param name="component">The component to locate.</param>
+    /// <returns>Whether the component remains attached.</returns>
+    private bool IsAttached(IPropertyValidationComponent component)
+    {
+        foreach (var attached in ValidationContext.Validations.Items)
+        {
+            if (ReferenceEquals(attached, component))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>Delivers a captured sequence while allowing disposal from any derived hook.</summary>
+    /// <param name="names">The names captured before event delivery.</param>
+    private void NotifyNames(IEnumerable<string> names)
+    {
+        foreach (var propertyName in names)
+        {
+            if (_disposables.IsDisposed)
+            {
+                return;
+            }
+
+            RaiseErrorsChanged(propertyName);
+        }
     }
 }

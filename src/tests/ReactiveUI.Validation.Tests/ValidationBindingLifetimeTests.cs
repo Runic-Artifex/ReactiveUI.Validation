@@ -320,7 +320,7 @@ public class ValidationBindingLifetimeTests
         IList<string>? lastMessages = null;
         using var binding = ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
             view,
-            vm => vm.Name,
+            static vm => vm.Name,
             (states, messages) =>
             {
                 lastStates = states;
@@ -442,13 +442,13 @@ public class ValidationBindingLifetimeTests
     {
         BindingPath.PropertyAction => ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
             view,
-            vm => vm.Name,
+            static vm => vm.Name,
             (_, messages) => callback(string.Join(" ", messages)),
             SingleLineFormatter.Default),
         BindingPath.ModelAction => ValidationBinding.ForViewModel<TestView, TestViewModel, string>(view, callback, SingleLineFormatter.Default),
         BindingPath.HelperAction => ValidationBinding.ForValidationHelperProperty<TestView, TestViewModel, string>(
             view,
-            vm => vm!.NameRule,
+            static vm => vm!.NameRule,
             (_, message) => callback(message),
             SingleLineFormatter.Default),
         _ => throw new ArgumentOutOfRangeException(nameof(path)),
@@ -473,29 +473,29 @@ public class ValidationBindingLifetimeTests
     {
         BindingPath.Property => ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
             view,
-            vm => vm.Name,
-            v => v.NameErrorLabel),
+            static vm => vm.Name,
+            static v => v.NameErrorLabel),
         BindingPath.NestedProperty => ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
             view,
-            vm => vm.Name,
-            v => v.NameErrorContainer.Text,
+            static vm => vm.Name,
+            static v => v.NameErrorContainer.Text,
             SingleLineFormatter.Default,
             false),
         BindingPath.Model => ValidationBinding.ForViewModel<TestView, TestViewModel, string>(
             view,
-            v => v.NameErrorLabel),
+            static v => v.NameErrorLabel),
         BindingPath.NestedModel => ValidationBinding.ForViewModel<TestView, TestViewModel, string>(
             view,
-            v => v.NameErrorContainer.Text,
+            static v => v.NameErrorContainer.Text,
             SingleLineFormatter.Default),
         BindingPath.PropertyAction => ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
             view,
-            vm => vm.Name,
+            static vm => vm.Name,
             (_, messages) => view.NameErrorLabel = string.Join(" ", messages),
             SingleLineFormatter.Default),
         BindingPath.NonStrictPropertyAction => ValidationBinding.ForProperty<TestView, TestViewModel, string?, string>(
             view,
-            vm => vm.Name,
+            static vm => vm.Name,
             (_, messages) => view.NameErrorLabel = string.Join(" ", messages),
             SingleLineFormatter.Default,
             false),
@@ -505,16 +505,16 @@ public class ValidationBindingLifetimeTests
             SingleLineFormatter.Default),
         BindingPath.Helper => ValidationBinding.ForValidationHelperProperty<TestView, TestViewModel, string>(
             view,
-            vm => vm!.NameRule,
-            v => v.NameErrorLabel),
+            static vm => vm!.NameRule,
+            static v => v.NameErrorLabel),
         BindingPath.NestedHelper => ValidationBinding.ForValidationHelperProperty<TestView, TestViewModel, string>(
             view,
-            vm => vm!.NameRule,
-            v => v.NameErrorContainer.Text,
+            static vm => vm!.NameRule,
+            static v => v.NameErrorContainer.Text,
             SingleLineFormatter.Default),
         BindingPath.HelperAction => ValidationBinding.ForValidationHelperProperty<TestView, TestViewModel, string>(
             view,
-            vm => vm!.NameRule,
+            static vm => vm!.NameRule,
             (_, message) => view.NameErrorLabel = message,
             SingleLineFormatter.Default),
         _ => throw new ArgumentOutOfRangeException(nameof(path)),

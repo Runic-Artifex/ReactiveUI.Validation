@@ -15,6 +15,22 @@ internal static class Program
             ("nested-target-handoff", NestedTarget),
             ("property-state-membership", PropertyMembership),
             ("rows-owned-observable-results", Rows),
+            ("latest-requests-owner-scheduling", CapabilityAdapterScenarios.LatestRequestsAndOwnerScheduling),
+            ("stable-rows-source-ownership", CapabilityAdapterScenarios.StableRowsAndSourceOwnership),
+            ("removed-pending-row-cancellation", CapabilityAdapterScenarios.RemovingPendingRowCancelsRequest),
+            ("domain-presentation-independence", CapabilityAdapterScenarios.DomainAndPresentationRemainIndependent),
+            ("nullable-output-stack-snapshots", CapabilityAdapterScenarios.NullableOutputAndStackSnapshots),
+            ("typed-formatter-resolver-lifetimes", FormatterRegistrationScenario.Run),
+            ("precompiled-fresh-expressions-callables", PrecompiledConsumerScenario.Run),
+            ("historical-peer-unchanged-original-api", LegacyPrecompiledConsumerScenario.Run),
+            ("static-factory-raw-nullable-projections", GeneratedValidation.StaticBindings.StaticBindingsScenario.Run),
+            ("selected-static-access-owner-replay", AccessCompatibilityScenario.Run),
+            ("typed-providers-components-host-adapter", ProviderComponentScenario.Run),
+            ("rules-generics-private-captures-indices", RuleCapabilityScenario.Run),
+            ("real-producer-commands-collections-oaph", ProducerInteropScenario.Run),
+            ("virtual-error-hook-order-and-disposal", ErrorHookScenario.Run),
+            ("peer-generated-registered-callers", PeerGeneratedCallerScenario.Run),
+            ("bindings-generics-storage-policies", BindingCapabilityScenario.Run),
         })
         {
             try

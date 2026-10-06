@@ -1,0 +1,163 @@
+// Copyright (c) 2019-2026 ReactiveUI and Contributors. All rights reserved.
+// ReactiveUI and Contributors licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for full license information.
+
+using System.Runtime.CompilerServices;
+
+#if REACTIVE_SHIM
+namespace ReactiveUI.Validation.Reactive.Extensions;
+#else
+namespace ReactiveUI.Validation.Extensions;
+#endif
+
+/// <summary>Provides typed callable selectors for generated or registered validation bindings.</summary>
+public static partial class ViewForExtensions
+{
+    /// <summary>Binds the specified ViewModel property validation to the View property.</summary>
+    /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
+    /// <typeparam name="TViewModel">ViewModel type.</typeparam>
+    /// <typeparam name="TViewModelProperty">ViewModel property type.</typeparam>
+    /// <typeparam name="TViewProperty">View property type.</typeparam>
+    /// <param name="view">IViewFor instance.</param>
+    /// <param name="viewModel">ViewModel instance. Can be null, used for generic type resolution.</param>
+    /// <param name="viewModelProperty">ViewModel property.</param>
+    /// <param name="viewProperty">View property to bind the validation message.</param>
+    /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelProperty"/> or <paramref name="viewProperty"/> is null.</exception>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [OverloadResolutionPriority(1)]
+    public static IDisposable BindValidation<TView, TViewModel, TViewModelProperty, TViewProperty>(
+        this TView view,
+        TViewModel? viewModel,
+        Func<TViewModel, TViewModelProperty> viewModelProperty,
+        Func<TView, TViewProperty> viewProperty)
+        where TView : IViewFor<TViewModel>
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForProperty(view, viewModelProperty, viewProperty);
+
+    /// <summary>Binds the specified ViewModel property validation to the View property.</summary>
+    /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
+    /// <typeparam name="TViewModel">ViewModel type.</typeparam>
+    /// <typeparam name="TViewModelProperty">ViewModel property type.</typeparam>
+    /// <typeparam name="TViewProperty">View property type.</typeparam>
+    /// <param name="view">IViewFor instance.</param>
+    /// <param name="viewModel">ViewModel instance. Can be null, used for generic type resolution.</param>
+    /// <param name="viewModelProperty">ViewModel property.</param>
+    /// <param name="viewProperty">View property to bind the validation message.</param>
+    /// <param name="formatter">
+    /// Validation formatter. Defaults to <see cref="SingleLineFormatter"/> when null. In order to override the global
+    /// default value, implement <see cref="IValidationTextFormatter{TOut}"/> and register an instance of
+    /// IValidationTextFormatter&lt;string&gt; into Splat.Locator.
+    /// </param>
+    /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelProperty"/> or <paramref name="viewProperty"/> is null.</exception>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [OverloadResolutionPriority(1)]
+    public static IDisposable BindValidation<TView, TViewModel, TViewModelProperty, TViewProperty>(
+        this TView view,
+        TViewModel? viewModel,
+        Func<TViewModel, TViewModelProperty> viewModelProperty,
+        Func<TView, TViewProperty> viewProperty,
+        IValidationTextFormatter<string>? formatter)
+        where TView : IViewFor<TViewModel>
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForProperty(view, viewModelProperty, viewProperty, formatter);
+
+    /// <summary>Binds the overall validation of a ViewModel to a specified View property.</summary>
+    /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
+    /// <typeparam name="TViewModel">ViewModel type.</typeparam>
+    /// <typeparam name="TViewProperty">View property type.</typeparam>
+    /// <param name="view">IViewFor instance.</param>
+    /// <param name="viewModel">ViewModel instance. Can be null, used for generic type resolution.</param>
+    /// <param name="viewProperty">View property to bind the validation message.</param>
+    /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewProperty"/> is null.</exception>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [OverloadResolutionPriority(1)]
+    public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
+        this TView view,
+        TViewModel? viewModel,
+        Func<TView, TViewProperty> viewProperty)
+        where TView : IViewFor<TViewModel>
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForViewModel<TView, TViewModel, TViewProperty>(view, viewProperty);
+
+    /// <summary>Binds the overall validation of a ViewModel to a specified View property.</summary>
+    /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
+    /// <typeparam name="TViewModel">ViewModel type.</typeparam>
+    /// <typeparam name="TViewProperty">View property type.</typeparam>
+    /// <param name="view">IViewFor instance.</param>
+    /// <param name="viewModel">ViewModel instance. Can be null, used for generic type resolution.</param>
+    /// <param name="viewProperty">View property to bind the validation message.</param>
+    /// <param name="formatter">
+    /// Validation formatter. Defaults to <see cref="SingleLineFormatter"/> when null. In order to override the global
+    /// default value, implement <see cref="IValidationTextFormatter{TOut}"/> and register an instance of
+    /// IValidationTextFormatter&lt;string&gt; into Splat.Locator.
+    /// </param>
+    /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewProperty"/> is null.</exception>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [OverloadResolutionPriority(1)]
+    public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
+        this TView view,
+        TViewModel? viewModel,
+        Func<TView, TViewProperty> viewProperty,
+        IValidationTextFormatter<string>? formatter)
+        where TView : IViewFor<TViewModel>
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForViewModel<TView, TViewModel, TViewProperty>(view, viewProperty, formatter);
+
+    /// <summary>Binds a <see cref="ValidationHelper" /> from a ViewModel to a specified View property.</summary>
+    /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
+    /// <typeparam name="TViewModel">ViewModel type.</typeparam>
+    /// <typeparam name="TViewProperty">View property type.</typeparam>
+    /// <param name="view">IViewFor instance.</param>
+    /// <param name="viewModel">ViewModel instance. Can be null, used for generic type resolution.</param>
+    /// <param name="viewModelHelperProperty">ViewModel's ValidationHelper property.</param>
+    /// <param name="viewProperty">View property to bind the validation message.</param>
+    /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelHelperProperty"/> or <paramref name="viewProperty"/> is null.</exception>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [OverloadResolutionPriority(1)]
+    public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
+        this TView view,
+        TViewModel? viewModel,
+        Func<TViewModel?, ValidationHelper?> viewModelHelperProperty,
+        Func<TView, TViewProperty> viewProperty)
+        where TView : IViewFor<TViewModel>
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForValidationHelperProperty(view, viewModelHelperProperty, viewProperty);
+
+    /// <summary>Binds a <see cref="ValidationHelper" /> from a ViewModel to a specified View property.</summary>
+    /// <typeparam name="TView">IViewFor of TViewModel.</typeparam>
+    /// <typeparam name="TViewModel">ViewModel type.</typeparam>
+    /// <typeparam name="TViewProperty">View property type.</typeparam>
+    /// <param name="view">IViewFor instance.</param>
+    /// <param name="viewModel">ViewModel instance. Can be null, used for generic type resolution.</param>
+    /// <param name="viewModelHelperProperty">ViewModel's ValidationHelper property.</param>
+    /// <param name="viewProperty">View property to bind the validation message.</param>
+    /// <param name="formatter">
+    /// Validation formatter. Defaults to <see cref="SingleLineFormatter"/> when null. In order to override the global
+    /// default value, implement <see cref="IValidationTextFormatter{TOut}"/> and register an instance of
+    /// IValidationTextFormatter&lt;string&gt; into Splat.Locator.
+    /// </param>
+    /// <returns>Returns a <see cref="IDisposable"/> object.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="viewModelHelperProperty"/> or <paramref name="viewProperty"/> is null.</exception>
+    /// <remarks>Uses the Runic Validation generator or an explicitly registered typed capability. Use BindValidationUnsafe for reflection-based execution.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [OverloadResolutionPriority(1)]
+    public static IDisposable BindValidation<TView, TViewModel, TViewProperty>(
+        this TView view,
+        TViewModel? viewModel,
+        Func<TViewModel?, ValidationHelper?> viewModelHelperProperty,
+        Func<TView, TViewProperty> viewProperty,
+        IValidationTextFormatter<string>? formatter)
+        where TView : IViewFor<TViewModel>
+        where TViewModel : class, IReactiveObject, IValidatableViewModel =>
+        ValidationBinding.ForValidationHelperProperty(view, viewModelHelperProperty, viewProperty, formatter);
+}
