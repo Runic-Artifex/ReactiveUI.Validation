@@ -1,59 +1,58 @@
 name: Package release
 on:
   workflow_dispatch:
+    inputs:
+      verify_only:
+        description: Verify accepted Build evidence without creating a release
+        required: false
+        default: false
+        type: boolean
 permissions:
+  actions: read
   contents: write
+concurrency:
+  group: validation-package-release-${{ github.repository }}
+  cancel-in-progress: false
 jobs:
-  verification:
-    uses: ./.github/workflows/ci-build.yml
   release:
-    needs: verification
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v6
-      - name: Download packages accepted by both generated consumer hosts at this workflow SHA
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          name: packages-ubuntu-latest
-          path: artifacts/packages
-      - name: Download generated acceptance reports from both hosts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: generated-validation-*
-          path: artifacts/generated-acceptance
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.x'
-      - name: Require complete generated acceptance at the release source SHA
-        env:
-          RELEASE_SOURCE: ${{ github.sha }}
-        shell: bash
-        run: |
-          python - <<'PY'
-          import hashlib
-          import json
-          import os
-          from pathlib import Path
-          expected = {f"{flavor}-{stage}" for flavor in ("Primitives", "Reactive") for stage in ("managed", "trimmed", "native")}
-          expected |= {f"{flavor}-NEGATIVE_{case}" for flavor in ("Primitives", "Reactive") for case in ("STORED_SELECTOR", "COMPUTED_SELECTOR", "INDEXER", "NESTED_TARGET", "NONNOTIFY_RULE", "STRUCT_OWNER")}
-          for rid in ("linux-x64", "win-x64"):
-              report = json.loads(Path(f"artifacts/generated-acceptance/generated-validation-{rid}/results.json").read_text())
-              assert report["source"] == os.environ["RELEASE_SOURCE"] and report["dirty"] is False
-              assert report["rid"] == rid and report["mode"] == "all"
-              assert report["sdk"] == json.loads(Path("global.json").read_text())["sdk"]["version"]
-              assert set(report["packages"]) == {"Primitives", "Reactive"}
-              for package in report["packages"].values():
-                  asset = Path("artifacts/packages") / f"{package['id']}.{package['version']}.nupkg"
-                  assert hashlib.sha256(asset.read_bytes()).hexdigest() == package["sha256"]
-              checks = report["checks"]
-              assert len(checks) == len(expected) and {item["name"] for item in checks} == expected
-              assert all(item["passed"] is True for item in checks)
-          PY
-      - name: Release NuGet assets
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Run release guard fixtures
+        run: python3 -B -m unittest discover -s eng/release -p test_release_assets.py -v
+      - name: Resolve accepted Build evidence
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          package=$(find artifacts/packages -maxdepth 1 -name 'Runic.ReactiveUI.Validation.*.nupkg' ! -name 'Runic.ReactiveUI.Validation.Reactive.*')
-          version=$(basename "$package" | sed -E 's/^Runic.ReactiveUI.Validation\.(.*)\.nupkg$/\1/')
-          gh release create "runic-v$version" artifacts/packages/*.nupkg --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Runic ReactiveUI.Validation $version" --prerelease --generate-notes
+        run: python3 eng/release/release_assets.py resolve --output artifacts/release-input/source.json
+      - name: Download digest-verified Build artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 eng/release/release_assets.py download --source-report artifacts/release-input/source.json --output artifacts/release-input
+      - name: Verify package and consumer evidence
+        run: python3 eng/release/release_assets.py verify --input artifacts/release-input --source-report artifacts/release-input/source.json --output artifacts/release-input/verified.json
+      - name: Retain release guard evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-guard-evidence-${{ github.run_id }}
+          path: |
+            artifacts/release-input/source.json
+            artifacts/release-input/download-metadata.json
+            artifacts/release-input/verified.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Verification-only completion
+        if: inputs.verify_only
+        run: echo 'Accepted Build evidence verified; no release mutation requested.'
+      - name: Release verified NuGet assets
+        if: ${{ !inputs.verify_only }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 eng/release/release_assets.py publish --verified artifacts/release-input/verified.json
