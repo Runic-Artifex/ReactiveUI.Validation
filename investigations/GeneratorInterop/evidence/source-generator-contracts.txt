@@ -1,0 +1,236 @@
+ReactiveUI.SourceGenerators interoperability source audit — 2026-10-06
+
+Scope and evidence
+This is a read-only source audit, not a build or runtime verification. Validation
+was inspected at 4ca1ee98dd04a8998be3da54da2595cc735cf4a3 before the coordinated
+interop work. No production or package files were changed by this audit.
+
+Pinned and latest published upstream releases checked on official GitHub release
+pages on 2026-10-06: ReactiveUI.SourceGenerators 4.2.0, commit
+c8a8c38dd7192073540e187b8e8abc8d53e16b1a; ReactiveUI.Binding and .Reactive 9.1.0,
+commit 05c45cec845835d670960fac733bb302bc1c1071. The cached NuGet nuspecs agree
+(also verified by parent). This concerns those immutable source snapshots, not
+whatever main will do later. ReactiveUI flavors 26.0.1 use source commit
+88312688d0281fd260977dfd78bb12e1c85ffaaa. The cached older SourceGenerators 3.2.0
+nuspec records 78cca2333f3d2e01bdb0f90ed1d16e4ea62cff15; its source was not fetched
+or separately tested here. The official 4.0 release documents its breaking move
+of ObservableAsProperty and IViewFor/view registration to Binding.
+
+Official release/package references:
+https://github.com/reactiveui/ReactiveUI.SourceGenerators/releases/tag/v4.2.0
+https://github.com/reactiveui/ReactiveUI.SourceGenerators/releases/tag/v4.0.0
+https://github.com/reactiveui/ReactiveUI.Binding.SourceGenerators/releases/tag/v9.1.0
+https://www.nuget.org/packages/ReactiveUI.SourceGenerators/4.2.0
+
+Source location notation below:
+SG = https://github.com/reactiveui/ReactiveUI.SourceGenerators/blob/c8a8c38dd7192073540e187b8e8abc8d53e16b1a/
+Binding = https://github.com/reactiveui/ReactiveUI.Binding.SourceGenerators/blob/05c45cec845835d670960fac733bb302bc1c1071/
+Local source mirrors are /tmp/runic-validation-binding-sources/sourcegenerators
+and /tmp/runic-validation-binding-sources/binding, respectively. All statements
+about implementation below derive from the pinned source, not live documentation.
+
+Recommendation
+Use declared partial properties as the first supported interop contract. For
+example, [Reactive] public partial string? Name { get; set; } already supplies
+the property symbol before any generator runs. A generated field-based property
+requires prediction or a separately compiled model assembly. Build a small,
+versioned prediction component only if existing field-based models must keep
+working without migration. Prefer sharing that component upstream with Binding
+over copying all its compiler/plugin implementation. SourceGenerators is optional
+model boilerplate generation; it does not itself generate ValidationRule or
+BindValidation interceptors. Binding's runtime ObservedProperty is a public,
+typed route for code emitted by another generator, but changes observation
+semantics enough that it needs separate lifetime/provider/null tests.
+
+1. Actual [Reactive] contracts in SourceGenerators 4.2.0
+
+SG src/ReactiveUI.SourceGenerators.Roslyn/Reactive/ReactiveGenerator.cs:21-97
+registers fields and, on the newer Roslyn bands, partial properties. Both are
+ordinary RegisterSourceOutput pipelines. The .NET 10/Roslyn 5 band supports the
+partial-property pipeline. Plain auto-properties with the attribute do not
+become implementations through this pipeline; use a partial definition.
+
+SG .../Reactive/ReactiveGenerator.Execute.cs:58-165,207-302,335-379:
+- The field path makes a PUBLIC property, regardless of backing-field access.
+  _name, __name and m_name become Name (uppercase first remaining character).
+  A field already named Name collides with its predicted property and produces
+  the name-collision diagnostic. Prefix-only edge names have no remaining
+  character in the generator's naming helper; do not assume them supported.
+- Field SetModifier controls the generated setter: public/default, protected,
+  internal, private, protected internal, private protected, or init. Field
+  Inheritance selects none/virtual/override/new; UseRequired emits required.
+- The partial-property path takes access, setter access, required and
+  virtual/override from the actual declaration. Attribute field-style options
+  are not substitutes for those declaration modifiers. It uses the C# 14 field
+  keyword on the newer language path; older supported partial-property code
+  uses a generated backing field.
+- Both paths preserve nullable annotations in generated type text. Setting
+  calls RaiseAndSetIfChanged and optional AlsoNotify property notifications.
+  The generated setter does not validate null or coerce values. MemberNotNull
+  emission is a compiler annotation, not a runtime non-null guarantee.
+
+SG .../Core/Extensions/FieldSyntaxExtensions.cs:30-51,114-132 requires the owner
+to derive ReactiveUI.ReactiveObject, implement the shared ReactiveUI.IReactiveObject,
+or have/inherit the IReactiveObject attribute. Generic and nested partial types
+are represented by TargetInfo plus recursive containing partial declarations
+(Core/Models/TargetInfo.cs and Core/CodeGeneration/SourceWriterExtensions.cs).
+That does NOT imply Validation supports private/open generic call sites: its
+current namespace-level emitters reject those types.
+
+2. [ReactiveCommand], observables and flavor contracts
+
+SG .../ReactiveCommand/ReactiveCommandGenerator.Execute.cs:96-220,291-330,
+439-463,471-626,650-685 creates a lazy command property. It maps synchronous
+methods to Create, Task/Task<T> to CreateFromTask, and IObservable-shaped results
+to CreateFromObservable. Prefix naming matches fields; a Task-returning method
+also loses an Async suffix, then gains Command. The task test specifically walks
+Task base classes: ValueTask is not recognized as asynchronous here. A ValueTask
+return could become a synchronous ValueTask payload, not awaited command output.
+
+One ordinary input is supported; the usual Task method may additionally take a
+trailing CancellationToken. Source-generated CanExecute accepts a bool observable
+field/property or a parameterless method returning one, including a predicted
+Reactive field's generated observable property. It is supplied to the command
+factory; the attribute does not automatically bind validation state. Expose an
+explicit IObservable<bool> validation stream if that is the intended CanExecute.
+
+SG src/ReactiveUI.SourceGenerators.Analyzers.CodeFixes/Diagnostics/CodeFixers/ReactiveCommandAnalyzer.cs
+and its DiagnosticDescriptors.cs report RXUISG0002 (too many non-token inputs)
+and RXUISG0008 (async void) as errors. RXUISG0021 warns about unresolved scheduler
+names. Do not describe every invalid method as skipped by the generator: the
+async-void case can still emit, but the analyzer prevents a clean build.
+RunInBackground uses CreateRunInBackground for synchronous work and Task.Run for
+task work; observable results are unaffected. Named scheduler members must have
+the scheduler type used by the selected command factory. This is relevant to
+Primitives versus System.Reactive compatibility; an arbitrary scheduler from
+the other flavor is not a valid substitute.
+
+SG .../Core/Extensions/ContextExtensions.cs:267-314 and
+Core/Models/ReactiveUiIntegration.cs detect the referenced command API rather
+than requiring the consumer to choose a generator flavor switch. System.Reactive
+uses ReactiveUI.Reactive and System.Reactive.Unit. Primitives uses ReactiveUI
+and ReactiveUI.Primitives.RxVoid. Types and attributes in ReactiveUI.SourceGenerators
+remain in the common namespace. Mixing both runtime flavors in one compilation
+is not a supported proof of either flavor; detection prioritizes the Reactive
+factory if it exists.
+
+SG src/ReactiveUI.SourceGenerators/KeepAttributes.cs:16 defines
+REACTIVEUI_SOURCEGENERATORS_KEEP_ATTRIBUTES. Attributes are public compile-time
+types, Conditional on that symbol, and normally do not survive into consumer
+metadata. A downstream assembly can still read the already compiled generated
+PROPERTY normally; it need not re-predict properties from retained attributes.
+
+OAPH: the pinned SG README's Moved to ReactiveUI.Binding section and the 4.0
+release establish the migration. Binding README:628-669 and its runtime attribute
+provide [ObservableAsProperty] on a partial get-only property. Its generated helper
+field is assigned with ToProperty. SG4.2 does not generate InitializeOAPH. Older
+field/method/observable-property OAPH shapes receive RXUIBIND018 and a migration
+code fix. Our cohort ReactiveUI26/Binding9 can use Binding's helper; old pre-Binding
+ReactiveUI releases have different helper/view interfaces and are not equivalent.
+
+3. Why current Validation does not see field-generated properties
+
+ValidationGenerator.cs:63-70,234-256 uses the ORIGINAL semantic model and an
+ordinary source output. An unresolved normal validation call reports RUVG001
+with guidance to declare a partial property, use explicit observables or choose
+Unsafe. GeneratorHelpers.cs:65-83,87-125,185-235 requires real readable property
+symbols accessible from its generated namespace, rejects open type parameters,
+and requires every observed owner to implement INPC, with reference-type
+intermediate nodes. A private getter usable within its original class is still
+not accessible to this namespace emitter. A partial-property declaration fixes
+symbol visibility, but [IReactiveObject] alone does not add INPC until generation;
+that interface also needs prediction or an explicitly declared source contract.
+Closed generic model types and public declared base properties should be tested
+separately from open generic call sites and field-generated inherited properties.
+
+4. Binding's private visibility/prediction architecture
+
+Binding src/ReactiveUI.Binding.SourceGenerators/Generators/SourceGeneratorsCompilation.cs:34-99
+collects Reactive fields, ReactiveCollection, BindableDerivedList, ReactiveCommand
+and IReactiveObject attributes. It also reads MAUI and Avalonia XAML AdditionalTexts
+and resolves named members. The declared interfaces/properties are grouped into
+one synthetic tree and added to a PRIVATE copy of the original compilation. That
+tree is never emitted; the real SG still supplies runtime implementations.
+
+Binding BindingGenerator.cs:53-72 passes that augmented compilation to every
+invocation extractor. Helpers/CallSiteContext.cs:18-48 obtains the semantic model
+for the ORIGINAL source tree from the augmented compilation; a ConditionalWeakTable
+shares models per compilation/source tree. This also keeps original interceptable
+locations. There is no public compiler pipeline API for Validation to call: these
+types and extractors are internal to the Binding analyzer assembly.
+
+Helpers/SourceGeneratorsMemberExtractor.cs:17,81-160,212-280,449 follows SG4.0
+according to its comment. For Reactive fields it predicts public properties and
+setter access, but omits inheritance/required and uses FullyQualifiedFormat without
+the nullable annotation option. PartialTypeRaisePlugin.cs:76-143 requires partial
+containing declarations, supports generic headers, and does not duplicate every
+source modifier/constraint. Commands use the same broad Task/IObservable naming
+and token rules, but prediction does not certify SG diagnostics or valid method
+implementations. Consequently a simple copy is not a full SG4.2 semantic model.
+Nullability, inherited virtual/override/new resolution, generated commands with
+invalid signatures, field-name collisions, and keyword/prefix-only names are
+important differential-test candidates. These are source-derived risks, not
+newly reproduced failures in this audit.
+
+Ordinary generators cannot order themselves to consume each other's ordinary
+outputs. Roslyn's experimental RegisterPreCompilationSourceOutput is a conditional
+exception for early sources derived from non-compilation inputs. Its inputs may
+not depend on SyntaxProvider/CompilationProvider. Attribute/member generation
+that needs semantic symbols is therefore not directly fixed by selecting it.
+Roslyn primary docs:
+https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.cookbook.md
+https://github.com/dotnet/roslyn/blob/main/docs/features/pre-compilation-source-outputs.md
+
+5. Feasible integration choices and costs
+
+A. Declare partial properties (recommended immediate convention). Minimal code
+and maintenance; real nullable/access/inheritance contracts are visible to both
+generators. Test each flavor, partial source target setters, declared base types,
+closed generic models, null/replacement/disposal, and CanExecute's explicit stream.
+For separate model assemblies, ordinary compiled property symbols already solve
+visibility. No compiler prediction is needed merely because SG generated the body.
+
+B. Narrow shared prediction for supported field-based Reactive/IReactiveObject
+contracts. Introduce an immutable descriptor with owner, real field type/nullability,
+generated member name/access and notification capability; add non-emitted declarations
+once per changed descriptor set; keep CallSiteContext semantics and locations. Use
+the actual original field/type contracts for guards and diagnostics, and fail on
+unknown/invalid cases. A small upstream shared Roslyn component would avoid parallel
+rules in Binding/Validation. Until such API exists, any source reuse needs license
+attribution, source pinning, version drift tests and compatible Roslyn packaging.
+Do not clone unrelated GUI/XAML/command pipelines merely to enable Name rules.
+
+C. Reuse public Binding runtime observation for generated code. Binding
+src/ReactiveUI.Binding.Shared/Mixins/ObservedProperty.cs:35-58,124-143,172-233
+accepts an expression naming ONE property plus a statically compiled getter.
+Create/Then/Switch need no expression Compile; Then tracks replacement and skips
+null parents. Non-INPC sources read once unless a registered provider wins. A
+provider can observe platform-specific properties. Direct typed getters/setters
+plus Validation's safe observable/callback APIs can bridge the result. Generated
+WhenAnyValue calls alone cannot depend on Binding's ordinary analyzer seeing them.
+This public API is explicitly designed for output from other generators.
+
+This expands provider coverage but is not transparent parity: ObservedProperty
+uses INPC affinity rather than Binding's specialized ReactiveObject plugin score;
+custom providers may win differently. Then's null behavior, duplicate filtering,
+events, schedulers and disposal need comparison against our validation contract.
+The library's typed getter is trim/AOT-safe; arbitrary registered provider code
+must be audited/tested independently before promising globally warning-free AOT.
+Binding's compiler observation plugins (Plugins/ObservationPluginRegistry.cs)
+cover platform types and POCO snapshots, but are internal and carry considerably
+more maintenance/runtime/platform cost than the narrow model interop requirement.
+
+D. Private/open generic call-site hosting is separate work. Binding9.1
+Helpers/CallSiteHosting.cs:21-27,260-275 can host unnamed/private access in a caller
+partial class, provided all enclosing classes are partial and nongeneric, and can
+generalize suitable method type parameters with preserved constraints. Generic
+interceptors exist; private generic containing types are not solved merely by a
+namespace interceptor. Stored expression variables likewise require a new explicit
+registration/descriptor contract; the compiler cannot recover arbitrary runtime
+expression construction. Keep explicit typed observable/callback escape hatches.
+
+The recommended initial implementation scope is A plus a carefully tested subset
+of B for existing field-based models. C is useful as a deliberate observation
+adapter with documented semantics. Full legacy parity includes dynamic/runtime
+expression/provider/platform behavior that static generation cannot infer; a
+specific supported subset with explicit Unsafe remains an honest boundary.

@@ -1,0 +1,126 @@
+{
+  "purpose": "Focused historical-cohort replay after the DD .30 main merge; not a native/full-matrix rerun",
+  "historicalFrozenCommit": "9ad0d6a34b2971e149a0477842b0b74b85bb6207",
+  "mergedInvestigationHead": "8698467f27a40ebdfe1715cb42de1e019a4e3c83",
+  "mode": "managed",
+  "case": "PARTIAL",
+  "checksExecuted": 2,
+  "sdk": "10.0.401",
+  "host": "Linux-7.2.8-x86_64-with-glibc2.44",
+  "shippingSource": "2550376b230ccfb78beb8d3b4ced8866b65d809e",
+  "shippingVersion": "8.1.0-runic.0.790.17.15.10",
+  "cohortPins": {
+    "runic.dynamicdata": "10.0.0-runic.5",
+    "runic.dynamicdata.reactive": "10.0.0-runic.5",
+    "reactiveui": "26.0.1",
+    "reactiveui.reactive": "26.0.1"
+  },
+  "inputAndRestoredDynamicDataArchivesVerified": true,
+  "publishedDynamicDataSha256": {
+    "Runic.DynamicData": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+    "Runic.DynamicData.Reactive": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+  },
+  "shippingPackages": {
+    "Primitives": {
+      "id": "Runic.ReactiveUI.Validation",
+      "version": "8.1.0-runic.0.790.17.15.10",
+      "sha256": "ffea7c200bde9893b535dcf3dc9d8fe81ddaba747aad3f95d8b24315218b01c5"
+    },
+    "Reactive": {
+      "id": "Runic.ReactiveUI.Validation.Reactive",
+      "version": "8.1.0-runic.0.790.17.15.10",
+      "sha256": "1f1cb6b0b8404d0914d935306575f2c399b7686e302846b2627f513112ca1a46"
+    }
+  },
+  "revisedRunnerSha256": "f680fce527fdd3523148b3bf3dbea2a785d0683c8bfeae20965f65ad89c45e66",
+  "fixtureFiles": {
+    "Imports.cs": "9dfa12e5367d46db0ac1e6900e31b68d97b26763545974839c272237dbe7c79f",
+    "Directory.Build.props": "82435745c5afdd62478c90a5f7236f448ee2f49d66d1c7fcc93d6582e51798b0",
+    "Directory.Build.targets": "979d471ee55f7b2f5c465a2ed345775b46a9670b17499745cebed9c141ab1fe5",
+    "Streams.cs": "5f4c6818564d66164538e5a0252eecc75d767a52c0948f851cb958a3320f226b",
+    "Models.cs": "37b5f465d96802d29c754ec847bc657975e855de1afdb4f6ed208336258e5222",
+    "Program.cs": "87adec24ff8622b4d563fa344825b31fd389ac519585386a0725a903cdd41c9e",
+    "Primitives/Probe.csproj": "8b6ee5938c4b7945f88b679e285b9efc8020bcb67a9f6b0c134b1f63a0fcde67",
+    "Reactive/Probe.csproj": "d7151eb565bb7ad27ea994786abd483e27a9ad98249882ec4625592553658752"
+  },
+  "fullReport": {
+    "path": "artifacts/GeneratorInterop-reproduction-smoke/results.json",
+    "sha256": "2d38e2a4d4eae969ed62e9a217a70abb4cceaa4e77679b8898f6c5db5bb21a45"
+  },
+  "checks": [
+    {
+      "name": "Primitives-PARTIAL-managed",
+      "passed": true,
+      "warnings": 0,
+      "errors": 0,
+      "cohortPackages": {
+        "ReactiveUI": {
+          "version": "26.0.1",
+          "sha256": "8b8e4ef3a51d07b16d6dd28ff4baa884396a7ed913f893e488aa2afa1f21e110"
+        },
+        "ReactiveUI.Binding": {
+          "version": "9.1.0",
+          "sha256": "b9f9e2fe5d2fcd63aab810d5c2c45a8d096dff1604c1598c12b7db5f223188ac"
+        },
+        "ReactiveUI.SourceGenerators": {
+          "version": "4.2.0",
+          "sha256": "9f631dfa1b6b1eeb2a4b9010a48abdf68fc32b09165380ad63c01cd0355be0b4"
+        }
+      },
+      "analyzersInReportedOrder": [
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/reactiveui.binding/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.SourceGenerators.dll",
+          "sha256": "137188a5a23c66516201ff4431bbd576bc69d3707926231a172b827b1c300896"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Roslyn.dll",
+          "sha256": "9b055317e4aa3e98d7d9a56d762f5ec2ba66f0119553fb5a5424b2cd3f2ede32"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/runic.reactiveui.validation/8.1.0-runic.0.790.17.15.10/analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+          "sha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+        }
+      ],
+      "generatedSourceCount": 8,
+      "buildLogSha256": "52fdf9c1e2703320ffc85bf8687c537057db96270f8ca7ecb8e256927cea2e9b",
+      "runtimeLogSha256": "ef170d09760ae2613476157380565dade31957d71065226f5eb9899964bf8624"
+    },
+    {
+      "name": "Reactive-PARTIAL-managed",
+      "passed": true,
+      "warnings": 0,
+      "errors": 0,
+      "cohortPackages": {
+        "ReactiveUI.Reactive": {
+          "version": "26.0.1",
+          "sha256": "1dda292340e5a523010623b14eb01c41131bc7046e1b3539b28a67f269c905d9"
+        },
+        "ReactiveUI.Binding.Reactive": {
+          "version": "9.1.0",
+          "sha256": "e7674abb786b502c54ba044d523bfcef27f5fc11708933b942bd40482c27de09"
+        },
+        "ReactiveUI.SourceGenerators": {
+          "version": "4.2.0",
+          "sha256": "9f631dfa1b6b1eeb2a4b9010a48abdf68fc32b09165380ad63c01cd0355be0b4"
+        }
+      },
+      "analyzersInReportedOrder": [
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/reactiveui.binding.reactive/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.SourceGenerators.dll",
+          "sha256": "137188a5a23c66516201ff4431bbd576bc69d3707926231a172b827b1c300896"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Roslyn.dll",
+          "sha256": "9b055317e4aa3e98d7d9a56d762f5ec2ba66f0119553fb5a5424b2cd3f2ede32"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/artifacts/GeneratorInterop/packages/runic.reactiveui.validation.reactive/8.1.0-runic.0.790.17.15.10/analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+          "sha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+        }
+      ],
+      "generatedSourceCount": 8,
+      "buildLogSha256": "0527f8caaf1eb127cc891a037402611a3ec9dbb5237ec0a52a79e43b38e3e7b2",
+      "runtimeLogSha256": "ef170d09760ae2613476157380565dade31957d71065226f5eb9899964bf8624"
+    }
+  ]
+}

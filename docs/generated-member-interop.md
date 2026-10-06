@@ -13,11 +13,20 @@ flavor **9.1.0** at `05c45cec845835d670960fac733bb302bc1c1071`, and ReactiveUI
 SDK **10.0.401**, C#14 and Roslyn **5.9**. These are versioned contracts, not
 promises about arbitrary generators or future producer versions.
 
+The original executed investigation snapshot is `9ad0d6a`, which preserves the
+fixture sources, runner provenance and measured hashes; it is an investigation
+snapshot, not a production interoperability implementation. Its released
+DynamicData **10.0.0-runic.5** / Validation **.790.17.15.10** cohort remains
+historical after main adopted DynamicData **10.0.0-runic.30**. These results do
+not establish interoperability for that newer dependency cohort.
+
 ## Visibility and the immediate convention
 
-Ordinary generators inspect the original consumer compilation. Sources emitted
-by another ordinary generator appear in the final compilation, without becoming
-inputs to Validation's generator. Packaging both analyzers together or reversing
+Ordinary semantic/source-output generation inspects the consumer compilation,
+which can include fixed post-initialization attribute/helper declarations. The
+Reactive attributes are available; peer property implementations emitted through
+normal source output are not inputs to Validation's generator. Those outputs
+appear in the final compilation. Packaging both analyzers together or reversing
 their registration order does not create a producer/consumer phase. Roslyn's
 [pipeline documentation](https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.md)
 describes that boundary.
@@ -96,8 +105,8 @@ Execution rows below distinguish package support from prototype feasibility.
 | One private nullable Name projection, actual producer + Binding + Validation | Original Validation and Binding calls are intercepted; real producer property executes; projected tree is absent from output. | Four managed passes: both flavors × both outer orders; unprojected controls reject with `RUVG001` + `RUVG005`. |
 | Roslyn early-output API | Available in Roslyn 5.9; syntax/semantic input restriction prevents this attribute-based shortcut. | Primary API/source documentation inspected. |
 
-The read-only source audit is retained at
-`artifacts/investigation/source-generator-contracts.txt` (SHA256
+The unchanged [read-only source audit](../investigations/GeneratorInterop/evidence/source-generator-contracts.txt)
+is retained with the investigation (SHA256
 `abe4f50a3679f37a79571b2110a642e5c5a29fc275b49dcdee982033a5dc85a2`). It records
 pinned source-file/line contracts and source-derived risks; it is not runtime or
 NativeAOT proof. The [managed package report](../investigations/GeneratorInterop/evidence/managed-results.json)
@@ -116,6 +125,13 @@ retained inputs and proof hashes. The Validation package source is `2550376b…`
 the local pair hashes are `ffea7c20…` (Primitives) and `1f1cb6b0…` (Reactive),
 distinct from the earlier CI package pair.
 
+After the dependency merge, the revised runner's
+[focused reproduction record](../investigations/GeneratorInterop/evidence/reproduction-smoke.json)
+records two clean managed `PARTIAL` executions, retaining the historical
+`.5`/`.10` cohort. It identifies the revised runner/fixture hashes separately;
+the original 90 evidence-manifest entries remain unchanged. This is not a rerun
+of the native or full configuration matrix.
+
 The [projection manifest](../investigations/GeneratorInterop/ProjectionProof/evidence/manifest.json)
 records four sources per run, zero final-dispatch diagnostics and the trace
 `initial-invalid → Ada-valid → null-invalid → disposed`; Binding continues with
@@ -124,6 +140,13 @@ The private compiler matches SDK defaults `NoWarn=1701;1702`; initial raw
 System.Reactive framework-identity warnings are retained in the
 [prototype evidence](../investigations/GeneratorInterop/ProjectionProof/README.md).
 No trim/AOT warnings are suppressed; this prototype has no native execution.
+
+The separate [portable projection replay](../investigations/GeneratorInterop/ProjectionProof/portability-replay.json)
+passes four managed flavor/order cases with clean strict builds and zero final
+dispatch diagnostics, using verified historical feeds and unchanged original
+fixture bytes. Original evidence/logs remain unchanged. It distinguishes the
+tested compiler snapshot from three later output-guard checks and the current
+runner hash; it adds no native or newer-dependency proof.
 
 ## Why early output is not a simple switch
 
@@ -178,7 +201,7 @@ would repeat the ordering problem.
 
 The safe observable/callback APIs avoid reflection-based observation/assignment;
 safe metadata overloads may inspect selector metadata without compiling it.
-explicit Unsafe retains its warning-bearing runtime-expression behavior. A
+Explicit Unsafe retains its warning-bearing runtime-expression behavior. A
 managed co-run proves neither arbitrary providers nor NativeAOT compatibility.
 Only actual trimmed/native executions can establish those claims for the tested
 cohort. This investigation changes no production support boundary, published

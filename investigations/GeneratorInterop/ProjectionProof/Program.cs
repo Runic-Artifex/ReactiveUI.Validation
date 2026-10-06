@@ -14,7 +14,14 @@ using Microsoft.CodeAnalysis.Text;
 var flavor = args[0];
 var root = Path.GetFullPath(args[1]);
 var cache = args[2];
-var evidence = Path.Combine(root, "evidence", flavor);
+// New reproduction output is separate from the immutable historical evidence.
+var output = Path.GetFullPath(args[3]);
+var historicalEvidence = Path.Combine(root, "evidence");
+if (output == root || output == historicalEvidence || output.StartsWith(historicalEvidence + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+    throw new InvalidOperationException("Reproduction cannot overwrite historical evidence");
+var evidence = Path.Combine(output, "evidence", flavor);
+if (Directory.Exists(evidence))
+    throw new InvalidOperationException("Each flavor requires a fresh reproduction output");
 Directory.CreateDirectory(evidence);
 var validationPackage = flavor == "Reactive" ? "runic.reactiveui.validation.reactive" : "runic.reactiveui.validation";
 var bindingPackage = flavor == "Reactive" ? "reactiveui.binding.reactive" : "reactiveui.binding";

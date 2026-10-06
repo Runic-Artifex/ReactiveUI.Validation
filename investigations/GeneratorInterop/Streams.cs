@@ -40,5 +40,3 @@ internal sealed class Cleanup(Action cleanup) : IDisposable
     private Action? _cleanup = cleanup;
     public void Dispose() => Interlocked.Exchange(ref _cleanup, null)?.Invoke();
 }
-
-

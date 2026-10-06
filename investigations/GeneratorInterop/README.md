@@ -9,8 +9,8 @@ It co-runs **unmodified packaged analyzers** from:
 - ReactiveUI / ReactiveUI.Reactive **26.0.1** and Binding / Binding.Reactive
   **9.1.0**. Binding includes its analyzer and generator (Roslyn 4.13 asset).
 - ReactiveUI.SourceGenerators **4.2.0** (Roslyn 5.0 asset).
-- Released matching Runic.DynamicData pair **10.0.0-runic.5**, SHA-verified against
-  the existing bootstrap; SDK **10.0.401**, C# 14, actual compiler Roslyn 5.9.
+- Released matching Runic.DynamicData pair **10.0.0-runic.5**, verified against the
+  retained historical release hashes; SDK **10.0.401**, C# 14, actual compiler Roslyn 5.9.
 
 The pinned NuGet inputs are real packages. Each temporary application restores
 outside the production project graph into an owned reusable cache, validates
@@ -65,6 +65,17 @@ execution; no separate trimmed managed execution or Windows execution was run fo
 this investigation.
 
 ## Reproduce
+
+The reproduction runner now carries explicit historical `.5`/ReactiveUI 26.0.1
+pins and `.5` release digests. It checks DynamicData archive bytes in both the
+input feed and the restored cache, and does not inherit the current shipping
+central pins. Main's later `.30` DynamicData update does not change this dated
+research cohort. Original tested runner/fixture bytes and the 20 historical
+outcomes are frozen in commit `9ad0d6a`; those historical reports and their
+manifest remain unchanged. A subsequent [reproduction smoke](evidence/reproduction-smoke.json)
+records only two managed PARTIAL executions with independent revised runner and
+fixture hashes after merging the `.30` main revision. It does not repeat or
+relabel the original native or full matrix results.
 
 From this worktree root, provide the locked SDK checkout and exact verified feeds:
 

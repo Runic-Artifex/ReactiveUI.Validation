@@ -20,6 +20,18 @@ NATIVE = importlib.util.module_from_spec(spec); spec.loader.exec_module(NATIVE)
 CASES = ('PARTIAL', 'FIELD_EMAIL', 'FIELD_HELPER', 'FIELD_CONTEXT', 'FIELD_TARGET', 'COMMAND_METADATA', 'GENERATED_INTERFACE', 'FIELD_OBSERVABLE')
 SOURCE = '2550376b230ccfb78beb8d3b4ced8866b65d809e'
 VERSION = '8.1.0-runic.0.790.17.15.10'
+# This dated investigation reproduces the verified .10/.5 cohort independently
+# of later shipping dependency updates. The original execution is frozen in 9ad0d6a.
+COHORT_PINS = {
+    'runic.dynamicdata': '10.0.0-runic.5',
+    'runic.dynamicdata.reactive': '10.0.0-runic.5',
+    'reactiveui': '26.0.1',
+    'reactiveui.reactive': '26.0.1',
+}
+DYNAMIC_DATA_DIGESTS = {
+    'Runic.DynamicData': 'ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366',
+    'Runic.DynamicData.Reactive': '49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268',
+}
 
 
 def sha(path):
@@ -49,11 +61,11 @@ def main():
         raise ValueError('Native probe requires matching Linux x64 host')
     sdk = subprocess.check_output(['dotnet', '--version'], cwd=ROOT, text=True).strip()
     if sdk != '10.0.401': raise ValueError('Pinned SDK required')
-    pins = NATIVE.PACKAGES.dependency_pins(ROOT)
+    pins = COHORT_PINS
     feed = args.package_feed.resolve(); dependencies = args.dependencies_feed.resolve()
     packages = NATIVE.packed_versions(feed, pins, SOURCE)
     if any(version != VERSION for _, _, version, _ in packages): raise ValueError('Exact verified .10 package pair required')
-    for package_id, expected in NATIVE.DEPENDENCIES.DIGESTS.items():
+    for package_id, expected in DYNAMIC_DATA_DIGESTS.items():
         path = dependencies / f'{package_id}.{pins[package_id.casefold()]}.nupkg'
         if sha(path) != expected: raise ValueError('Released DynamicData bytes differ')
     output = args.output.resolve(); output.mkdir(parents=True, exist_ok=True)
@@ -61,7 +73,7 @@ def main():
     report = {'investigationHead': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'shippingSource': SOURCE, 'shippingVersion': VERSION, 'sdk': sdk, 'host': platform.platform(),
               'mode': args.mode, 'runnerSha256': sha(Path(__file__)), 'fixtureSources': {p.name: sha(p) for p in FIXTURE.glob('*.cs')},
-              'publishedDynamicDataSha256': NATIVE.DEPENDENCIES.DIGESTS, 'shippingPackages': {}, 'checks': []}
+              'cohortPins': COHORT_PINS, 'publishedDynamicDataSha256': DYNAMIC_DATA_DIGESTS, 'shippingPackages': {}, 'checks': []}
     for reactive, package_id, version, package in packages:
         flavor = 'Reactive' if reactive else 'Primitives'
         report['shippingPackages'][flavor] = {'id': package_id, 'version': version, 'sha256': sha(package)}
@@ -90,6 +102,8 @@ def main():
                 assets = json.loads((project.parent / 'obj/project.assets.json').read_text())
                 NATIVE.verify_native_graph(assets, reactive, pins, version, 'linux-x64' if args.mode == 'native' else None)
                 NATIVE.verify_restored_bytes(assets, package_id, version, sha(package))
+                dynamic_data = NATIVE.PACKAGES.flavor_ids(reactive)[1]
+                NATIVE.verify_restored_bytes(assets, dynamic_data, pins[dynamic_data.casefold()], DYNAMIC_DATA_DIGESTS[dynamic_data])
                 if any(name.split('/', 1)[0].lower().startswith('microsoft.codeanalysis') for name in assets['libraries']):
                     raise ValueError('Roslyn runtime package leaked into consumer graph')
                 forbidden = {'ReactiveUI.Validation.SourceGenerators.dll', 'ReactiveUI.Binding.SourceGenerators.dll', 'ReactiveUI.SourceGenerators.Roslyn.dll', 'ReactiveUI.Binding.Analyzer.dll', 'ReactiveUI.SourceGenerators.Analyzers.CodeFixes.dll'}

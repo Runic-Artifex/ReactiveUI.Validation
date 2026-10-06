@@ -5,7 +5,12 @@ outer generator orders. A private declaration lets the unchanged packaged
 Validation generator analyze a `[Reactive]` field-generated property. The final
 assembly uses the real ReactiveUI generated property and notifications, the real
 Binding `WhenAnyValue` interceptor, and Validation's generated rule interceptor.
-The projected declaration never enters the final compilation.
+The projected declaration never enters the final compilation. The retained
+evidence and four original logs describe the tested snapshot committed as
+`9ad0d6a`. Their source hashes refer to that original snapshot. The current runner
+adds path parameterization and writes new reproduction records separately; it
+does not rewrite those historical files or claim tests against the current
+production dependency graph.
 
 ## Inputs
 
@@ -90,15 +95,45 @@ warnings/errors.
 
 ## Reproduce
 
-From this directory:
+From this directory, supply the approved locked SDK project, the retained
+candidate package feed, the released DynamicData `.5` feed, and an existing cache:
 
 ```sh
-direnv exec /home/viktor/Development/RunicArtifex/runic-sdk python3 run.py
+proof_sdk=/path/to/runic-sdk
+direnv exec "$proof_sdk" python3 run.py \
+  --sdk "$proof_sdk" \
+  --package-feed /path/to/retained/candidate-packages \
+  --dependencies-feed /path/to/released/dynamicdata-packages \
+  --cache /path/to/existing/nuget-cache
 ```
 
-The runner reuses the existing NuGet cache and retained candidate feed. Runs are
-sequential. `bin/` and `obj/` are task-owned disposable compiler-host outputs;
-`evidence/` and the four logs are retained verification artifacts.
+The runner checks the exact historical `.10` Validation and `.5` DynamicData
+package hashes before restore. It creates a proof-owned NuGet configuration with
+explicit source mappings and passes that configuration and cache to MSBuild;
+production feeds and the current `.30` dependency pins do not determine this
+experiment. The checked-in project retains the original versions.
+
+By default, all new reports, generated sources, consumer DLLs and logs go into a
+fresh ignored `reproductions/<UTC timestamp>-<id>/` directory. `--output` selects
+another fresh, nonexistent directory outside this proof tree or beneath its
+excluded `reproductions/` directory. Existing outputs, historical evidence and
+other directories inside the proof tree are rejected. `--binding-source` optionally verifies the pinned inspected
+checkout and file hashes; otherwise the historical source inspection is labeled
+as historical and no local Binding checkout is required. Every reproduction
+manifest records the new proof source hashes separately from the original
+manifest hash and snapshot.
+
+[portability-replay.json](portability-replay.json) records the four successful
+managed checks of the parameterized runner after merge base `8698467`, using the
+same historical `.10`/`.5` package bytes. It confirms the original fixture text,
+evidence and logs are unchanged. A subsequent runner-only output guard has three
+separate rejection checks and its own hash; the record distinguishes those
+checks from the measured compiler source snapshot. This replay does not repeat
+or replace the original NativeAOT measurements.
+
+Runs are sequential. `bin/` and `obj/` are reusable task-owned compiler-host
+outputs. Generated reproduction directories are disposable after review;
+`evidence/` and the four original logs remain historical verification artifacts.
 
 ## Limits
 

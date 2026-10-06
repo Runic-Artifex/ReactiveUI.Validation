@@ -1,0 +1,187 @@
+{
+  "purpose": "parameterized managed replay; distinct from historical 9ad0d6a compiler/native evidence",
+  "historicalSnapshot": "9ad0d6a34b2971e149a0477842b0b74b85bb6207",
+  "currentBase": "8698467f27a40ebdfe1715cb42de1e019a4e3c83",
+  "historicalManifestSha256": "0f804794dd205653793ad3de6f5e38d796bf80a8627aa243f9bb618702e3a440",
+  "historicalEvidenceAndLogsUnchanged": true,
+  "fixtureSourceBytesUnchangedBothFlavors": true,
+  "sdk": "10.0.401",
+  "versions": {
+    "validation": "8.1.0-runic.0.790.17.15.10",
+    "dynamicData": "10.0.0-runic.5",
+    "reactiveUI": "26.0.1",
+    "reactiveUISourceGenerators": "4.2.0",
+    "binding": "9.1.0",
+    "roslyn": "5.9.0"
+  },
+  "fullReplayDirectory": "/home/viktor/Development/RunicArtifex/.worktrees/validation-generator-interop/investigations/GeneratorInterop/ProjectionProof/reproductions/20261006T001813Z-76ab83cf",
+  "fullReplayManifestSha256": "e0ec8c49eb6b9ae5fd2d41195407f89107c1f30bc6849c72d7dcf6174736458b",
+  "isolatedRestoreConfigSha256": "704f911047fc37c9eb1504232240f5091e3e1726f2413dfcac42e8ad1b4a29c6",
+  "verifiedFeedArchives": [
+    {
+      "path": "/home/viktor/Development/RunicArtifex/ReactiveUI.Validation/artifacts/verification/generated-support/2550376/candidate-packages/Runic.ReactiveUI.Validation.8.1.0-runic.0.790.17.15.10.nupkg",
+      "sha256": "ffea7c200bde9893b535dcf3dc9d8fe81ddaba747aad3f95d8b24315218b01c5"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/ReactiveUI.Validation/artifacts/verification/generated-support/2550376/candidate-packages/Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.790.17.15.10.nupkg",
+      "sha256": "1f1cb6b0b8404d0914d935306575f2c399b7686e302846b2627f513112ca1a46"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/ReactiveUI.Validation/artifacts/dependencies/Runic.DynamicData.10.0.0-runic.5.nupkg",
+      "sha256": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366"
+    },
+    {
+      "path": "/home/viktor/Development/RunicArtifex/ReactiveUI.Validation/artifacts/dependencies/Runic.DynamicData.Reactive.10.0.0-runic.5.nupkg",
+      "sha256": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268"
+    }
+  ],
+  "bindingSourceCheckoutRequired": false,
+  "bindingSourceReinspectedThisReplay": false,
+  "testedProofSources": [
+    {
+      "path": "Directory.Build.props",
+      "sha256": "cdf8ffc522ef5c82a8f87730ed35d1c3a065aeb3486958b8075f6d9d532846e3"
+    },
+    {
+      "path": "Directory.Build.targets",
+      "sha256": "a5da923c33af13c1f593c0e100d8cd2d845e7d1239d03ece7c123a304b1de8e6"
+    },
+    {
+      "path": "Program.cs",
+      "sha256": "e4b75c64c8f9e7e178ed86bfe403356fc7fcfc1864f5d956d50cb4d1dc0d95fd"
+    },
+    {
+      "path": "ProjectionProof.csproj",
+      "sha256": "ce44e6e0e87dc0998ebe298a9ee2587f3474c28f9b5aaa016467b283543b9c09"
+    },
+    {
+      "path": "nuget.config",
+      "sha256": "c673bf8a724f2708236333e3c08a041a41839435b4055591d82f72b9cfcb7cd4"
+    },
+    {
+      "path": "run.py",
+      "sha256": "44c8328e93ad207a4d0e086be3ee274237e483d63ccfefffcdf216ee22344608"
+    }
+  ],
+  "builds": [
+    {
+      "flavor": "Primitives",
+      "warnings": 0,
+      "errors": 0,
+      "logSha256": "74dd436cf40fe061779ef3bf25748347454722f375277b9ad4f88e4b0258ab37"
+    },
+    {
+      "flavor": "Reactive",
+      "warnings": 0,
+      "errors": 0,
+      "logSha256": "f7686b15980bbbc06219c4818d4bf84019cda6b680e6e476060dec8ec2716319"
+    }
+  ],
+  "results": [
+    {
+      "flavor": "Primitives",
+      "analyzers": [
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Roslyn.dll",
+          "sha256": "9b055317e4aa3e98d7d9a56d762f5ec2ba66f0119553fb5a5424b2cd3f2ede32"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.binding/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.SourceGenerators.dll",
+          "sha256": "137188a5a23c66516201ff4431bbd576bc69d3707926231a172b827b1c300896"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/runic.reactiveui.validation/8.1.0-runic.0.790.17.15.10/analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+          "sha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+        }
+      ],
+      "cases": [
+        {
+          "order": "producer-first",
+          "trace": "initial-invalid -> Ada-valid -> null-invalid -> disposed; Binding=[null,Ada,null,Detached]",
+          "generatedCount": 4,
+          "finalDispatchDiagnostics": 0,
+          "emittedProjection": false,
+          "originalSourceSha256": "802f5021cd0cb0f26ed5a6eda07313dd371a8a65a403459be28813511522d344",
+          "interceptor": "ReactiveUI.Validation.Generated.Assembly_ProjectionConsumer_Primitives_producer_first.ValidationInterceptors.Intercept0(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, System.Func<string?, bool>, string)",
+          "bindingInterceptor": "ReactiveUI.Binding.Generated.Interceptors.ProjectionConsumer_Primitives_producer_first.__ReactiveUIGeneratedBindings.__Intercept_WhenAnyValue_7FFFEBDF87256747(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, string, string, int)"
+        },
+        {
+          "order": "adapter-first",
+          "trace": "initial-invalid -> Ada-valid -> null-invalid -> disposed; Binding=[null,Ada,null,Detached]",
+          "generatedCount": 4,
+          "finalDispatchDiagnostics": 0,
+          "emittedProjection": false,
+          "originalSourceSha256": "802f5021cd0cb0f26ed5a6eda07313dd371a8a65a403459be28813511522d344",
+          "interceptor": "ReactiveUI.Validation.Generated.Assembly_ProjectionConsumer_Primitives_adapter_first.ValidationInterceptors.Intercept0(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, System.Func<string?, bool>, string)",
+          "bindingInterceptor": "ReactiveUI.Binding.Generated.Interceptors.ProjectionConsumer_Primitives_adapter_first.__ReactiveUIGeneratedBindings.__Intercept_WhenAnyValue_7FFFEBDF87256747(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, string, string, int)"
+        }
+      ],
+      "unprojectedControl": {
+        "generatorDiagnostics": [
+          "RUVG001"
+        ],
+        "dispatchDiagnostics": [
+          "RUVG005"
+        ]
+      }
+    },
+    {
+      "flavor": "Reactive",
+      "analyzers": [
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.sourcegenerators/4.2.0/analyzers/dotnet/roslyn5.0/cs/ReactiveUI.SourceGenerators.Roslyn.dll",
+          "sha256": "9b055317e4aa3e98d7d9a56d762f5ec2ba66f0119553fb5a5424b2cd3f2ede32"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/reactiveui.binding.reactive/9.1.0/analyzers/dotnet/roslyn4.13/cs/ReactiveUI.Binding.SourceGenerators.dll",
+          "sha256": "137188a5a23c66516201ff4431bbd576bc69d3707926231a172b827b1c300896"
+        },
+        {
+          "path": "/home/viktor/Development/RunicArtifex/runic-sdk/.cache/nuget/runic.reactiveui.validation.reactive/8.1.0-runic.0.790.17.15.10/analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll",
+          "sha256": "92e8fb71e0ec81728f2f2e7c4130ab75f3a9093af63f3506892a33a306549e78"
+        }
+      ],
+      "cases": [
+        {
+          "order": "producer-first",
+          "trace": "initial-invalid -> Ada-valid -> null-invalid -> disposed; Binding=[null,Ada,null,Detached]",
+          "generatedCount": 4,
+          "finalDispatchDiagnostics": 0,
+          "emittedProjection": false,
+          "originalSourceSha256": "0c2c43b858bcf00493436d3baa7792c3a09515f0370671da1f5334afc2cd09b0",
+          "interceptor": "ReactiveUI.Validation.Generated.Assembly_ProjectionConsumer_Reactive_producer_first.ValidationInterceptors.Intercept0(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, System.Func<string?, bool>, string)",
+          "bindingInterceptor": "ReactiveUI.Binding.Generated.Interceptors.ProjectionConsumer_Reactive_producer_first.__ReactiveUIGeneratedBindings.__Intercept_WhenAnyValue_7FFFEBDF87256747(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, string, string, int)"
+        },
+        {
+          "order": "adapter-first",
+          "trace": "initial-invalid -> Ada-valid -> null-invalid -> disposed; Binding=[null,Ada,null,Detached]",
+          "generatedCount": 4,
+          "finalDispatchDiagnostics": 0,
+          "emittedProjection": false,
+          "originalSourceSha256": "0c2c43b858bcf00493436d3baa7792c3a09515f0370671da1f5334afc2cd09b0",
+          "interceptor": "ReactiveUI.Validation.Generated.Assembly_ProjectionConsumer_Reactive_adapter_first.ValidationInterceptors.Intercept0(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, System.Func<string?, bool>, string)",
+          "bindingInterceptor": "ReactiveUI.Binding.Generated.Interceptors.ProjectionConsumer_Reactive_adapter_first.__ReactiveUIGeneratedBindings.__Intercept_WhenAnyValue_7FFFEBDF87256747(ProjectionInput.Model, System.Linq.Expressions.Expression<System.Func<ProjectionInput.Model, string?>>, string, string, int)"
+        }
+      ],
+      "unprojectedControl": {
+        "generatorDiagnostics": [
+          "RUVG001"
+        ],
+        "dispatchDiagnostics": [
+          "RUVG005"
+        ]
+      }
+    }
+  ],
+  "postSmokeGuard": {
+    "change": "reject custom output within proof tree except excluded reproductions; compiler fixtures not repeated for runner-only guard",
+    "runnerSha256": "409082cb576e5a69a0230b33913abdfb8c9c92496ef5828a1836a78a76a348f4",
+    "checkedWithoutBuild": [
+      "unexpected in-tree directory rejected; no directory created",
+      "historical evidence descendant rejected; no directory created",
+      "existing replay output rejected"
+    ],
+    "checksPassed": 3
+  },
+  "scope": "Four managed flavor/order cases only. No native publishing and no production support/dependency change."
+}

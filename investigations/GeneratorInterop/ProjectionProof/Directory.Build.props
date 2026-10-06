@@ -10,7 +10,7 @@
     <IsPackable>false</IsPackable>
     <BaseIntermediateOutputPath>obj/$(Flavor)/</BaseIntermediateOutputPath>
     <BaseOutputPath>bin/$(Flavor)/</BaseOutputPath>
-    <DefaultItemExcludes>$(DefaultItemExcludes);obj/**;bin/**;evidence/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj/**;bin/**;evidence/**;reproductions/**</DefaultItemExcludes>
     <ValidationVersion>8.1.0-runic.0.790.17.15.10</ValidationVersion>
   </PropertyGroup>
 </Project>
