@@ -42,7 +42,7 @@ def restore_cohort(version, digests):
 def main():
     """Restore the current central pair or the explicit immutable legacy baseline."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--legacy", action="store_true", help="Restore the immutable .5 pair used by dated baseline investigations")
+    parser.add_argument("--legacy", action="store_true", help="Restore the immutable .5 pair used by the native gate's released Validation baseline")
     args = parser.parse_args()
     if args.legacy:
         restore_cohort(LEGACY_VERSION, LEGACY_DIGESTS)

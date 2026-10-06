@@ -29,16 +29,11 @@ def module(name, path):
 
 PACKAGES = module("verify_packages", ROOT / "eng/verify-packages.py")
 DEPENDENCIES = module("fork_dependencies", ROOT / "eng/restore-fork-dependencies.py")
-RELEASE = module("validation_release", ROOT / "investigations/NativeAot/restore-validation-feed.py")
+RELEASE = module("validation_release", ROOT / "eng/restore-validation-feed.py")
 
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def verify_restored_bytes(assets, package_id, version, expected):
-    """Compatibility entry point for dated investigation consumers of this gate."""
-    return PACKAGES.verify_restored_bytes(assets, package_id, version, expected)
 
 
 def write_report(output, report):
@@ -249,7 +244,7 @@ def main():
                 shutil.copyfile(package, retained / package.name)
             feed = retained
         release_feed = ROOT / "artifacts/verification/released-validation"
-        run([sys.executable, ROOT / "investigations/NativeAot/restore-validation-feed.py", release_feed],
+        run([sys.executable, ROOT / "eng/restore-validation-feed.py", release_feed],
             output / "baseline-feed.log", ROOT)
         inputs = (("candidate", feed, packed_versions(feed, pins, report["source"]), pins, DEPENDENCIES.DIGESTS),
                   ("baseline", release_feed, packed_versions(release_feed, baseline_pins), baseline_pins, DEPENDENCIES.LEGACY_DIGESTS))

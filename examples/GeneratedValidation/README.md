@@ -28,8 +28,6 @@ factories and synchronous stack snapshots. It also defines all eleven static
 binding factories, ordered raw/custom nullable formatter projections, typed
 formatter registrations, selected init/readonly/private access, immutable storage
 alternatives, direct typed component constructors and custom observation providers.
-These source fixtures are acceptance inputs; their presence is not proof of a
-completed package or native run.
 
 Each flavor also builds a separate precompiled caller DLL against the actual
 package before compiling the application. The application consumes its binary
@@ -39,14 +37,14 @@ require finite registration, reject ambiguity and missing/unregistered plans, an
 check detached callback lifetimes. Compiler replay records these calls as explicit
 `RuntimeRegistered` dispatch; they do not satisfy the normal generated inventory.
 
-The historical ABI lane compiles a second pair of peer DLLs against the audited
-`2550376` package pair (`8.1.0-runic.0.790.17.15.10`, DynamicData `.5`) and retains them unchanged. Only that
-historical compilation excludes the old Validation analyzer so its IL retains the
-original API invocation and method group. The current host supplies the finite
+The legacy ABI lane uses a second pair of peer DLLs, compiled once against an
+earlier package pair (`8.1.0-runic.0.790.17.15.10`, DynamicData `.5`) and kept
+unchanged in `eng/verification-fixtures/LegacyPeer`. That compilation excluded
+the old Validation analyzer, so its IL retains the original API invocation and
+method group. The current host supplies the finite
 typed catalog and links those unchanged binaries into every managed, trimmed and
 native consumer. The gate checks their source, compiler manifest, baseline package
-hashes and actual original-call IL separately from the current-package peer. This
-fixture closes historical ABI acceptance only after those application runs pass.
+hashes and actual original-call IL separately from the current-package peer.
 
 `Negative.cs` contains six genuine compile-negative configurations: an opaque
 runtime selector without deliberate registration, unmarked init/readonly targets,
@@ -77,17 +75,16 @@ consumers are removed automatically while its package cache is reused.
 
 The CI native matrix executes all three modes on Linux x64 and Windows x64 using
 the same Linux shipping package artifact. Release requires both complete reports
-at the release SHA. These workflow requirements are not evidence of a completed
-run; verification records must identify the executed source and package bytes.
-The historical `NativeValidation` corpus and immutable-release expectations remain
-separate.
+at the release SHA. The explicit-observable `NativeValidation` corpus has its own
+gate.
 
 The same application also links the maintained rule, real producer, error-hook and
 generated-peer scenarios from `eng/verification-fixtures`. The gate builds the
 private `PeerGeneratedCaller` analyzer once and records its bytes and emitted
 caller source. Direct example builds require that tool DLL through
 `PeerGeneratedCallerAnalyzerPath`; it is an analyzer input and never a runtime
-reference. The 43-row acceptance map requires all 23 final application cases,
-while actual platform producer/UI contracts remain separate compiler evidence.
+reference. The [capability reference](../../docs/generated-capabilities.md) maps
+the 23 application cases to capabilities; platform producer/UI contracts are
+covered by compiler tests only.
 SDK compiler replay retains the effective CoreCompile warning defaults and rejects
 any additions to the three verified .NETCoreApp defaults (1701, 1702, 8002).

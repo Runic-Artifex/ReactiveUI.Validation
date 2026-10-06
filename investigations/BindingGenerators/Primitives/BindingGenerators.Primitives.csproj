@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <Compile Include="../Program.cs" Link="Program.cs" />
-    <PackageReference Include="Runic.ReactiveUI.Validation" />
-    <PackageReference Include="Runic.DynamicData" />
-    <PackageReference Include="ReactiveUI" Condition="'$(UseReactiveUIReference)' == 'true'" />
-    <PackageReference Include="ReactiveUI.SourceGenerators" PrivateAssets="all" Condition="'$(UseVmGenerator)' == 'true'" />
-  </ItemGroup>
-</Project>
