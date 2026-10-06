@@ -1,5 +1,0 @@
-# Investigation must report unsafe paths and still produce a runnable artifact.
-# Preserve diagnostics as warnings; no suppression or linker roots are applied.
-[*.cs]
-dotnet_diagnostic.IL2026.severity = warning
-dotnet_diagnostic.IL3050.severity = warning

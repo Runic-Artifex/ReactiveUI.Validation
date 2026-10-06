@@ -2,8 +2,8 @@
 
 These package-only consumers are opt-in and outside the shipping solution. Shared
 application models use real property notifications. The `ExpectedFailure` pair
-pins released Validation `8.1.0-runic.0.790.17` (source `c9fa501`) and matching
-released DynamicData `10.0.0-runic.5`. No sibling project reference is used.
+pins released Validation `8.1.0-runic.0.790.17` and the matching released
+DynamicData `10.0.0-runic.5`. No sibling project reference is used.
 
 | Case | Application contract | Released baseline |
 | --- | --- | --- |
@@ -43,15 +43,13 @@ The safe `generic-field` case also checks the application adapters' synchronous
 initial delivery: reentrant parent replacement/null, ownership disposed before
 `Subscribe` returns, and initial getter/callback failures. Pending ownership slots
 reject obsolete tokens and suppress detached notifications; failed subscription
-setup removes its registrations. These checks assume one serialized model owner.
-The compact managed before/after reproduction and source hashes are retained in
-`evidence/adapter-lifecycle-results.json`; they do not establish concurrent or
-transport cancellation behavior.
+setup removes its registrations. These checks assume one serialized model owner;
+they do not establish concurrent or transport cancellation behavior.
 
 From the repository root, inside the locked SDK shell:
 
 ```sh
-python3 investigations/NativeAot/restore-validation-feed.py examples/NativeValidation/artifacts/baseline-feed
+python3 eng/restore-validation-feed.py examples/NativeValidation/artifacts/baseline-feed
 python3 eng/restore-fork-dependencies.py
 python3 eng/restore-fork-dependencies.py --legacy
 python3 examples/NativeValidation/run.py baseline-managed examples/NativeValidation/artifacts/baseline-feed artifacts/dependencies
@@ -65,18 +63,7 @@ flavor boundaries, complete case output, and diagnostic codes with Validation
 method provenance. It rejects unrelated compile failures. Logs remain under
 `artifacts/`; generated binaries can be removed after verification.
 
-`manifest.json` is the runner's assertion contract. The safe fixtures are verified
-at released source `f22d2bb42c30d66df19a59333ed4fa633b241940`, version
-[`8.1.0-runic.0.790.17.15`](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15).
-Local Linux execution passes all five cases in both flavors across managed,
-standalone full-trim and NativeAOT modes. Final CI passes actual Linux x64 and
-Windows x64 NativeAOT using its own Ubuntu package pair; the release matrix
-independently verifies both native RIDs against the exact pair it publishes.
-Both runs have zero positive warnings/errors. The handoff/initial-failure adapter
-checks execute within `generic-field`. The [implementation review](../../docs/upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
-records distinct local/CI/published hashes and the strict baseline failures.
-The baseline report in `evidence/baseline-results.json` records actual focused
-managed and strict-build evidence, including source hashes. The focused `.14`
-package report and adapter `.12` before/after report remain
-historical managed evidence; the final `.15` native results belong to the gate's
-separate exact-source report.
+`manifest.json` is the runner's assertion contract. The strict
+[native gate](../../eng/verify-native-validation.py) runs all five safe cases in
+both flavors across managed, fully trimmed and NativeAOT modes on Linux x64 and
+Windows x64, and checks that the released baseline still fails its strict build.

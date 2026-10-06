@@ -2,7 +2,7 @@
 # Copyright (c) 2026 Runic Artifex. Licensed under the MIT license.
 """Check framework-only InspectIl output without loading or executing product assemblies.
 
-Feed output from investigations/AotSurfaceAudit/InspectIl for both core DLLs.
+Feed output from eng/tools/InspectIl for both core DLLs.
 This checks the three built-in attachment sites, while retaining each explicit
 custom-provider interface branch. It is a dispatch-shape check, not crash proof.
 """

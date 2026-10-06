@@ -1,7 +1,7 @@
 # Runic ReactiveUI.Validation (.NET 10)
 
-This Runic-Artifex fork starts from upstream `cde3062` (2026-10-04) and uses
-ReactiveUI **26.0.1** with the released **10.0.0-runic.30** DynamicData fork.
+This Runic-Artifex fork of upstream ReactiveUI.Validation uses ReactiveUI
+**26.0.1** with the released **10.0.0-runic.30** Runic.DynamicData packages.
 It ships two core NuGet packages:
 
 | Package ID | Namespace root | Dependencies |
@@ -9,64 +9,43 @@ It ships two core NuGet packages:
 | `Runic.ReactiveUI.Validation` | `ReactiveUI.Validation` | `ReactiveUI`, `Runic.DynamicData` |
 | `Runic.ReactiveUI.Validation.Reactive` | `ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive`, `Runic.DynamicData.Reactive` |
 
-Both target .NET 10. Use the flavor that matches your ReactiveUI package.
-The Reactive flavor's validation collection uses `DynamicData.Reactive` types.
-Keep one implementation of each flavor in an application; replace upstream
-validation and DynamicData package references with their matching `Runic.*` IDs.
-The original MIT license and authorship remain.
+Both target .NET 10. Use the flavor that matches your ReactiveUI package; the
+Reactive flavor's validation collection uses `DynamicData.Reactive` types. Keep
+one flavor per application and replace upstream Validation and DynamicData
+references with the matching `Runic.*` IDs. The original MIT license and
+authorship remain.
 
-See [CONTRIBUTING](CONTRIBUTING.md) for build/test instructions and the pinned
-DynamicData download bootstrap. The manual release workflow attaches core NuGet
-assets to [GitHub releases](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases).
-Download those assets and the matching DynamicData packages into a local NuGet
-feed to consume the fork. AndroidX and platform samples are retained outside
-core CI and releases. This fork will not be proposed upstream.
-
-The [upstream review](docs/upstream/README.md) catalogs every accessible issue and
-pull request, with Runic priorities, implementation plans and diagnostic evidence.
-The [implementation ledger](docs/upstream/implementation-2026-10.md) tracks subsequent
-decisions, exact adoption and verification.
-For monthly syncs and retained fork adaptations, see the
+Packages are attached to [GitHub releases](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases);
+download them and the matching DynamicData packages into a local NuGet feed.
+See [CONTRIBUTING](CONTRIBUTING.md) to build and test,
+[NativeAOT and generators](docs/aot-and-generators.md) for trimming/AOT, the
 [maintenance policy](docs/maintenance.md) and
-[fork difference register](docs/fork-differences.md).
+[fork difference register](docs/fork-differences.md) for fork policy, and the
+[upstream inventory](docs/upstream/README.md) for every upstream issue and PR
+with Runic dispositions. AndroidX and platform samples are outside core CI and
+releases. This fork will not be proposed upstream.
 
-## Unreleased generated validation API
+## Generated validation API (unreleased)
 
-The implemented generated/Unsafe split makes inline-lambda predicate `ValidationRule` and expression
-`BindValidation`, `BindValidationContext` and `BindValidationState` calls the
-primary generated surface. The matching core package embeds the Validation
-analyzer and interceptor allowlist props; consuming projects must retain those
-assets and recompile their call sites. The expanded implementation also provides
-typed selectors/targets, finite owner-scoped plan registration and deliberately
-registered normal dispatch for stored selectors, delegates and compiled peers.
-Unregistered normal calls fail actionably; there is no reflection fallback.
-Generated normal property text bindings expose
-actual initial invalid text immediately; explicit Unsafe property callbacks
-retain the legacy synthetic empty-list prelude.
+On the maintained branch, inline-lambda `ValidationRule`, `BindValidation`,
+`BindValidationContext`, `BindValidationState` and `ValidationBinding.For*` calls
+are intercepted by a Validation source generator embedded in each core package,
+producing direct typed getters, notifications and setters that work under
+trimming and NativeAOT. Consumers keep the package's analyzer and
+`buildTransitive` assets and recompile their call sites. Typed selectors,
+targets, storage cells/lenses and finite owner-scoped plan registration cover
+cases the generator cannot handle automatically (silent fields, runtime
+selectors, precompiled callers, immutable targets). Unregistered normal calls
+fail actionably; there is no reflection fallback. Normal property text bindings
+expose the actual initial state.
 
-Use `ValidationRuleUnsafe`, `BindValidationUnsafe`,
-`BindValidationContextUnsafe` or `BindValidationStateUnsafe` when deliberately
-choosing reflected runtime expressions. Those methods retain trimming warnings. Supplied
-observable/metadata rule overloads and the explicit observable APIs remain
-available. See the [migration and examples](docs/examples/generated-validation.md)
-and [generator contract](docs/generated-validation-design.md).
-
-The earlier restricted split was verified at source
-`2550376b230ccfb78beb8d3b4ced8866b65d809e`, and remains **UNRELEASED** until
-publication. Local and [Linux/Windows CI](https://github.com/Runic-Artifex/ReactiveUI.Validation/actions/runs/37386897109)
-pass 683 tests; actual-package generated consumers pass managed, full trimming
-and NativeAOT on Linux/Windows x64 with zero positive warnings/errors. The
-[verification record](docs/upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
-keeps tested source and local/CI package hashes separate. Published releases and
-their historical behavior remain unchanged; this later documentation record is
-not the tested package source. The [expanded capability plan](docs/generated-capabilities-plan.md)
-and [ledger](docs/generated-capabilities-progress.md) record the current source
-implementation and focused managed checks. Its integrated compiler, actual-package
-and Linux/Windows trim/native acceptance remain pending; no new capability row
-is complete or package published. Typed factories cover legal private/generic
-access, explicit notifications, captures and stable struct/immutable storage;
-known producer projection uses versioned final-member contracts rather than
-generator ordering. These source-stage contracts do not expand UI host support.
+`ValidationRuleUnsafe`, `BindValidationUnsafe`, `BindValidationContextUnsafe`
+and `BindValidationStateUnsafe` keep reflected runtime expressions and their
+trimming warnings, plus the legacy empty-list prelude. Supplied-observable rule
+overloads and the explicit observable APIs remain available. See the
+[capability reference](docs/generated-capabilities.md),
+[migration guide](docs/examples/generated-validation.md) and
+[design](docs/generated-validation-design.md).
 
 ---
 

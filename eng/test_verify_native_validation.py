@@ -3,14 +3,11 @@
 """Adversarial cases for strict native evidence, not native compiler simulations."""
 
 from copy import deepcopy
-import base64
-import hashlib
 import importlib.util
 import json
 from pathlib import Path
 import tempfile
 import unittest
-import zipfile
 
 
 def load(name, filename):
@@ -92,28 +89,6 @@ class NativeGateTests(unittest.TestCase):
         for lines in (records[:-1], records + records[:1], [line.replace('true', 'false') for line in records]):
             with self.subTest(lines=lines), self.assertRaises(ValueError):
                 VERIFY.verify_runtime("\n".join(lines))
-
-    def test_same_version_stale_cache_is_not_package_evidence(self):
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            folder = root / "package/1.0"
-            folder.mkdir(parents=True)
-            package = folder / "package.1.0.nupkg"
-            with zipfile.ZipFile(package, "w") as archive:
-                archive.writestr("lib/net10.0/Package.dll", b"stale package DLL")
-            extracted = folder / "lib/net10.0/Package.dll"
-            extracted.parent.mkdir(parents=True)
-            extracted.write_bytes(b"stale package DLL")
-            sha512 = base64.b64encode(hashlib.sha512(package.read_bytes()).digest()).decode()
-            assets = {"libraries": {"Package/1.0": {"path": "package/1.0", "sha512": sha512}}, "packageFolders": {str(root): {}}}
-            # GeneratorInterop's dated probe imports this native entry point, so
-            # preserve it as a delegate to the shared SHA-512-aware helper.
-            VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
-            with self.assertRaisesRegex(ValueError, "bytes do not match"):
-                VERIFY.verify_restored_bytes(assets, "Package", "1.0", "new-package-hash")
-            assets["libraries"]["Package/1.0"]["sha512"] = "stale-asset-binding"
-            with self.assertRaisesRegex(ValueError, "SHA-512"):
-                VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
 
     def test_incomplete_report_replaces_prior_success_and_keeps_partial_evidence(self):
         with tempfile.TemporaryDirectory() as temp:

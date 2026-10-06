@@ -1,29 +1,57 @@
 # Maintaining the Runic ReactiveUI.Validation fork
 
-Applied **2026-10-05**, following the [Runic DynamicData maintenance policy at 5887123](https://github.com/Runic-Artifex/DynamicData/blob/5887123c83c831262bbb9ef383ca4ad399d0abc9/docs/maintenance.md), adapted to this repository's dependencies and build scope. This document governs maintenance. The [upstream investigation](upstream/README.md) is dated research, not live completion state. The [fork difference register](fork-differences.md) identifies adaptations and regressions to preserve.
+This policy follows the [Runic DynamicData maintenance policy](https://github.com/Runic-Artifex/DynamicData/blob/main/docs/maintenance.md),
+adapted to this repository. The [fork difference register](fork-differences.md)
+lists the adaptations and regressions to preserve; the
+[upstream inventory](upstream/README.md) catalogs upstream issues and PRs.
 
 ## Repository and integration ownership
 
-Runic `main` on `origin` is the maintained integration branch. It already contains the port in [`509dd45`](https://github.com/Runic-Artifex/ReactiveUI.Validation/commit/509dd45b7f8458a22ae4cb758b1b68e72d874217), based on upstream [`cde3062`](https://github.com/reactiveui/ReactiveUI.Validation/commit/cde3062937752abeb4216a92c15f5b3b37be9a34). A local branch still named `main` may be behind; fetch and use `origin/main` as the starting point. Topic branches carry small logical changes and their regressions.
+Runic `main` on `origin` is the maintained integration branch, based on upstream
+[`cde3062`](https://github.com/reactiveui/ReactiveUI.Validation/commit/cde3062937752abeb4216a92c15f5b3b37be9a34).
+Start work from fetched `origin/main`; a local `main` may be behind. Topic
+branches carry small logical changes with their regressions.
 
-One integration owner pins inputs, orders dependent topics, reviews conflicts and verification, and integrates/releases the result. Keep existing Runic and upstream Git history. Monthly syncs use real merges preserving both parent histories; do not squash syncs, rebase away upstream ancestry, reconstruct the fork as a patch stack, or replace it with a submodule wrapper. Patch exports may be derived artifacts. Preserve MIT licensing and original authorship. This workflow does not include upstream issues, PRs, comments or contributions.
+One integration owner pins inputs, orders dependent topics, reviews conflicts and
+verification, and integrates and releases the result. Keep existing Runic and
+upstream history. Monthly syncs use real merges preserving both parents; do not
+squash syncs, rebase away upstream ancestry or replace the fork with a submodule
+wrapper. Preserve MIT licensing and original authorship. This workflow sends no
+issues, PRs, comments or contributions upstream.
 
 ## Monthly upstream review
 
-Review upstream monthly, and sooner for an urgent correctness or security fix. The monthly preparation workflow collects review inputs; selection, implementation and integration remain human decisions. The [October operations record](upstream/reviews/2026-10-maintenance-automation.md) separates its adoption and hosted evidence from the earlier manual cadence.
+Review upstream monthly, sooner for urgent correctness or security fixes. The
+[preparation workflow](../.github/workflows/upstream-review.yml) collects inputs;
+selection, implementation and integration remain human decisions.
 
-Preparation pins maintained Runic `main` and one fetched upstream commit, collects a fresh **unassessed** issue/PR inventory, and calculates a virtual merge without checking out or executing upstream code. Preserve the inherited upstream baseline `cde3062937752abeb4216a92c15f5b3b37be9a34` separately from a proven later upstream merge. The inherited baseline is not evidence that a new merge was performed; ambiguous or missing ancestry must remain explicit in the snapshot.
+Preparation pins Runic `main` and one fetched upstream commit, collects a fresh
+**unassessed** issue/PR inventory and computes a virtual merge without checking
+out or executing upstream code. The inherited baseline `cde3062` is not evidence
+that a later merge happened; ambiguous ancestry stays explicit. Review branches
+are immutable and identified by month and both pins; a repeated run recovers the
+matching branch rather than rewriting it. If the restricted `GITHUB_TOKEN`
+cannot create a PR, the run keeps the branch and prints a manual compare URL.
+Token-created PRs do not trigger CI; dispatch verification explicitly.
+Preparation never merges into `main`, publishes packages or contacts upstream.
 
-Keep preparation snapshots and same-fork review branches immutable, identified by month and both source pins. A repeated request recovers the matching branch/PR rather than rewriting it. Preserve collection errors, merge diagnostics and artifacts even when preparation fails. Restricted `GITHUB_TOKEN` settings can prevent PR creation: retain the prepared branch and an explicit manual compare URL instead of claiming a PR exists. Token-created branches/PRs do not establish that CI ran; dispatch required verification at the chosen implementation head. Preparation never merges into `main`, publishes packages or sends anything upstream.
-
-1. Fetch `origin` and `upstream`. Start from the maintained Runic `origin/main` in a clean checkout or isolated worktree. Preserve unrelated work. Record the Runic base SHA, previous integrated upstream SHA and review date.
-2. Inspect upstream commits since that integrated point, including changes already ported selectively. Select one exact reviewed release/main commit and record its full SHA. A fresh issue catalog helps triage but does not establish that a change was integrated.
-3. Create `sync/upstream/YYYY-MM` from the Runic base. Merge the pinned upstream commit with a real Git merge. Review cleanly merged changes as well as conflicts: an upstream build or dependency change can silently restore unwanted targets, package IDs, namespaces or workflows. Adapt the result to the difference register.
-4. Keep follow-up behavioral adaptations in logical topic commits with focused regressions. Update the register when a difference is added, changed or retired. Preserve both flavors and both .NET 10 public API baselines.
-5. Validate the resulting revision using the gates below. Record exact inputs, accepted/deferred changes, conflict decisions, retained differences and verification in `docs/upstream/reviews/YYYY-MM.md`, using the [template](upstream/reviews/TEMPLATE.md). A no-change review still records its pinned input and reason. An attempted merge that is deferred does not advance the integrated upstream point.
-6. The integration owner integrates the tested branch into Runic `main` without squashing. If `main` moved, merge that new head into the sync branch, review the result and rerun affected checks. A fast-forward from the unchanged Runic base preserves the upstream merge commit. Remove task-owned temporary branches/worktrees after integration and evidence retention.
-
-Example preparation commands, from a clean checkout:
+1. Fetch `origin` and `upstream`. Start from `origin/main` in a clean checkout or
+   worktree. Record the Runic base, the previous integrated upstream SHA and the date.
+2. Inspect upstream commits since that point, including changes already ported
+   selectively. Pick one reviewed upstream commit and record its full SHA.
+3. Create `sync/upstream/YYYY-MM` from the Runic base and merge the pinned commit
+   with a real merge. Review clean merges as well as conflicts: an upstream build
+   change can silently restore targets, package IDs, namespaces or workflows.
+4. Put behavioral adaptations in logical topic commits with focused regressions.
+   Update the register when a difference is added, changed or retired. Preserve
+   both flavors and both .NET 10 API baselines.
+5. Run the gates below. Record the inputs, accepted/deferred changes, conflict
+   decisions and verification in the sync PR description. A no-change review
+   still records its pinned input. A deferred merge does not advance the
+   integrated upstream point.
+6. Integrate the tested branch into `main` without squashing. If `main` moved,
+   merge it into the sync branch and rerun affected checks. Remove task-owned
+   branches and worktrees afterwards.
 
 ```sh
 git fetch origin main
@@ -35,25 +63,44 @@ git merge --no-ff --no-commit "$upstream_commit"
 # Review and adapt the tree before recording the merge and follow-up commits.
 ```
 
-Replace the month and choose the upstream SHA after review. If it is already an ancestor of the Runic base, record a no-change review rather than manufacture a merge. Check retained ancestry with `git merge-base --is-ancestor <pinned-upstream-sha> <tested-sync-sha>`. A selective port is not a full upstream sync.
+If the chosen upstream SHA is already an ancestor of the Runic base, record a
+no-change review instead of manufacturing a merge. Check ancestry with
+`git merge-base --is-ancestor <upstream-sha> <sync-sha>`. A selective port is
+not a full sync.
 
 ## Coupled dependency updates
 
-Validation consumes **released packages**, not the adjacent DynamicData checkout. The current cohort is ReactiveUI/ReactiveUI.Reactive 26.0.1 with Runic.DynamicData/Runic.DynamicData.Reactive [10.0.0-runic.30](https://github.com/Runic-Artifex/DynamicData/releases/tag/v10.0.0-runic.30), built from `9e3039a597f912c6ddc2628e38bb1162ad9c4563`, on .NET 10. Pins live in [src/Directory.Packages.props](../src/Directory.Packages.props).
+Validation consumes **released packages**, not a DynamicData checkout. The cohort
+is ReactiveUI/ReactiveUI.Reactive 26.0.1 with Runic.DynamicData/Runic.DynamicData.Reactive
+[10.0.0-runic.30](https://github.com/Runic-Artifex/DynamicData/releases/tag/v10.0.0-runic.30)
+on .NET 10, pinned in [src/Directory.Packages.props](../src/Directory.Packages.props).
 
-When DynamicData changes, complete and publish its tested pair first. Record its release tag, source SHA, versions and both asset hashes. Then update both Validation package pins and the allowed version/checksums in [eng/restore-fork-dependencies.py](../eng/restore-fork-dependencies.py) together. Validate the restored cohort and packaged consumers before adoption. Do not replace hashes merely to silence a checksum failure; verify the intended immutable release assets. The strict native gate also restores the immutable `.5` DynamicData pair solely for the released `.790.17` validation baseline, verifies it independently, and reports that legacy cohort separately from the active pair.
+When DynamicData changes, publish its tested pair first, then update both
+Validation pins and the versions/checksums in
+[eng/restore-fork-dependencies.py](../eng/restore-fork-dependencies.py) together
+and verify packaged consumers. Never replace hashes just to silence a checksum
+failure. The native gate separately restores the immutable `.5` pair for its
+released Validation baseline.
 
-Keep ReactiveUI flavors on a compatible generation and preserve their corresponding DynamicData namespaces and scheduler types. No upstream `DynamicData` package may re-enter either restored consumer graph; the Primitives consumer must remain free of System.Reactive. Review inherited Renovate proposals as inputs to this process: NuGet-only automation does not update the GitHub-release bootstrap or prove cohort compatibility.
-
-DynamicData separately tests Primitives 8.4.0 and 9.0.0. That does not imply Validation supports ReactiveUI 25 or needs the same matrix: this fork's supported cohort is ReactiveUI 26. Add an older cohort only with explicit consumer need, compatible package assets and its own verification. SDK, runtime, platform and major ReactiveUI upgrades are support-policy decisions; an upstream merge does not authorize .NET 11 or renewed legacy platform support by itself.
+Keep ReactiveUI flavors on a compatible generation with their DynamicData
+namespaces and schedulers. No upstream `DynamicData` package may enter either
+consumer graph, and Primitives consumers must stay free of System.Reactive.
+Renovate proposals are inputs only: NuGet automation does not update the
+release-feed bootstrap or prove cohort compatibility. SDK, runtime, platform and
+major ReactiveUI upgrades (including ReactiveUI 25 or .NET 11 support) are
+support-policy decisions, not side effects of a merge.
 
 ## Urgent fixes and conflicts
 
-An urgent fix may be ported ahead of the monthly merge. Pin the source and prerequisites; use `git cherry-pick -x` when applicable, or cite the source commit/PR in an adapted commit. Include a meaningful regression and register entry. At the next upstream merge, compare implementations and remove redundant adaptation only after equivalent behavior is verified. Keep useful regressions after replacement.
+An urgent fix may be ported ahead of the monthly merge: pin the source, use
+`git cherry-pick -x` where possible or cite the source, and add a regression and
+register entry. At the next merge, remove redundant adaptation only after
+equivalent behavior is verified; keep the regression.
 
-Separate mechanical edits, public contracts and behavioral fixes where practical. Translate upstream tests to awaited TUnit assertions. Pin initial emissions, message-only changes, rule membership, property paths, replacement/null behavior, scheduling and disposal when touching those areas. Performance changes need relevant measurements and correctness replay.
-
-Use recorded conflict resolutions as an aid, with automatic staging disabled:
+Separate mechanical edits, public contracts and behavioral fixes. Translate
+upstream tests to awaited TUnit assertions. Pin initial emissions, membership,
+paths, replacement/null behavior, scheduling and disposal when touching those
+areas. Use rerere with automatic staging disabled and review reused resolutions:
 
 ```sh
 git config --local rerere.enabled true
@@ -61,13 +108,11 @@ git config --local rerere.autoupdate false
 git rerere diff
 ```
 
-Review reused resolutions and surrounding code, then stage deliberately. Forget stale resolutions with `git rerere forget <path>` and retest affected behavior in both flavors. Record significant choices in the monthly review; a clean merge or remembered resolution is not proof of correctness.
-
 ## Validation and development environment
 
-Follow [CONTRIBUTING](../CONTRIBUTING.md), [global.json](../global.json), project files and current CI. On this NixOS desktop, read `../runic-sdk/.envrc` and `flake.nix`, inspect `direnv status`, and reuse the locked environment. Use Git-aware flakes, resolve SDK pin mismatches, and do not accept a last-working-shell fallback as validation of changed Nix inputs.
-
-From this repository root:
+Follow [CONTRIBUTING](../CONTRIBUTING.md), [global.json](../global.json) and CI.
+On the Runic NixOS desktop, read `../runic-sdk/.envrc` and `flake.nix`, check
+`direnv status`, and reuse the locked shell. From the repository root:
 
 ```sh
 direnv exec ../runic-sdk python3 eng/restore-fork-dependencies.py
@@ -77,106 +122,103 @@ direnv exec ../../runic-sdk dotnet test --solution ReactiveUI.Validation.slnx -c
 direnv exec ../../runic-sdk dotnet pack ReactiveUI.Validation.slnx -c Release --no-build -o ../artifacts/packages
 cd ..
 direnv exec ../runic-sdk python3 eng/verify-packages.py
+direnv exec ../runic-sdk python3 -B -m unittest discover -s eng -p 'test_verify_*.py'
 ```
 
-For other systems, run the same commands directly in the correctly pinned environment. Build current sources before tests; do not use `--no-build` for tests. Packing with `--no-build` is valid only after building the same source/configuration. Review both [Primitives](../src/ReactiveUI.Validation/PublicAPI/net10.0/PublicAPI.txt) and [Reactive](../src/ReactiveUI.Validation.Reactive/PublicAPI/net10.0/PublicAPI.txt) baselines for intentional API changes. The build enforces PublicApiSharp baselines; do not bypass it or blindly regenerate baselines to accept drift.
+Build before testing; never use `--no-build` for tests. Packing with `--no-build`
+is only valid after building the same source. Review the
+[Primitives](../src/ReactiveUI.Validation/PublicAPI/net10.0/PublicAPI.txt) and
+[Reactive](../src/ReactiveUI.Validation.Reactive/PublicAPI/net10.0/PublicAPI.txt)
+baselines for intentional changes; do not regenerate them to accept drift.
 
-Focused test evidence must validate discovery and an expected minimum executed
-count, not just exit status. The measured compiler host has 279 discovered tests;
-its namespace-qualified class segment needs
-`--treenode-filter '/*/*/*CapabilityCompilerHostTests/*'` to select all six host
-cases. The simple-class-only spelling selects zero. List with the same filter,
-inspect the selected cases, then build/run and check passed/failed/skipped
-counters. Zero discovered or executed tests is never accepted verification;
-update group expectations deliberately when the corpus changes. See the
-[focused command recipe](../CONTRIBUTING.md).
+Focused test runs must check discovery and a minimum executed count, not just
+the exit code; zero discovered or executed tests is never a pass. TUnit class
+segments are namespace-qualified, so filter with a leading wildcard such as
+`--treenode-filter '/*/*/*CapabilityCompilerHostTests/*'` (see
+[CONTRIBUTING](../CONTRIBUTING.md)).
 
-The generated-capability compiler host retains producer and executable fixture
-assemblies for the test process lifetime. It caches only assemblies from each
-exact verified package/path/content cohort, with immutable dependency directories;
-each host still creates fresh generators, suppressors and an independent driver.
-Host disposal releases compilation graphs. Each executed fixture has its own
-noncollectible load context so edited compilations with the same assembly name
-execute their current bytes. The finite test corpus bounds these retained
-assemblies, and process exit releases them; no compilation or source text is kept
-in the assembly cache. This follows the [locked Roslyn analyzer loader's lifetime](https://github.com/dotnet/roslyn/blob/35d9211b841e7613c1d2f8f5af6d628ace696c4c/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalyzerAssemblyLoader.Core.cs#L179).
+The generator test host keeps producer and fixture assemblies loaded for the
+process lifetime in noncollectible load contexts, caching only assemblies from
+exact verified package/path/content cohorts. Each test still creates fresh
+generators and drivers, and each executed fixture gets its own context so edited
+compilations run their current bytes. This mirrors the
+[Roslyn analyzer loader's lifetime](https://github.com/dotnet/roslyn/blob/35d9211b841e7613c1d2f8f5af6d628ace696c4c/src/Compilers/Core/Portable/DiagnosticAnalyzer/AnalyzerAssemblyLoader.Core.cs#L179)
+and avoids collectible unloading under the locked CLR, which contains a
+[generic dispatch cache defect](https://github.com/dotnet/runtime/pull/132859).
 
-This policy avoids collectible unload/address reuse under the locked CLR, whose
-installed CoreLib contains the [generic dispatch cache sentinel defect](https://github.com/dotnet/runtime/pull/132859).
-Two retained full-test crashes showed native/type-confusion failures at different
-fixtures; that defect's causal connection to those crashes remains unproven.
-Collectible plugin loading is not a validation product contract. The compiler
-fixture policy preserves every assertion and does not replace package, trimming
-or static NativeAOT acceptance.
+`verify-packages.py` expects exactly one current package per flavor in
+`artifacts/packages`; move or remove older outputs before packing a new version.
+All package gates use an isolated NuGet configuration and gate-owned cache,
+verify restored graphs and bytes before running consumers, invalidate earlier
+success before their own checks, and keep failure logs. A cached package with the
+same ID and version is not proof that the selected bytes were exercised.
 
-The package verifier expects exactly one current package per core flavor in `artifacts/packages`. Before packing a different version, move useful prior outputs to a separate retained location or remove only disposable task-owned outputs. Never mix old/new packages as evidence of the current build. Preserve the verified dependency feed and useful caches. Exercise representative external consumers for overload, namespace, scheduler or dependency changes.
-
-Ordinary, native and generated package evidence must identify the current source, pinned SDK, exact input package hashes and restored matching dependency cohort. Use an isolated XML NuGet configuration and gate-owned cache; a global cached package with the same ID/version is not proof that the selected bytes were exercised. Validate restored graphs and bytes before executing consumers. A rerun must invalidate previous success before prerequisite checks, retain failure/partial evidence, and mark completion only after all required checks pass. Preserve logs and graphs in CI failure artifacts. Artifact upload/download verification must bind the transferred pair to the bytes accepted by consumers.
-
-Require successful [Linux and Windows CI](../.github/workflows/ci-build.yml) at the tested code/workflow revision before integration or release, including strict safe-subset NativeAOT consumers (with trimming enabled) on matching Linux x64 and Windows x64 hosts using the same Linux shipping package artifact. The [native gate](../eng/verify-native-validation.py) must retain warning-as-error analysis, exact package graphs and source identity, and execute the emitted binaries. The dated diagnostic investigations do not satisfy that gate. The workflow's push triggers cover `main` and `runic/**`, not `sync/**`. For a sync branch, push it to this fork and dispatch the existing workflow explicitly:
+[CI](../.github/workflows/ci-build.yml) builds, tests, runs the examples, packs
+and verifies consumers on Linux and Windows. The
+[native workflow](../.github/workflows/native-validation.yml) runs the
+[native gate](../eng/verify-native-validation.py) and the
+[generated gate](../eng/verify-generated-validation.py) on Linux x64 and Windows
+x64 against the same Linux package artifact (see
+[NativeAOT and generators](aot-and-generators.md)). Require green CI at the
+tested revision before integration or release. Push triggers cover `main` and
+`runic/**`, not `sync/**`; dispatch sync branches explicitly and confirm the
+run's head SHA:
 
 ```sh
 git push -u origin sync/upstream/2026-10
 gh workflow run ci-build.yml --repo Runic-Artifex/ReactiveUI.Validation --ref sync/upstream/2026-10
 ```
 
-Verify the completed run's exact head SHA and both OS jobs; a prior green main run is not validation of new implementation. Documentation-only updates need document/link/inventory checks and may reuse unchanged code's recorded results; record that distinction.
-
-AndroidX and native samples remain in [the platform solution](../src/ReactiveUI.Validation.Platforms.slnx), outside core CI/releases. Expanding support requires workloads, platform/API verification, branded consumer tests and deliberate release inclusion. Check project/temp storage before large runs, use conservative concurrency and avoid overlapping matrices. On storage failure, stop and diagnose; remove only task-owned disposable artifacts and preserve shared caches, useful logs and Nix store paths.
+AndroidX and samples stay in [the platform solution](../src/ReactiveUI.Validation.Platforms.slnx)
+outside core CI and releases. Check storage before large matrices, use
+conservative concurrency and remove only task-owned disposable artifacts.
 
 ## Generated and Unsafe API boundary
 
-The initial generator/API split was implemented and verified at
-`2550376b230ccfb78beb8d3b4ced8866b65d809e`, and remains **UNRELEASED** until
-publication. The [verification record](upstream/reviews/2026-10-implementation.md#unreleased-generated-api-follow-up)
-separates this tested source from the later documentation record and historical
-releases. Preserve [RUV-018](fork-differences.md#unreleased-generated-api-contract)
-in monthly merges: inline supported lambda calls use generated direct operations;
-explicit `Unsafe` calls own the reflection/trimming boundary. The expanded
-[capability implementation](generated-capabilities-progress.md) adds typed plans
-and explicit finite registered compatibility dispatch. Normal calls without
-interception or a matching supplied/registered typed plan must still throw
-actionably. Recognize deliberate `ValidationRuntimeDispatchAttribute` contracts
-without weakening final ordinary-call checks. Do not restore hidden reflection.
-Precompiled callers can use a registered preserved-ABI facade; fresh-expression,
-capture, scope/ambiguity and native-link proof is required. Recompilation, supplied
-observables and explicit Unsafe migration remain alternatives. An old native
-executable cannot acquire new DLL behavior by package replacement.
+Preserve [RUV-018](fork-differences.md#runtime-contracts) in merges: supported
+normal calls use generated direct operations or typed/registered plans, and the
+`*Unsafe` methods own reflection with accurate `RequiresUnreferencedCode`.
+Unintercepted, unregistered normal calls must keep failing actionably; never
+restore a hidden reflection fallback. Recognize `ValidationRuntimeDispatchAttribute`
+without weakening the final ordinary-call checks.
 
-Both branded core packages must carry the same Validation analyzer DLL and their
-matching flavor-named `buildTransitive` interceptor allowlist props. Verify actual
-package imports/analyzer inputs, generated code, exact matching graphs, negative
-selector diagnostics and normal-stub failure behavior. Safe observable and
-metadata overloads retain their runtime contract. Generated notification sources
-must handle initial callbacks, replacement/null, stale-source rejection and
-failure cleanup without owning models, contexts or supplied sources. Require
-actual-package generated consumers with warning-as-error managed/trim/native
-analysis and execution on each claimed host. Earlier green release gates prove
-their pinned revision only. Keep accurate RUC warnings on Unsafe/reflection
-operations. The source-landed .NET 10 `IsAotCompatible` flag requires the full
-current surface/dependency audit and strict flagged-package gates; the flag alone
-is not acceptance or UI platform support. Earlier unset-flag audit records remain
-historical. No expanded capability row is complete before its required code,
-permanent regression, behavior and applicable package/native proofs.
+Both core packages must carry the same analyzer DLL and their flavor-named
+`buildTransitive` props. For generator changes, keep both-flavor compiler and
+diagnostic tests, inspect emitted getters, notification sources, paths and
+setters, and check that generated output never calls expression APIs,
+`WhenAnyValueUnsafe` or Unsafe methods, or relies on Binding to rewrite emitted
+calls. The generated gate must pass managed, trimmed and native on each claimed
+host. The [capability reference](generated-capabilities.md) maps each capability
+to its tests and gate cases; update it with the behavior.
 
-This boundary does not authorize a dependency update: retain the authorized matching
-DynamicData 10.0.0-runic.30 packages, their hashes and ReactiveUI 26.0.1 pins.
-Never adopt sibling SDK/DynamicData source as an implicit generator dependency.
+The safe observable rule/binding files use classic `this` extensions because the
+locked C# 14 compiler's synthesized static bridge reports `CS8714`; their narrow
+SST1703 exception records that. Do not restore extension blocks without
+reproducing a fixed compiler. This boundary does not authorize dependency updates.
 
 ## Releases and retirement
 
-Release a tested source commit with a unique version/tag. MinVer settings in [src/Directory.Build.props](../src/Directory.Build.props) use the `runic-v` tag prefix, 8.1 minimum and `runic.0` prerelease identifiers; inspect the produced version rather than infer it from an upstream tag. The [manual release workflow](../.github/workflows/release.yml) promotes the exact Linux package pair from a successful trusted Build at its maintained-main source. Require the latest eligible exact-source Build and all current core/native/generated host gates, not an earlier green run or a PR checkout. Check completed acceptance reports, source/cohort and package hashes against the downloaded artifacts. A `verify_only` invocation performs read-only verification and creates no release, tag or uploaded assets. This maintenance adoption does not authorize a new Validation package release or publish to NuGet.org.
+Release a tested source commit under a unique version and tag. MinVer settings in
+[src/Directory.Build.props](../src/Directory.Build.props) use the `runic-v` tag
+prefix, an 8.1 minimum and `runic.0` prerelease identifiers; inspect the produced
+version. The [release workflow](../.github/workflows/release.yml) promotes the
+exact Linux package pair from the latest successful trusted Build of the current
+`main` SHA, after checking its completed core, native and generated reports,
+source, cohort and hashes. `verify_only: true` performs read-only verification;
+the default publishes. Nothing is pushed to NuGet.org.
 
-Preserve `Runic.ReactiveUI.Validation` and `Runic.ReactiveUI.Validation.Reactive` IDs, their current namespace roots, licensing and attribution. Record the source SHA, dependency cohort/release hashes, verification and known limitations in release notes. Published versions, tags and assets are immutable: do not retag or replace assets with different code under an existing version. Corrections receive a new version.
+Keep the `Runic.ReactiveUI.Validation` and `Runic.ReactiveUI.Validation.Reactive`
+IDs, namespaces, licensing and attribution. Release notes record the source SHA,
+dependency cohort, verification and known limitations. Published versions, tags
+and assets are immutable: never retag or replace assets; corrections get a new
+version. Publication refuses an existing tag/release, uploads to a draft,
+re-downloads and compares both assets with the accepted bytes, then creates the
+tag at the tested SHA. A failed verification leaves the draft for deliberate
+recovery.
 
-Before publication, require the exact two same-version branded assets, matching repository SHA, dependency pins, MIT license/attribution and generated analyzer/allowlist payloads. Refuse an existing tag or release and serialize publication. Upload to a draft, download both assets and compare them with the accepted input bytes, then create and resolve the new tag at the tested SHA before publishing. A failed verification leaves evidence and any draft for deliberate recovery; do not replace published assets or force a tag. This is an operating policy, not a claim that GitHub server-side immutable releases are enabled.
+A documentation-only commit still moves `main` to a new SHA, and the release
+guard requires a successful Build for that exact SHA; dispatch it with
+`gh workflow run ci-build.yml --repo Runic-Artifex/ReactiveUI.Validation --ref main`.
 
-A documentation-only `[skip ci]` commit may reuse explicitly recorded unchanged-code results, but it advances `main` to a different source SHA. Earlier release verification remains evidence for its earlier head. Before promoting packages from the new main, dispatch Build explicitly and verify that its completed four-job result identifies that exact current SHA:
-
-```sh
-gh workflow run ci-build.yml --repo Runic-Artifex/ReactiveUI.Validation --ref main
-```
-
-The release guard deliberately rejects a current head without its own successful trusted Build, even when only documentation changed. Use `verify_only: true` explicitly for a read-only release check; the workflow's default performs publication.
-
-Retire a register entry only when its stated condition is met. Record the replacement/upstream SHA or policy decision, removal commit and verification; retain its ID with `retired` status. Source ancestry alone does not prove behavior. Known failing diagnostic expectations remain open work until an actual implementation and permanent regression establish the fix.
+Retire a register entry only when its condition is met: record the replacement
+or policy decision and verification, and keep the ID with `retired` status.

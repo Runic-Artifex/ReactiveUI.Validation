@@ -886,7 +886,7 @@ def main():
         configuration_spec = importlib.util.spec_from_file_location("generated_configuration_gate", configuration_path)
         configuration = importlib.util.module_from_spec(configuration_spec)
         configuration_spec.loader.exec_module(configuration)
-        metadata_project = ROOT / "investigations/AotSurfaceAudit/InspectIl/InspectIl.csproj"
+        metadata_project = ROOT / "eng/tools/InspectIl/InspectIl.csproj"
         metadata_output = output / "metadata-inspector"
         NATIVE.run(["dotnet", "build", metadata_project, "-c", "Release", "-m:2", "-warnaserror", "-o", metadata_output],
                    output / "metadata-inspector.build.log", ROOT)

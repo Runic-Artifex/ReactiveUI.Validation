@@ -1,23 +1,10 @@
 # ReactiveUI.Validation upstream review for Runic
 
-This is dated research at the commits recorded below. Follow the
-[maintenance policy](../maintenance.md), [difference register](../fork-differences.md)
-and [monthly review records](reviews/2026-10.md) for integration decisions and
-actual adoption. Verify findings against the current branch before implementation.
-
-For subsequent implementation status, use the [live October ledger](implementation-2026-10.md)
-and [implementation review](reviews/2026-10-implementation.md). The recommendations
-and diagnostic results below describe the original reviewed baseline.
-
-The active DynamicData cohort is recorded separately in the
-[2026-10-06 adoption record](reviews/2026-10-dynamicdata-adoption.md). The
-`.5` references in this dated investigation describe its original review cohort;
-the strict native baseline deliberately retains that immutable pair.
-
-The separate [NativeAOT and generator investigation](../aot-and-generators.md),
-dated 2026-10-05 against the released cohort, follows up on the generator/AOT
-questions below. It records native consumer results and proposed support work;
-it does not change this historical review or declare production AOT support.
+This inventory was captured on **2026-10-05** against Runic `509dd45` (upstream `cde3062`). The recommended
+work below has since been adopted; the [fork difference register](../fork-differences.md#upstream-items-adopted-and-deferred)
+maps each item to its contract and lists the explicit deferrals. Monthly reviews
+follow the [maintenance policy](../maintenance.md) and start from a fresh,
+unassessed inventory.
 
 This review inventories upstream issues and pull requests and identifies useful work for our .NET 10 fork. The immediate recommendation is to fix binding lifetime behavior, then add explicit validation-context selection and a Runic collection-validation example. Typed state bindings and benchmarks are useful follow-ups. Most historical dependency upgrades and bug fixes are already inherited and should not be replayed.
 
@@ -30,8 +17,6 @@ The inventory contains **53 issues and 936 pull requests**, covering open, close
 | [Issue catalog](issues.md) | All 53 issues, with links, summaries and a Runic disposition. |
 | [Pull request catalog](pull-requests.md) | All 936 PRs, grouped by topic, with links, state, summaries and a disposition. |
 | [Machine readable catalog](catalog.json) | All 989 records, dates, authors, labels, summaries, decisions, review depth and merge ancestry. |
-| [Diagnostic source](evidence/UpstreamInvestigationProbes.cs.txt) | Four reproducible expectations, compiled against both flavors during this review. |
-| [Diagnostic results](evidence/probe-results.txt) | The final diagnostic run: eight executions, four passes and four expected failing expectations. |
 
 The reviewed fork is [`509dd45`](https://github.com/Runic-Artifex/ReactiveUI.Validation/commit/509dd45b7f8458a22ae4cb758b1b68e72d874217), based on upstream [`cde3062`](https://github.com/reactiveui/ReactiveUI.Validation/commit/cde3062937752abeb4216a92c15f5b3b37be9a34). It targets .NET 10 with ReactiveUI 26.0.1 and Runic.DynamicData 10.0.0-runic.5, in Primitives and System.Reactive flavors. AndroidX and native samples remain outside core CI and releases.
 
@@ -70,7 +55,6 @@ The property and whole-model binding paths observe `ViewModel`, filter out null,
 
 **Proposed fix:** make the private subscription nullable and take it once before disposing it, for example `Interlocked.Exchange(ref _disposable, null)?.Dispose()`. This also protects reentrant disposal of the subscription field, without making every operation on the binding thread-safe. Test two calls, reentrant callbacks, disposal after ViewModel replacement and disposal through multiple owning scopes. This is internal work and should not require changing the public API baseline.
 
-The diagnostic source is retained as `.cs.txt` so intentionally failing expectations do not enter the shipping suite. A reproduction command and cleanup procedure are in [the evidence instructions](evidence/README.md).
 
 ## Multiple contexts
 
@@ -134,7 +118,7 @@ These reports repeatedly show runtime method mismatches after package-generation
 
 PR #990 also records a source-generator caveat involving anonymous/private selector result types in ReactiveUI.Binding.SourceGenerators. That belongs to the binding generator, not to a validation PR to finish here. It was **not independently reproduced against the currently resolved 9.1 generation** in this review. Before adding a workaround, reproduce the exact selector and inspect generator diagnostics/output. Public named result types and simple selectors are a reasonable interim example convention, not proof of a general fix.
 
-Native AOT is a separate validation target: rule and binding APIs currently carry dynamic-code or trimming annotations. A .NET 10 target and an AOT-friendly bridge serializer do not remove those limits. If Runic needs those APIs in a native AOT binary, add a focused publish/run smoke using the actual generated rule path, then address generator gaps with evidence. Do not advertise blanket AOT compatibility from this review.
+Native AOT is a separate validation target: rule and binding APIs currently carry dynamic-code or trimming annotations. A .NET 10 target and an AOT-friendly bridge serializer do not remove those limits. If Runic needs those APIs in a native AOT binary, add a focused publish/run smoke using the actual generated rule path, then address generator gaps with evidence. Do not advertise blanket AOT compatibility from this review. The fork has since added explicit observable APIs and a generated API for this; see [NativeAOT and generators](../aot-and-generators.md).
 
 ## Virtual error hook
 

@@ -3,14 +3,10 @@
 Use caller-created streams and ordinary delegates to register rules and present
 validation without discovering model properties or target setters at runtime.
 These APIs ship in [8.1.0-runic.0.790.17.15](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases/tag/runic-v8.1.0-runic.0.790.17.15)
-from exact source `f22d2bb42c30d66df19a59333ed4fa633b241940`. The local
-source-pinned pair passes five cases per flavor in managed, standalone full-trim
-and Linux x64 NativeAOT modes. Final CI passes actual Linux x64/Windows x64 native
-cases using its own Ubuntu package pair. The release matrix independently
-verifies both native RIDs against the pair it publishes, with zero positive-path
-warnings/errors. The [implementation review](../upstream/reviews/2026-10-implementation.md#native-runtime-and-examples-follow-up)
-records those distinct package hashes and the historical preliminary CI.
-The immutable `8.1.0-runic.0.790.17` release does not contain these new APIs.
+and later; the earlier `8.1.0-runic.0.790.17` release does not contain them.
+The [native gate](../../eng/verify-native-validation.py) runs five cases per
+flavor in managed, fully trimmed and NativeAOT modes on Linux x64 and Windows x64
+with warnings as errors.
 
 ## Register rules and retain property metadata
 
@@ -141,9 +137,8 @@ Use the matching released Runic.DynamicData package. The Primitives consumer
 graph stays free of System.Reactive and both graphs stay free of upstream
 DynamicData packages.
 
-The [NativeAOT status](../aot-and-generators.md) separates the new strict
-safe-path gate from the dated warning-bearing release investigation. Legacy
-expression observation and reflected targets retain their trimming contracts.
+See [NativeAOT and generators](../aot-and-generators.md) for the full support
+matrix. Legacy expression observation and reflected targets retain their trimming contracts.
 A typed action on a legacy `BindValidationState` overload leaves its reflective
 source-selection path in place. Platform UI controls, bridge/browser behavior
 and unexecuted RIDs do not follow from a console consumer result.

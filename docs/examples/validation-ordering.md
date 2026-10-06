@@ -37,17 +37,13 @@ examples outside the normal solution and package output. The provider and its
 model context are real SDK implementation code; this is **not** an end-to-end
 SDK bridge or browser test.
 
-The reviewed SDK input was `e878a4f361a7c4b9326f54663defa7debe41adb9` on
-2026-10-05. A pre-fix probe on Validation base
-`48a7bde8e4fdbb34f85d700597c87d60c24aff69` found that adding an invalid rule to a
-settled valid context left `GetIsValid()`, `HasErrors` and command admission stale
-within that same model turn. The source had scheduled membership before domain
-aggregation. The fix keeps membership and aggregate streams synchronous and
-schedules only presentation properties. Public `Validations` membership delivery
-also now occurs synchronously on the model owner; consumers needing a separate
-rendering scheduler should apply it at their presentation boundary. The probe now
-checks same-turn rule
-addition/removal and child edits with each SDK adapter.
+Adding an invalid rule to a settled valid context used to leave `GetIsValid()`,
+`HasErrors` and command admission stale within the same model turn, because
+membership was scheduled before domain aggregation. Membership and aggregate
+streams are now synchronous and only presentation properties are scheduled.
+Public `Validations` membership is delivered synchronously on the model owner;
+apply a separate rendering scheduler at the presentation boundary if needed. The
+probe checks same-turn rule addition/removal and child edits with each SDK adapter.
 
 The shared [ValidationContextSchedulingTests](../../src/tests/ReactiveUI.Validation.Tests/ValidationContextSchedulingTests.cs)
 use an immediate-only manual queue implementing the flavor's actual scheduler
