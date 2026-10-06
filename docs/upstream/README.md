@@ -1,28 +1,21 @@
-# ReactiveUI.Validation upstream review for Runic
+# ReactiveUI.Validation upstream assessment for Runic
 
-This inventory was captured on **2026-10-05** against Runic `509dd45` (upstream `cde3062`). The recommended
-work below has since been adopted; the [fork difference register](../fork-differences.md#upstream-items-adopted-and-deferred)
-maps each item to its contract and lists the explicit deferrals. Monthly reviews
-follow the [maintenance policy](../maintenance.md) and start from a fresh,
-unassessed inventory.
+Upstream issues and pull requests were assessed on **2026-10-05** against upstream
+[`cde3062`](https://github.com/reactiveui/ReactiveUI.Validation/commit/cde3062937752abeb4216a92c15f5b3b37be9a34).
+The recommended work below has since been adopted; the
+[fork difference register](../fork-differences.md#upstream-items-adopted-and-deferred)
+maps each item to its contract and lists the deferrals. Later upstream activity is
+summarized each month by the [upstream review workflow](../maintenance.md#monthly-upstream-review)
+in an `Upstream review YYYY-MM` issue; its raw inventory is a workflow artifact and
+is not committed.
 
-This review inventories upstream issues and pull requests and identifies useful work for our .NET 10 fork. The immediate recommendation is to fix binding lifetime behavior, then add explicit validation-context selection and a Runic collection-validation example. Typed state bindings and benchmarks are useful follow-ups. Most historical dependency upgrades and bug fixes are already inherited and should not be replayed.
-
-The inventory contains **53 issues and 936 pull requests**, covering open, closed and merged records as of **2026-10-05**. Five issues are open; no pull requests are open. The assessment below separates upstream reports, observations in our fork, and proposed implementation work. No product fixes were applied during this review.
-
-## Documents and scope
+The inventory contained **53 issues and 936 pull requests**; five issues and no
+pull requests were open.
 
 | Document | Contents |
 | --- | --- |
 | [Issue catalog](issues.md) | All 53 issues, with links, summaries and a Runic disposition. |
 | [Pull request catalog](pull-requests.md) | All 936 PRs, grouped by topic, with links, state, summaries and a disposition. |
-| [Machine readable catalog](catalog.json) | All 989 records, dates, authors, labels, summaries, decisions, review depth and merge ancestry. |
-
-The reviewed fork is [`509dd45`](https://github.com/Runic-Artifex/ReactiveUI.Validation/commit/509dd45b7f8458a22ae4cb758b1b68e72d874217), based on upstream [`cde3062`](https://github.com/reactiveui/ReactiveUI.Validation/commit/cde3062937752abeb4216a92c15f5b3b37be9a34). It targets .NET 10 with ReactiveUI 26.0.1 and Runic.DynamicData 10.0.0-runic.5, in Primitives and System.Reactive flavors. AndroidX and native samples remain outside core CI and releases.
-
-Collection used the paginated GitHub issues, pulls and issue-comments APIs. The 989 unique records reconcile exactly with separate GraphQL totals: 53 issues and 936 PRs. All PR bodies and 1,619 repository issue-comment records were retrieved. Runtime proposals, relevant discussions, selected abandoned patches and current implementation were examined in detail. Routine dependency summaries describe their metadata; this is **not an audit of all 936 diffs or all inline review threads**. Deleted or inaccessible records and GitHub Discussions are outside the inventory. Current API results take precedence over stale web-page counts. Exact capture time and collection commands are in the JSON catalog.
-
-Of 724 merged PRs, **718 merge commits are ancestors of our upstream baseline**. Six merged PRs have merge SHAs outside that proven ancestry: [#2](https://github.com/reactiveui/ReactiveUI.Validation/pull/2), [#5](https://github.com/reactiveui/ReactiveUI.Validation/pull/5), [#6](https://github.com/reactiveui/ReactiveUI.Validation/pull/6), [#109](https://github.com/reactiveui/ReactiveUI.Validation/pull/109), [#131](https://github.com/reactiveui/ReactiveUI.Validation/pull/131) and [#132](https://github.com/reactiveui/ReactiveUI.Validation/pull/132). Several targeted non-main branches. That is a history distinction, not evidence that their useful behavior is absent: current storage already uses SourceList, for example. An inherited merge also does not imply that every line or older framework target remains in the fork.
 
 ## Recommended work
 

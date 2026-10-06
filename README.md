@@ -21,7 +21,7 @@ See [CONTRIBUTING](CONTRIBUTING.md) to build and test,
 [NativeAOT and generators](docs/aot-and-generators.md) for trimming/AOT, the
 [maintenance policy](docs/maintenance.md) and
 [fork difference register](docs/fork-differences.md) for fork policy, and the
-[upstream inventory](docs/upstream/README.md) for every upstream issue and PR
+[upstream assessment](docs/upstream/README.md) for upstream issues and PRs
 with Runic dispositions. AndroidX and platform samples are outside core CI and
 releases. This fork will not be proposed upstream.
 
