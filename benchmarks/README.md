@@ -4,7 +4,7 @@ This separate .NET 10 solution measures the two core validation flavors for the
 work proposed in upstream [#117](https://github.com/reactiveui/ReactiveUI.Validation/issues/117).
 Both executables compile the same source files, reference their matching core
 project, and restore that project's existing ReactiveUI 26.0.1 / released
-Runic.DynamicData 10.0.0-runic.5 dependency cohort. No benchmark dependency is
+Runic.DynamicData 10.0.0-runic.30 dependency cohort. No benchmark dependency is
 added to the normal core solution, tests, package graph, or release workflow.
 The benchmark executables set `IsPackable=false` and `IsTestProject=false`.
 

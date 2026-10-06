@@ -22,6 +22,7 @@
   },
   "candidate": {
     "route": "SAFE_API paired package consumers, explicit notifying observables and typed callback",
+    "dynamicDataVersion": "10.0.0-runic.30",
     "managedExpected": {
       "generic-field": true,
       "nullable-editor-rich-target": true,
