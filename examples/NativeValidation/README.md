@@ -19,7 +19,8 @@ has no static writes or metadata roots. Actual native publication/execution is
 owned by the serialized native gate; strict compile failures must not be reported
 as native runtime failures.
 
-The `Safe` pair defines `SAFE_API` and accepts a fresh candidate package version.
+The `Safe` pair defines `SAFE_API`, uses the current released DynamicData
+10.0.0-runic.30 pair, and accepts a fresh candidate package version.
 Its implementation uses `AddObservableRule`, `BindObservableValidationState` and
 `BindObservablePropertyValidationState`. Application INPC streams provide initial
 values and explicit replacements. Nested null emits an actual null value, which
@@ -52,6 +53,7 @@ From the repository root, inside the locked SDK shell:
 ```sh
 python3 investigations/NativeAot/restore-validation-feed.py examples/NativeValidation/artifacts/baseline-feed
 python3 eng/restore-fork-dependencies.py
+python3 eng/restore-fork-dependencies.py --legacy
 python3 examples/NativeValidation/run.py baseline-managed examples/NativeValidation/artifacts/baseline-feed artifacts/dependencies
 python3 examples/NativeValidation/run.py baseline-strict examples/NativeValidation/artifacts/baseline-feed artifacts/dependencies
 python3 examples/NativeValidation/run.py candidate-managed /absolute/candidate/feed artifacts/dependencies --version FRESH_VERSION

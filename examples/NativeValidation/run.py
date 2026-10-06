@@ -11,11 +11,21 @@ from xml.etree import ElementTree as ET
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parents[1]
 BASELINE = "8.1.0-runic.0.790.17"
-HASHES = {
+BASELINE_VALIDATION_HASHES = {
     f"Runic.ReactiveUI.Validation.{BASELINE}.nupkg": "5d3c5261324181b7d8b995cc7b242977adba21a0ad81c361a4d4bd8a163d14df",
     f"Runic.ReactiveUI.Validation.Reactive.{BASELINE}.nupkg": "e3ba50fa1ad991912bd2d243a923c25055e9d434fb6d7c2eb840cf1ebbd5cb4b",
-    "Runic.DynamicData.10.0.0-runic.5.nupkg": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
-    "Runic.DynamicData.Reactive.10.0.0-runic.5.nupkg": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268",
+}
+BASELINE_DYNAMICDATA_VERSION = "10.0.0-runic.5"
+CURRENT_DYNAMICDATA_VERSION = "10.0.0-runic.30"
+DYNAMICDATA_HASHES = {
+    False: {
+        f"Runic.DynamicData.{BASELINE_DYNAMICDATA_VERSION}.nupkg": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
+        f"Runic.DynamicData.Reactive.{BASELINE_DYNAMICDATA_VERSION}.nupkg": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268",
+    },
+    True: {
+        f"Runic.DynamicData.{CURRENT_DYNAMICDATA_VERSION}.nupkg": "cf0d369f43774c2ba1535db8c468c0214d9a82c7f3d1a3d6fa1bf74918f8cbbc",
+        f"Runic.DynamicData.Reactive.{CURRENT_DYNAMICDATA_VERSION}.nupkg": "23cc3f33c029157585a2521cc1c04afbaba21efc6dc6659a855ecafc67217fc5",
+    },
 }
 
 
@@ -29,10 +39,10 @@ def run(command, log):
     return result
 
 
-def verify_graph(project, flavor, version):
+def verify_graph(project, flavor, version, dynamicdata_version):
     libraries = json.loads((project.parent / "obj/project.assets.json").read_text())["libraries"]
     suffix = "" if flavor == "Primitives" else ".Reactive"
-    expected = {f"Runic.ReactiveUI.Validation{suffix}/{version}", f"Runic.DynamicData{suffix}/10.0.0-runic.5"}
+    expected = {f"Runic.ReactiveUI.Validation{suffix}/{version}", f"Runic.DynamicData{suffix}/{dynamicdata_version}"}
     assert expected <= libraries.keys(), (expected, libraries.keys())
     assert not any(key.startswith(("DynamicData/", "DynamicData.Reactive/")) for key in libraries)
     opposite = ".Reactive" if not suffix else ""
@@ -50,6 +60,8 @@ def main():
     args = parser.parse_args()
     candidate = args.mode.startswith("candidate")
     expectations = json.loads((ROOT / "manifest.json").read_text())["candidate" if candidate else "baseline"]
+    dynamicdata_version = CURRENT_DYNAMICDATA_VERSION if candidate else BASELINE_DYNAMICDATA_VERSION
+    assert expectations["dynamicDataVersion"] == dynamicdata_version
     if not candidate and args.version != BASELINE:
         parser.error("baseline uses immutable released .790.17")
     if candidate and args.version == BASELINE:
@@ -57,10 +69,13 @@ def main():
     assert subprocess.check_output(["dotnet", "--version"], text=True).strip() == "10.0.401"
     args.validation_feed = args.validation_feed.resolve()
     args.dynamicdata_feed = args.dynamicdata_feed.resolve()
-    for name, digest in HASHES.items():
-        if name.startswith("Runic.ReactiveUI") and candidate:
+    for name, digest in BASELINE_VALIDATION_HASHES.items():
+        if candidate:
             continue
-        feed = args.validation_feed if name.startswith("Runic.ReactiveUI") else args.dynamicdata_feed
+        feed = args.validation_feed
+        assert hashlib.sha256((feed / name).read_bytes()).hexdigest() == digest, name
+    for name, digest in DYNAMICDATA_HASHES[candidate].items():
+        feed = args.dynamicdata_feed
         assert hashlib.sha256((feed / name).read_bytes()).hexdigest() == digest, name
     output = ROOT / "artifacts" / args.mode
     output.mkdir(parents=True, exist_ok=True)
@@ -104,7 +119,7 @@ def main():
                         failure = expectations["managedExpectedFailures"][record["case"]]
                         assert record["exception"] == failure["exception"] and record["failureId"] == failure["failureId"], record
                 assert runtime.returncode == (0 if candidate else 1), runtime.stderr
-        verify_graph(project, flavor, args.version)
+        verify_graph(project, flavor, args.version, dynamicdata_version)
         print(f"{args.mode} {flavor}: verified")
 
 

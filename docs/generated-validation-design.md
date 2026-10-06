@@ -234,7 +234,7 @@ results for changed generated code.
 No blanket `IsAotCompatible`, all-reflection-removed, retained UI-platform or
 bridge/browser claim follows. Explicit Unsafe APIs and some retained runtime
 components remain reflection boundaries. Preserve producer analysis and their
-accurate warnings. The released DynamicData 10.0.0-runic.5 and ReactiveUI
+accurate warnings. The released DynamicData 10.0.0-runic.30 and ReactiveUI
 26.0.1 cohort remains pinned; no sibling source adoption is required.
 
 ## Historical annotation proof and superseded alternatives

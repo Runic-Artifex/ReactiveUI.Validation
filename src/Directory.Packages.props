@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup Label="Core packages">
-    <PackageVersion Include="Runic.DynamicData" Version="10.0.0-runic.5" />
-    <PackageVersion Include="Runic.DynamicData.Reactive" Version="10.0.0-runic.5" />
+    <PackageVersion Include="Runic.DynamicData" Version="10.0.0-runic.30" />
+    <PackageVersion Include="Runic.DynamicData.Reactive" Version="10.0.0-runic.30" />
     <PackageVersion Include="ReactiveUI" Version="26.0.1" />
     <PackageVersion Include="ReactiveUI.AndroidX" Version="26.0.1" />
     <PackageVersion Include="ReactiveUI.AndroidX.Reactive" Version="26.0.1" />

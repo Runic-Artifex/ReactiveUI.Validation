@@ -14,7 +14,7 @@ Runic.DynamicData.Reactive. Keep exactly one matching flavor. The
 corresponding imports are `ReactiveUI.Validation.Extensions`, `.Contexts`,
 `.Helpers`, `.Abstractions` and `.States`, or the same roots below
 `ReactiveUI.Validation.Reactive`. The shipped dependency cohort remains
-ReactiveUI 26.0.1 and released DynamicData 10.0.0-runic.5.
+ReactiveUI 26.0.1 and released DynamicData 10.0.0-runic.30.
 
 Both core packages embed `ReactiveUI.Validation.SourceGenerators.dll` and
 their flavor-named `buildTransitive` props. The props allowlist

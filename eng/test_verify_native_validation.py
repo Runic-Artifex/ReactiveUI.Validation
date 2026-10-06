@@ -45,6 +45,20 @@ class NativeGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "exact consumer targets"):
             VERIFY.verify_native_graph(graph, False, CORE_TESTS.PINS, CORE_TESTS.VERSION, "linux-x64")
 
+    def test_legacy_baseline_cohort_is_not_reinterpreted_as_the_current_pin(self):
+        current = CORE_TESTS.PINS
+        legacy = VERIFY.legacy_pins(current)
+        self.assertEqual(legacy["runic.dynamicdata"], VERIFY.DEPENDENCIES.LEGACY_VERSION)
+        self.assertEqual(legacy["runic.dynamicdata.reactive"], VERIFY.DEPENDENCIES.LEGACY_VERSION)
+        graph = CORE_TESTS.consumer_graph()
+        current_identity = f"Runic.DynamicData/{current['runic.dynamicdata']}"
+        legacy_identity = f"Runic.DynamicData/{legacy['runic.dynamicdata']}"
+        graph["libraries"][legacy_identity] = graph["libraries"].pop(current_identity)
+        graph["targets"]["net10.0"][legacy_identity] = graph["targets"]["net10.0"].pop(current_identity)
+        VERIFY.verify_native_graph(graph, False, legacy, CORE_TESTS.VERSION)
+        with self.assertRaisesRegex(ValueError, "must resolve package"):
+            VERIFY.verify_native_graph(graph, False, current, CORE_TESTS.VERSION)
+
     def test_any_project_reference_is_rejected(self):
         graph = CORE_TESTS.consumer_graph()
         graph["libraries"]["ApplicationAdapter/1.0"] = {"type": "project"}

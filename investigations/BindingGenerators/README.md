@@ -22,7 +22,7 @@ both SHA-256 hashes before use:
 
 ```sh
 : "${RUNIC_SDK:?Set RUNIC_SDK to your locked Runic SDK checkout}"
-direnv exec "$RUNIC_SDK" python3 eng/restore-fork-dependencies.py
+direnv exec "$RUNIC_SDK" python3 eng/restore-fork-dependencies.py --legacy
 direnv exec "$RUNIC_SDK" python3 investigations/NativeAot/restore-validation-feed.py \
   "$PWD/artifacts/packages"
 direnv exec "$RUNIC_SDK" python3 investigations/BindingGenerators/verify.py \

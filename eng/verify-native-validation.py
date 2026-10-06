@@ -170,6 +170,14 @@ def verify_restored_bytes(assets, package_id, version, expected):
         raise ValueError(f"Restored {package_id} bytes do not match the verified input package")
 
 
+def legacy_pins(pins):
+    """Keep the immutable Validation baseline on its released DynamicData pair."""
+    result = dict(pins)
+    for package in DEPENDENCIES.LEGACY_DIGESTS:
+        result[package.casefold()] = DEPENDENCIES.LEGACY_VERSION
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rid", choices=("linux-x64", "win-x64"), required=True)
@@ -194,11 +202,16 @@ def main():
         package = ROOT / "artifacts/dependencies" / f"{package_id}.{pins[package_id.casefold()]}.nupkg"
         if digest(package) != expected_hash:
             raise ValueError(f"DynamicData release bytes differ from bootstrap SHA-256: {package}")
+    baseline_pins = legacy_pins(pins)
+    DEPENDENCIES.restore_cohort(DEPENDENCIES.LEGACY_VERSION, DEPENDENCIES.LEGACY_DIGESTS)
     report = {"source": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
               "dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip()),
               "sdk": sdk, "rid": args.rid, "mode": args.mode,
               "baselineSource": "c9fa501c4d2e9442d85693dae77bb6f727e9eb7a",
-              "dynamicDataSha256": DEPENDENCIES.DIGESTS, "packages": {}, "checks": []}
+              "cohorts": {
+                  "candidate": {"dynamicDataVersion": DEPENDENCIES.CURRENT_VERSION, "dynamicDataSha256": DEPENDENCIES.DIGESTS},
+                  "baseline": {"dynamicDataVersion": DEPENDENCIES.LEGACY_VERSION, "dynamicDataSha256": DEPENDENCIES.LEGACY_DIGESTS},
+              }, "packages": {}, "checks": []}
     # Each invocation packs current source into its own feed. Consumers have no
     # production ProjectReference and restore Validation in a fresh local cache.
     with tempfile.TemporaryDirectory(prefix="work-", dir=output) as temporary:
@@ -219,9 +232,9 @@ def main():
         release_feed = ROOT / "artifacts/verification/released-validation"
         run([sys.executable, ROOT / "investigations/NativeAot/restore-validation-feed.py", release_feed],
             output / "baseline-feed.log", ROOT)
-        inputs = (("candidate", feed, packed_versions(feed, pins, report["source"])),
-                  ("baseline", release_feed, packed_versions(release_feed, pins)))
-        for kind, validation_feed, packages in inputs:
+        inputs = (("candidate", feed, packed_versions(feed, pins, report["source"]), pins, DEPENDENCIES.DIGESTS),
+                  ("baseline", release_feed, packed_versions(release_feed, baseline_pins), baseline_pins, DEPENDENCIES.LEGACY_DIGESTS))
+        for kind, validation_feed, packages, cohort_pins, cohort_digests in inputs:
             if kind == "baseline":
                 for _, _, version, path in packages:
                     if version != RELEASE.VERSION:
@@ -262,10 +275,10 @@ def main():
                             command += ["-p:IlcSingleThreaded=true"]
                     code, content = run(command, output / f"{stem}.build.log", folder, expected=kind == "baseline")
                     assets = json.loads((project.parent / "obj/project.assets.json").read_text())
-                    verify_native_graph(assets, reactive, pins, version, rid)
+                    verify_native_graph(assets, reactive, cohort_pins, version, rid)
                     verify_restored_bytes(assets, package_id, version, package_hash)
                     dynamic_data = PACKAGES.flavor_ids(reactive)[1]
-                    verify_restored_bytes(assets, dynamic_data, pins[dynamic_data.casefold()], DEPENDENCIES.DIGESTS[dynamic_data])
+                    verify_restored_bytes(assets, dynamic_data, cohort_pins[dynamic_data.casefold()], cohort_digests[dynamic_data])
                     (output / f"{stem}.graph.json").write_text(json.dumps(assets, indent=2))
                     if kind == "baseline":
                         verify_expected_failure(code, content)
