@@ -17,13 +17,13 @@ jobs:
             rid: win-x64
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
-      - uses: actions/setup-dotnet@v5.3.0
+      - uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # v5.3.0
         with:
           global-json-file: global.json
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: '3.x'
       - name: Native toolchain and space
@@ -45,25 +45,52 @@ jobs:
       - name: Restore SHA-verified DynamicData pair
         run: python eng/restore-fork-dependencies.py
       - name: Download the same-SHA core package pair
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: packages-ubuntu-latest
           path: artifacts/packages
+          digest-mismatch: error
+      - name: Verify the selected Ubuntu package manifest and bytes
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $manifestPath = 'artifacts/packages/package-manifest.json'
+          if (-not (Test-Path $manifestPath -PathType Leaf)) { throw 'Missing package source manifest' }
+          $manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json
+          if ($manifest.source -cne $env:GITHUB_SHA -or $manifest.source -cnotmatch '^[0-9a-f]{40}$') { throw 'Package manifest source does not match this checkout' }
+          $records = @($manifest.packages)
+          $files = @(Get-ChildItem artifacts/packages -File -Recurse)
+          if ($records.Count -ne 2 -or $files.Count -ne 3) { throw 'Expected only two packages and their manifest' }
+          $names = @()
+          $versions = @()
+          foreach ($record in $records) {
+            if ($record.filename -cnotmatch '^Runic\.ReactiveUI\.Validation(\.Reactive)?\.([0-9][0-9A-Za-z.+-]*)\.nupkg$' -or [IO.Path]::GetFileName($record.filename) -cne $record.filename) { throw 'Unexpected package filename in manifest' }
+            $versions += $Matches[2]
+            $names += $record.filename
+            if ($record.sha256 -cnotmatch '^[0-9a-f]{64}$' -or "$($record.size)" -notmatch '^[1-9][0-9]*$') { throw 'Invalid package hash or byte size' }
+            $path = Join-Path artifacts/packages $record.filename
+            if (-not (Test-Path $path -PathType Leaf)) { throw "Missing selected package: $($record.filename)" }
+            if ((Get-Item $path).Length -ne $record.size -or (Get-FileHash $path -Algorithm SHA256).Hash.ToLowerInvariant() -cne $record.sha256) { throw "Package byte mismatch: $($record.filename)" }
+          }
+          if (@($names | Select-Object -Unique).Count -ne 2 -or @($versions | Select-Object -Unique).Count -ne 1 -or @($names | Where-Object { $_ -cmatch '^Runic\.ReactiveUI\.Validation\.Reactive\.' }).Count -ne 1) { throw 'Expected matching versions of both flavors' }
+          Write-Host 'Same-source Ubuntu package pair verified for this native host'
       - name: Publish and execute strict consumers of the verified package bytes
         run: python eng/verify-native-validation.py --rid ${{ matrix.rid }} --mode native --package-feed artifacts/packages
       - name: Publish and execute generated managed, trimmed and NativeAOT consumers
         run: python eng/verify-generated-validation.py --rid ${{ matrix.rid }} --mode all --package-feed artifacts/packages
-      - uses: actions/upload-artifact@v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
+          if-no-files-found: error
           name: native-validation-${{ matrix.rid }}
           path: |
             artifacts/verification/native-gates/*.log
             artifacts/verification/native-gates/*.json
           retention-days: 14
-      - uses: actions/upload-artifact@v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
+          if-no-files-found: error
           name: generated-validation-${{ matrix.rid }}
           path: |
             artifacts/verification/generated-gates/*.log
