@@ -1,0 +1,15 @@
+{
+    "version": "9.0-runic.{height}",
+    "publicReleaseRefSpec": [
+        "^refs/heads/main$" // main publishes pre-release packages
+    ],
+    "nugetPackageVersion": {
+        "semVer": 2
+    },
+    "cloudBuild": {
+        "setVersionVariables": true,
+        "buildNumber": {
+            "enabled": false
+        }
+    }
+}

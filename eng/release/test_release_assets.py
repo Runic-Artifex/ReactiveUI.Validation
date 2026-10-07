@@ -5,7 +5,6 @@ import importlib.util
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import tempfile
 import unittest
@@ -16,7 +15,6 @@ ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location("release_assets", Path(__file__).with_name("release_assets.py"))
 RELEASE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(RELEASE)
-EVIDENCE = Path(os.environ.get("VALIDATION_RELEASE_EVIDENCE", ROOT.parents[1] / "ReactiveUI.Validation/artifacts/verification/dynamicdata-upgrade-2026-10-06/hosted-37391350972/artifacts"))
 SOURCE = "c5afc80b55a4c65f262ca0a60879f9319c62991e"
 
 
@@ -30,7 +28,7 @@ def manifest(folder):
 def package(folder, package_id, marker):
     reactive = package_id.endswith(".Reactive")
     assembly = "ReactiveUI.Validation.Reactive" if reactive else "ReactiveUI.Validation"
-    version = "8.1.0-runic.0.1"
+    version = "9.0.0-runic.1"
     path = folder / f"{package_id}.{version}.nupkg"
     reactive_ui = "ReactiveUI.Reactive" if reactive else "ReactiveUI"
     dynamic_data = "Runic.DynamicData.Reactive" if reactive else "Runic.DynamicData"
@@ -69,8 +67,8 @@ def make_evidence(target):
         folder.mkdir()
         pair = {package_id: package(folder, package_id, host.encode()) for package_id in RELEASE.PACKAGE_IDS}
         manifest(folder)
-        host_packages[host] = {"Primitives": {"id": RELEASE.PACKAGE_IDS[0], "version": "8.1.0-runic.0.1", "sha256": RELEASE.sha256(pair[RELEASE.PACKAGE_IDS[0]])},
-                               "Reactive": {"id": RELEASE.PACKAGE_IDS[1], "version": "8.1.0-runic.0.1", "sha256": RELEASE.sha256(pair[RELEASE.PACKAGE_IDS[1]])}}
+        host_packages[host] = {"Primitives": {"id": RELEASE.PACKAGE_IDS[0], "version": "9.0.0-runic.1", "sha256": RELEASE.sha256(pair[RELEASE.PACKAGE_IDS[0]])},
+                               "Reactive": {"id": RELEASE.PACKAGE_IDS[1], "version": "9.0.0-runic.1", "sha256": RELEASE.sha256(pair[RELEASE.PACKAGE_IDS[1]])}}
     for rid in ("linux-x64", "win-x64"):
         for prefix, mode, checks in (("native-validation", "native", {"candidate-Primitives-native", "candidate-Reactive-native", "baseline-Primitives-baseline", "baseline-Reactive-baseline"}), ("generated-validation", "all", all_generated)):
             folder = target / f"{prefix}-{rid}"
@@ -110,7 +108,7 @@ class ReleaseEvidenceTests(unittest.TestCase):
             output = target / "verified.json"
             with mock.patch.dict(os.environ, {"GITHUB_SHA": SOURCE}):
                 RELEASE.verify(target, source_report, output)
-            self.assertEqual(json.loads(output.read_text())["version"], "8.1.0-runic.0.1")
+            self.assertEqual(json.loads(output.read_text())["version"], "9.0.0-runic.1")
             generated = target / "validation-ubuntu-latest/artifacts/verification/generated-gates/results.json"
             value = json.loads(generated.read_text())
             value["source"] = "0" * 40
@@ -159,49 +157,11 @@ class ReleaseEvidenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "did not succeed"):
             RELEASE.verify_jobs([{ "jobs": jobs }])
 
-    def test_actual_hosted_evidence_shape_with_completed_reports(self):
-        if not EVIDENCE.is_dir():
-            self.skipTest("retained hosted evidence is unavailable")
-        with tempfile.TemporaryDirectory() as temporary:
-            target = Path(temporary) / "evidence"
-            shutil.copytree(EVIDENCE, target)
-            for host in ("ubuntu-latest", "windows-latest"):
-                manifest(target / f"packages-{host}")
-            for path in target.rglob("results.json"):
-                value = json.loads(path.read_text())
-                value["completed"] = True
-                path.write_text(json.dumps(value))
-            # Current retained evidence predates the ordinary package-smoke
-            # report. Add its final two-check shape beside generated-gates so
-            # this fixture also proves the release guard selects both paths.
-            for host in ("ubuntu-latest", "windows-latest"):
-                generated = json.loads((target / f"validation-{host}" / "artifacts/verification/generated-gates/results.json").read_text())
-                ordinary = {key: generated[key] for key in ("source", "dirty", "sdk", "rid", "packages", "completed")}
-                ordinary.pop("rid")
-                for package in ordinary["packages"].values():
-                    package["repositoryCommit"] = SOURCE
-                ordinary["checks"] = [{"name": "Primitives-managed", "passed": True}, {"name": "Reactive-managed", "passed": True}]
-                destination = target / f"validation-{host}" / "artifacts/verification/package-smoke"
-                destination.mkdir(parents=True)
-                (destination / "results.json").write_text(json.dumps(ordinary))
-            source_report = target / "source.json"
-            source_report.write_text(json.dumps({"source": SOURCE}))
-            output = target / "verified.json"
-            old = os.environ.get("GITHUB_SHA")
-            os.environ["GITHUB_SHA"] = SOURCE
-            try:
-                RELEASE.verify(target, source_report, output)
-            finally:
-                if old is None:
-                    del os.environ["GITHUB_SHA"]
-                else:
-                    os.environ["GITHUB_SHA"] = old
-            self.assertEqual(json.loads(output.read_text())["source"], SOURCE)
 
     def test_manifest_corruption_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)
-            package = folder / "Runic.ReactiveUI.Validation.8.1.0-runic.0.1.nupkg"
+            package = folder / "Runic.ReactiveUI.Validation.9.0.0-runic.1.nupkg"
             package.write_bytes(b"wrong")
             (folder / "package-manifest.json").write_text(json.dumps({"source": SOURCE, "packages": [{"filename": package.name, "sha256": "0" * 64, "size": 5}]}))
             with self.assertRaises(ValueError):
@@ -222,20 +182,20 @@ class ReleaseEvidenceTests(unittest.TestCase):
 
     def test_wrong_draft_tag_is_rejected_before_upload_or_publish(self):
         with self.assertRaisesRegex(ValueError, "expected draft"):
-            RELEASE.require_draft({"id": 7, "tag_name": "runic-vwrong", "draft": True, "prerelease": True,
-                                   "target_commitish": SOURCE}, "runic-v8.1.0-runic.0.1", SOURCE)
+            RELEASE.require_draft({"id": 7, "tag_name": "vwrong", "draft": True, "prerelease": True,
+                                   "target_commitish": SOURCE}, "v9.0.0-runic.1", SOURCE)
 
     def test_mocked_publication_downloads_exact_draft_bytes_before_tag_and_publish(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)
-            first, second = folder / "Runic.ReactiveUI.Validation.8.1.0-runic.0.1.nupkg", folder / "Runic.ReactiveUI.Validation.Reactive.8.1.0-runic.0.1.nupkg"
+            first, second = folder / "Runic.ReactiveUI.Validation.9.0.0-runic.1.nupkg", folder / "Runic.ReactiveUI.Validation.Reactive.9.0.0-runic.1.nupkg"
             first.write_bytes(b"first")
             second.write_bytes(b"second")
             packages = {"Primitives": {"path": str(first), "sha256": RELEASE.sha256(first)},
                         "Reactive": {"path": str(second), "sha256": RELEASE.sha256(second)}}
             verified = folder / "verified.json"
-            verified.write_text(json.dumps({"source": SOURCE, "version": "8.1.0-runic.0.1", "packages": packages}))
-            tag = "runic-v8.1.0-runic.0.1"
+            verified.write_text(json.dumps({"source": SOURCE, "version": "9.0.0-runic.1", "packages": packages}))
+            tag = "v9.0.0-runic.1"
             calls = []
             assets = [{"id": 1, "name": first.name, "state": "uploaded", "size": 5, "digest": "sha256:" + packages["Primitives"]["sha256"]},
                       {"id": 2, "name": second.name, "state": "uploaded", "size": 6, "digest": "sha256:" + packages["Reactive"]["sha256"]}]

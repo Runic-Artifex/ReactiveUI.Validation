@@ -203,10 +203,12 @@ reproducing a fixed compiler. This boundary does not authorize dependency update
 
 ## Releases and retirement
 
-Release a tested source commit under a unique version and tag. MinVer settings in
-[src/Directory.Build.props](../src/Directory.Build.props) use the `runic-v` tag
-prefix, an 8.1 minimum and `runic.0` prerelease identifiers; inspect the produced
-version. The [release workflow](../.github/workflows/release.yml) promotes the
+Release a tested source commit under a unique version and tag. Nerdbank.GitVersioning
+reads [version.json](../version.json) (`9.0-runic.{height}`), so `main` produces
+`9.0.0-runic.1`, `9.0.0-runic.2`, ... and other branches add a commit suffix. This
+matches the DynamicData fork. Change the major/minor in `version.json` for a new
+line; the height then restarts. Releases are tagged `v<version>`; the older
+`runic-v8.1.0-runic.0.*` releases are historical. The [release workflow](../.github/workflows/release.yml) promotes the
 exact Linux package pair from the latest successful trusted Build of the current
 `main` SHA, after checking its completed core, native and generated reports,
 source, cohort and hashes. `verify_only: true` performs read-only verification;
