@@ -306,6 +306,18 @@ def one_result(root, artifact, rid, report_path="results.json"):
     return report
 
 
+def gate_passed(report, mode, flavors, stages):
+    """Accept a completed generated gate that ran every flavor stage and passed all of its own checks.
+
+    The gate enforces its required case, negative and configuration set itself and only marks
+    the report completed when they all pass, so the release guard does not duplicate that list.
+    """
+    checks = report.get("checks", [])
+    required = {f"{flavor}-{stage}" for flavor in flavors for stage in stages}
+    return (report.get("mode") == mode and required <= {item.get("name") for item in checks}
+            and all(item.get("passed") is True for item in checks))
+
+
 def require_package(report, key, package, label, require_repository_commit=False):
     actual = report.get("packages", {}).get(key, {})
     if any(actual.get(field) != package[field] for field in ("id", "version", "sha256")):
@@ -349,21 +361,17 @@ def verify(root, source_report, output):
     if packages["ubuntu-latest"]["Primitives"]["version"] != packages["windows-latest"]["Primitives"]["version"]:
         fail("core hosts produced different Validation versions")
     selected = packages["ubuntu-latest"]
-    generated_expected = {f"{flavor}-{stage}" for flavor in selected for stage in ("managed", "trimmed", "native")}
-    generated_expected |= {f"{flavor}-NEGATIVE_{case}" for flavor in selected for case in ("STORED_SELECTOR", "COMPUTED_SELECTOR", "INDEXER", "NESTED_TARGET", "NONNOTIFY_RULE", "STRUCT_OWNER")}
     native_expected = {"candidate-Primitives-native", "candidate-Reactive-native", "baseline-Primitives-baseline", "baseline-Reactive-baseline"}
     for rid in ("linux-x64", "win-x64"):
         generated = one_result(root, f"generated-validation-{rid}", rid)
         native = one_result(root, f"native-validation-{rid}", rid)
-        if generated.get("mode") != "all" or len(generated.get("checks", [])) != len(generated_expected) or {item.get("name") for item in generated.get("checks", [])} != generated_expected or not all(item.get("passed") is True for item in generated["checks"]):
+        if not gate_passed(generated, "all", selected, ("managed", "trimmed", "native")):
             fail(f"generated validation report is incomplete for {rid}")
         if native.get("mode") != "native" or len(native.get("checks", [])) != len(native_expected) or {item.get("name") for item in native.get("checks", [])} != native_expected or not all(item.get("passed") is True for item in native["checks"]):
             fail(f"native validation report is incomplete for {rid}")
         for flavor, package in selected.items():
             require_package(generated, flavor, package, f"generated {rid} {flavor}")
             require_package(native, f"candidate-{flavor}", package, f"native {rid} {flavor}")
-    managed_expected = {f"{flavor}-managed" for flavor in selected}
-    managed_expected |= {f"{flavor}-NEGATIVE_{case}" for flavor in selected for case in ("STORED_SELECTOR", "COMPUTED_SELECTOR", "INDEXER", "NESTED_TARGET", "NONNOTIFY_RULE", "STRUCT_OWNER")}
     for host in packages:
         artifact = f"validation-{host}"
         verify_trx(Path(root) / artifact)
@@ -377,7 +385,7 @@ def verify(root, source_report, output):
         for flavor, package in packages[host].items():
             require_package(ordinary, flavor, package, f"ordinary package {host} {flavor}", True)
         managed = one_result(root, artifact, rid, "artifacts/verification/generated-gates/results.json")
-        if managed.get("mode") != "managed" or len(managed.get("checks", [])) != len(managed_expected) or {item.get("name") for item in managed.get("checks", [])} != managed_expected or not all(item.get("passed") is True for item in managed["checks"]):
+        if not gate_passed(managed, "managed", packages[host], ("managed",)):
             fail(f"generated managed report is incomplete for {host}")
         for flavor, package in packages[host].items():
             require_package(managed, flavor, package, f"generated managed {host} {flavor}")

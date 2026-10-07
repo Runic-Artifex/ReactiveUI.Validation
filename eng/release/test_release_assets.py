@@ -62,7 +62,7 @@ def report(packages, rid, mode, checks, repository_commit=False):
 
 def make_evidence(target):
     all_generated = {f"{flavor}-{stage}" for flavor in ("Primitives", "Reactive") for stage in ("managed", "trimmed", "native")}
-    all_generated |= {f"{flavor}-NEGATIVE_{case}" for flavor in ("Primitives", "Reactive") for case in ("STORED_SELECTOR", "COMPUTED_SELECTOR", "INDEXER", "NESTED_TARGET", "NONNOTIFY_RULE", "STRUCT_OWNER")}
+    all_generated |= {f"{flavor}-NEGATIVE_{case}" for flavor in ("Primitives", "Reactive") for case in ("OPAQUE_SELECTOR", "UNMARKED_INIT", "VALUE_VIEW")}
     host_packages = {}
     for host in ("ubuntu-latest", "windows-latest"):
         folder = target / f"packages-{host}"
@@ -87,7 +87,7 @@ def make_evidence(target):
         ordinary.mkdir(parents=True)
         managed_checks = {"Primitives-managed", "Reactive-managed"}
         managed_checks |= {f"{flavor}-NEGATIVE_{case}" for flavor in ("Primitives", "Reactive")
-                           for case in ("STORED_SELECTOR", "COMPUTED_SELECTOR", "INDEXER", "NESTED_TARGET", "NONNOTIFY_RULE", "STRUCT_OWNER")}
+                           for case in ("OPAQUE_SELECTOR", "UNMARKED_INIT", "VALUE_VIEW")}
         (generated / "results.json").write_text(json.dumps(report(host_packages[host], rid, "managed", managed_checks)))
         smoke = report(host_packages[host], rid, "smoke", {"Primitives-managed", "Reactive-managed"}, True)
         smoke.pop("rid")
@@ -118,6 +118,21 @@ class ReleaseEvidenceTests(unittest.TestCase):
             with mock.patch.dict(os.environ, {"GITHUB_SHA": SOURCE}):
                 with self.assertRaisesRegex(ValueError, "incomplete or not for the release source"):
                     RELEASE.verify(target, source_report, output)
+
+    def test_generated_gate_requires_every_stage_and_passing_checks(self):
+        for mutate in (lambda value: value.update(checks=[item for item in value["checks"] if item["name"] != "Reactive-native"]),
+                       lambda value: value["checks"][0].update(passed=False),
+                       lambda value: value.update(mode="managed")):
+            with tempfile.TemporaryDirectory() as temporary:
+                target = Path(temporary)
+                source_report = make_evidence(target)
+                generated = target / "generated-validation-linux-x64/results.json"
+                value = json.loads(generated.read_text())
+                mutate(value)
+                generated.write_text(json.dumps(value))
+                with mock.patch.dict(os.environ, {"GITHUB_SHA": SOURCE}):
+                    with self.assertRaisesRegex(ValueError, "generated validation report is incomplete for linux-x64"):
+                        RELEASE.verify(target, source_report, target / "verified.json")
 
     def test_latest_eligible_run_must_succeed(self):
         base = {"head_sha": SOURCE, "head_repository": {"full_name": "Runic-Artifex/ReactiveUI.Validation"},
