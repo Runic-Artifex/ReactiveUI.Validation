@@ -90,16 +90,8 @@
   <ItemGroup Condition="'$(IsTestProject)' != 'true'">
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
-	<!-- MinVer (versioning) — replaces Nerdbank.GitVersioning. The runic-v prefix isolates versioning from upstream tags. -->
-	<PropertyGroup>
-		<MinVerAutoIncrement>minor</MinVerAutoIncrement>
-		<MinVerDefaultPreReleaseIdentifiers>runic.0</MinVerDefaultPreReleaseIdentifiers>
-		<MinVerTagPrefix>runic-v</MinVerTagPrefix>
-		<MinVerMinimumMajorMinor>8.1</MinVerMinimumMajorMinor>
-	</PropertyGroup>
-
 	<ItemGroup>
-		<PackageReference Include="MinVer" PrivateAssets="all" />
+		<PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="all" />
 		<PackageReference Include="StyleSharp.Analyzers" PrivateAssets="all" />
 		<PackageReference Include="PerformanceSharp.Analyzers" PrivateAssets="all" />
 		<PackageReference Include="SecuritySharp.Analyzers" PrivateAssets="all" />

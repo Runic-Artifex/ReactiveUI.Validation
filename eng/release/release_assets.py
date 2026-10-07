@@ -259,8 +259,8 @@ def verify_package(path, package_id, source):
         fail(f"{path.name} has no nuspec metadata")
     text = lambda name: metadata.findtext(f"n:{name}", namespaces=NS)
     version = text("version")
-    if text("id") != package_id or text("authors") != "ReactiveUI and Contributors" or version is None or not re.fullmatch(r"8\.1\.\d+-runic\.\d+(?:\.\d+)*", version):
-        fail(f"{path.name} does not have the expected branded MinVer identity")
+    if text("id") != package_id or text("authors") != "ReactiveUI and Contributors" or version is None or not re.fullmatch(r"9\.0\.\d+-runic\.\d+", version):
+        fail(f"{path.name} does not have the expected branded version identity")
     license_ = metadata.find("n:license", NS)
     repository = metadata.find("n:repository", NS)
     if (license_ is None or license_.get("type") != "expression" or license_.text != "MIT" or
@@ -415,7 +415,7 @@ def publish(verified):
     if data.get("source") != source:
         fail("verified evidence is not for the current release source")
     version = data["version"]
-    tag = f"runic-v{version}"
+    tag = f"v{version}"
     absent(f"repos/{repository}/git/ref/tags/{tag}", f"tag {tag}")
     releases = paged(f"repos/{repository}/releases?per_page=100")
     if any(release.get("tag_name") == tag for page in releases for release in page):
