@@ -215,20 +215,46 @@ reads [version.json](../version.json) (`9.0-runic.{height}`), so `main` produces
 `9.0.0-runic.1`, `9.0.0-runic.2`, ... and other branches add a commit suffix. This
 matches the DynamicData fork. Change the major/minor in `version.json` for a new
 line; the height then restarts. Releases are tagged `v<version>`; the older
-`runic-v8.1.0-runic.0.*` releases are historical. The [release workflow](../.github/workflows/release.yml) promotes the
-exact Linux package pair from the latest successful trusted Build of the current
-`main` SHA, after checking its completed core, native and generated reports,
-source, cohort and hashes. `verify_only: true` performs read-only verification;
-the default publishes. Nothing is pushed to NuGet.org.
+`runic-v8.1.0-runic.0.*` releases are historical.
+
+The [release workflow](../.github/workflows/release.yml) promotes the exact Linux
+`RunicArtifex.ReactiveUI.Validation` and `RunicArtifex.ReactiveUI.Validation.Reactive`
+pair from the latest successful trusted Build of the current `main` SHA, after
+checking its completed core, native and generated reports, source, cohort,
+attribution and hashes. It creates a prerelease GitHub release with those assets
+and the release notes, then pushes the pair to nuget.org with trusted publishing
+from the protected `nuget` environment, and finally waits up to an hour until
+nuget.org lists both versions. Earlier releases were GitHub release assets only,
+under the IDs `Runic.ReactiveUI.Validation` and `Runic.ReactiveUI.Validation.Reactive`;
+the native gate still consumes the released `8.1.0-runic.0.790.17` pair under
+those legacy IDs as its baseline. AndroidX packages are not released.
+
+1. Wait for a green Build run (and the native workflow) of the `main` commit.
+2. Run **Package release** on `main` with `dry-run` checked (the default). It
+   verifies the Build evidence and runs every check, including keyless nuget.org
+   lookups for the package globs, ID ownership, dependencies and already
+   published versions, without creating the release or pushing.
+3. Run it again with `dry-run` unchecked and approve the `nuget` environment.
+4. Wait for the `indexed` job before depending on the new version.
+
+If the `nuget` job fails, use **Re-run failed jobs** in the same run; it skips
+versions nuget.org already has with identical contents and refuses changed ones.
+See the [release guide](../eng/release/README.md#retries) for retries and for the
+one-time [nuget.org account setup](../eng/release/README.md#nugetorg-account-setup):
+the trusted publishing policy for `Runic-Artifex`/`ReactiveUI.Validation`, workflow
+`release.yml`, environment `nuget`, glob `RunicArtifex.*`; the `NUGET_USER`
+repository variable; and the `nuget` environment, limited to `main` with required
+reviewers. Keep [`nuget-policy.json`](../eng/release/nuget-policy.json) in step
+with the nuget.org policy.
 
 Keep the `RunicArtifex.ReactiveUI.Validation` and `RunicArtifex.ReactiveUI.Validation.Reactive`
 IDs, namespaces, licensing and attribution. Release notes record the source SHA,
-dependency cohort, verification and known limitations. Published versions, tags
-and assets are immutable: never retag or replace assets; corrections get a new
-version. Publication refuses an existing tag/release, uploads to a draft,
-re-downloads and compares both assets with the accepted bytes, then creates the
-tag at the tested SHA. A failed verification leaves the draft for deliberate
-recovery.
+dependency cohort, verification and known limitations. Published versions, tags,
+assets and nuget.org packages are immutable: never retag or replace assets;
+corrections get a new version. Publication refuses an existing tag/release,
+uploads to a draft, re-downloads and compares both assets with the accepted
+bytes, then creates the tag at the tested SHA. A failed verification leaves the
+draft for deliberate recovery.
 
 A documentation-only commit still moves `main` to a new SHA, and the release
 guard requires a successful Build for that exact SHA; dispatch it with

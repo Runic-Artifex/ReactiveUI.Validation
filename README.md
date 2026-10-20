@@ -7,17 +7,21 @@ It ships two core NuGet packages:
 
 | Package ID | Namespace root | Dependencies |
 | --- | --- | --- |
-| `RunicArtifex.ReactiveUI.Validation` | `ReactiveUI.Validation` | `ReactiveUI`, `RunicArtifex.DynamicData` |
-| `RunicArtifex.ReactiveUI.Validation.Reactive` | `ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive`, `RunicArtifex.DynamicData.Reactive` |
+| [`RunicArtifex.ReactiveUI.Validation`](https://www.nuget.org/packages/RunicArtifex.ReactiveUI.Validation) | `ReactiveUI.Validation` | `ReactiveUI`, `RunicArtifex.DynamicData` |
+| [`RunicArtifex.ReactiveUI.Validation.Reactive`](https://www.nuget.org/packages/RunicArtifex.ReactiveUI.Validation.Reactive) | `ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive`, `RunicArtifex.DynamicData.Reactive` |
 
 Both target .NET 10. Use the flavor that matches your ReactiveUI package; the
 Reactive flavor's validation collection uses `DynamicData.Reactive` types. Keep
 one flavor per application and replace upstream Validation and DynamicData
-references with the matching `Runic.*` / `RunicArtifex.*` IDs. The original MIT license and
-authorship remain.
+references with the matching `RunicArtifex.*` IDs. The namespaces and assembly
+names remain `ReactiveUI.Validation` and `ReactiveUI.Validation.Reactive`. The
+original MIT license and authorship remain.
 
-Packages are attached to [GitHub releases](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases);
-put them in a local NuGet feed; the DynamicData dependencies restore from NuGet.org.
+Install both packages and their dependencies from nuget.org; release notes are on
+the [GitHub releases](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases)
+page. Earlier releases were published only as GitHub release assets, under the IDs
+`Runic.ReactiveUI.Validation` and `Runic.ReactiveUI.Validation.Reactive`; those
+assets stay as they are, and nuget.org has only the `RunicArtifex.*` IDs.
 See [CONTRIBUTING](CONTRIBUTING.md) to build and test,
 [NativeAOT and generators](docs/aot-and-generators.md) for trimming/AOT, the
 [maintenance policy](docs/maintenance.md) and
@@ -49,6 +53,10 @@ overloads and the explicit observable APIs remain available. See the
 [design](docs/generated-validation-design.md).
 
 ---
+
+[RunicArtifex.ReactiveUI.Validation on nuget.org](https://www.nuget.org/packages/RunicArtifex.ReactiveUI.Validation) ·
+[RunicArtifex.ReactiveUI.Validation.Reactive on nuget.org](https://www.nuget.org/packages/RunicArtifex.ReactiveUI.Validation.Reactive) ·
+[Release notes](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases)
 
 The upstream usage guide and contributor history below are retained for reference.
 Its NuGet badges link to the upstream distribution.
