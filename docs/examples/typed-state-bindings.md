@@ -8,7 +8,7 @@ formatter overloads retain their signatures.
 Use the imports matching your package:
 
 ```csharp
-// Runic.ReactiveUI.Validation (Primitives)
+// RunicArtifex.ReactiveUI.Validation (Primitives)
 using ReactiveUI;
 using ReactiveUI.Binding;
 using ReactiveUI.Validation.Extensions;
@@ -17,7 +17,7 @@ using ReactiveUI.Validation.States;
 ```
 
 ```csharp
-// Runic.ReactiveUI.Validation.Reactive (System.Reactive)
+// RunicArtifex.ReactiveUI.Validation.Reactive (System.Reactive)
 using ReactiveUI;
 using ReactiveUI.Reactive;
 using ReactiveUI.Binding.Reactive;

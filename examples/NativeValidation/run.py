@@ -29,6 +29,11 @@ CURRENT_DYNAMICDATA_HASHES = {
     "RunicArtifex.DynamicData.Reactive": "2fc449f7f33888f19d377f08ad99880cd89714b7305719a1f15758f2b906e9e3",
 }
 DYNAMICDATA_FAMILIES = ("Runic.DynamicData", "RunicArtifex.DynamicData")
+# The released baseline keeps its GitHub-release-only Runic IDs; the candidate is
+# the RunicArtifex ID published on NuGet.org.
+BASELINE_VALIDATION = "Runic.ReactiveUI.Validation"
+CURRENT_VALIDATION = "RunicArtifex.ReactiveUI.Validation"
+VALIDATION_FAMILIES = (BASELINE_VALIDATION, CURRENT_VALIDATION)
 
 
 def run(command, log):
@@ -41,16 +46,20 @@ def run(command, log):
     return result
 
 
-def verify_graph(project, flavor, version, dynamicdata):
+def verify_graph(project, flavor, version, dynamicdata, validation):
     assets = json.loads((project.parent / "obj/project.assets.json").read_text())
     libraries = assets["libraries"]
     suffix = "" if flavor == "Primitives" else ".Reactive"
     family, dynamicdata_version = dynamicdata
-    expected = {f"Runic.ReactiveUI.Validation{suffix}/{version}", f"{family}{suffix}/{dynamicdata_version}"}
+    expected = {f"{validation}{suffix}/{version}", f"{family}{suffix}/{dynamicdata_version}"}
     assert expected <= libraries.keys(), (expected, libraries.keys())
     names = {key.rsplit("/", 1)[0].casefold() for key in libraries}
     opposite = ".Reactive" if not suffix else ""
-    forbidden = {"dynamicdata", "dynamicdata.reactive", f"runic.reactiveui.validation{opposite}".casefold()}
+    forbidden = {"dynamicdata", "dynamicdata.reactive"}
+    for other in VALIDATION_FAMILIES:
+        forbidden.add(f"{other}{opposite}".casefold())
+        if other != validation:
+            forbidden |= {other.casefold(), f"{other}.reactive".casefold()}
     for other in DYNAMICDATA_FAMILIES:
         forbidden.add(f"{other}{opposite}".casefold())
         if other != family:
@@ -96,7 +105,8 @@ def main():
         parser.error("candidate requires a fresh version and candidate feed")
     assert subprocess.check_output(["dotnet", "--version"], text=True).strip() == "10.0.401"
     args.validation_feed = args.validation_feed.resolve()
-    source_list = [("validation", str(args.validation_feed), "Runic.ReactiveUI.Validation*")]
+    validation = CURRENT_VALIDATION if candidate else BASELINE_VALIDATION
+    source_list = [("validation", str(args.validation_feed), f"{validation}*")]
     if not candidate:
         args.dynamicdata_feed = args.dynamicdata_feed.resolve()
         for name, digest in BASELINE_VALIDATION_HASHES.items():
@@ -147,7 +157,7 @@ def main():
                         failure = expectations["managedExpectedFailures"][record["case"]]
                         assert record["exception"] == failure["exception"] and record["failureId"] == failure["failureId"], record
                 assert runtime.returncode == (0 if candidate else 1), runtime.stderr
-        assets = verify_graph(project, flavor, args.version, dynamicdata)
+        assets = verify_graph(project, flavor, args.version, dynamicdata, validation)
         if candidate:
             verify_current_dynamicdata(assets, flavor)
         print(f"{args.mode} {flavor}: verified")

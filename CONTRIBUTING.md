@@ -44,8 +44,8 @@ The core solution builds the generator, both .NET 10 libraries and their tests:
 
 | Validation package | ReactiveUI package | DynamicData package |
 | --- | --- | --- |
-| `Runic.ReactiveUI.Validation` | `ReactiveUI` 26.0.1 | `RunicArtifex.DynamicData` |
-| `Runic.ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive` 26.0.1 | `RunicArtifex.DynamicData.Reactive` |
+| `RunicArtifex.ReactiveUI.Validation` | `ReactiveUI` 26.0.1 | `RunicArtifex.DynamicData` |
+| `RunicArtifex.ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive` 26.0.1 | `RunicArtifex.DynamicData.Reactive` |
 
 Keep both shared-source flavors working. The Reactive flavor exposes
 `DynamicData.Reactive.IObservableList`; Primitives exposes
@@ -108,7 +108,14 @@ extension blocks without reproducing a fixed compiler.
 samples; it needs extra workloads and is outside core CI and releases. The old
 UWP sample and non-.NET-10 API baselines are retained as upstream history.
 
-The manual release workflow attaches the two core `.nupkg` assets to a GitHub
-prerelease on this fork; it does not publish to NuGet.org or under upstream IDs.
+The manual release workflow publishes the two core packages to nuget.org, as
+[RunicArtifex.ReactiveUI.Validation](https://www.nuget.org/packages/RunicArtifex.ReactiveUI.Validation)
+and [RunicArtifex.ReactiveUI.Validation.Reactive](https://www.nuget.org/packages/RunicArtifex.ReactiveUI.Validation.Reactive),
+and records release notes in a [GitHub prerelease](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases);
+it does not publish under upstream package names (see the
+[release guide](eng/release/README.md)). Consume the fork from nuget.org, for
+example `dotnet add package RunicArtifex.ReactiveUI.Validation --prerelease`.
+Earlier releases were only GitHub release assets, under the IDs
+`Runic.ReactiveUI.Validation` and `Runic.ReactiveUI.Validation.Reactive`.
 Preserve upstream MIT licensing and authorship. This fork is maintained for Runic
 and will not be proposed upstream.

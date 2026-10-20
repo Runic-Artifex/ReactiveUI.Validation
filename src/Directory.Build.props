@@ -5,15 +5,14 @@
     <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Copyright>Copyright © 2019-$(CompanyName) $([System.DateTime]::Now.ToString(`yyyy`)) ReactiveUI and Contributors</Copyright>
-    <Product>ReactiveUI.Validations ($(TargetFramework))</Product>
+    <Copyright>Copyright © 2019-$([System.DateTime]::Now.ToString(`yyyy`)) ReactiveUI and Contributors</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Runic-Artifex/ReactiveUI.Validation/</PackageProjectUrl>
     <PackageIconUrl>https://github.com/Runic-Artifex/ReactiveUI.Validation/blob/main/media/logo.png?raw=true</PackageIconUrl>
-    <Authors>ReactiveUI and Contributors</Authors>
-    <Description>Validations library for ReactiveUI.</Description>
-    <Owners>xanaisbettsx;ghuntley</Owners>
-    <PackageTags>reactiveui;validation library;reactive programming;netcore;netframework</PackageTags>
+    <!-- Upstream authorship and copyright are kept; nuget.org takes owners from the account, so no Owners. -->
+    <Authors>ReactiveUI and Contributors, Runic Artifex</Authors>
+    <Description>The Runic Artifex fork of ReactiveUI.Validation for .NET 10.</Description>
+    <PackageTags>reactiveui;validation library;reactive programming;netcore</PackageTags>
     <PackageIcon>logo.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>https://github.com/Runic-Artifex/ReactiveUI.Validation/releases</PackageReleaseNotes>

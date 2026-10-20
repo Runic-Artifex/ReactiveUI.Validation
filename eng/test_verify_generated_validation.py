@@ -556,7 +556,7 @@ class GeneratedGateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             package = Path(temp) / "candidate.nupkg"
             analyzer = "analyzers/dotnet/roslyn5.0/cs/ReactiveUI.Validation.SourceGenerators.dll"
-            props = "buildTransitive/Runic.ReactiveUI.Validation.props"
+            props = "buildTransitive/RunicArtifex.ReactiveUI.Validation.props"
             optin = '<Project><PropertyGroup><InterceptorsNamespaces>$(InterceptorsNamespaces);ReactiveUI.Validation.Generated</InterceptorsNamespaces></PropertyGroup></Project>'
             for assets in ({analyzer: b"assembly" * 200, props: optin}, {},
                            {analyzer: b"assembly" * 200}, {analyzer: b"stub", props: optin},

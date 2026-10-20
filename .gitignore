@@ -21,6 +21,8 @@ mono_crash.*
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+# The repository's release tooling, not a Release build output.
+!/eng/release/
 x64/
 x86/
 [Aa][Rr][Mm]/

@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Promote an already accepted Runic ReactiveUI.Validation package pair."""
+"""Promote an already accepted RunicArtifex.ReactiveUI.Validation package pair.
+
+resolve, download, verify  bind the release to the accepted Build evidence.
+stage                      copies the verified Ubuntu pair into a package folder.
+check, publish             check (read-only) or create the GitHub prerelease.
+nuget-check, nuget-push    check nuget.org with keyless lookups, then push what it lacks.
+wait-indexed               waits until the nuget.org flat container lists the pair.
+
+See eng/release/README.md.
+"""
 import argparse
 import hashlib
 import io
@@ -7,13 +16,20 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-PACKAGE_IDS = ("Runic.ReactiveUI.Validation", "Runic.ReactiveUI.Validation.Reactive")
+PACKAGE_IDS = ("RunicArtifex.ReactiveUI.Validation", "RunicArtifex.ReactiveUI.Validation.Reactive")
+# Earlier releases were GitHub-release assets under these IDs; a new release never uses them.
+LEGACY_PACKAGE_IDS = ("Runic.ReactiveUI.Validation", "Runic.ReactiveUI.Validation.Reactive")
 BUILD_WORKFLOW = ".github/workflows/ci-build.yml"
 EXPECTED_JOBS = {
     "build (ubuntu-latest)", "build (windows-latest)",
@@ -27,6 +43,9 @@ EXPECTED_ARTIFACTS = {
     "generated-validation-linux-x64", "generated-validation-win-x64",
 }
 NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
+VERSION_PATTERN = r"9\.0\.\d+-runic\.\d+"
+AUTHORS = "ReactiveUI and Contributors, Runic Artifex"
+FORK_NAME = "Runic Artifex fork of ReactiveUI.Validation"
 
 
 def fail(message):
@@ -235,7 +254,24 @@ def verify_manifest(folder, pair, source):
         fail(f"package manifest does not describe the exact package pair in {folder}")
 
 
+def verify_attribution(name, metadata, text, reactive):
+    """Keep upstream authorship and copyright, name the fork and its flavour, leave owners to nuget.org."""
+    if text("authors") != AUTHORS:
+        fail(f'{name} authors must be "{AUTHORS}"')
+    if metadata.find("n:owners", NS) is not None:
+        fail(f"{name} must not declare <owners>; nuget.org takes owners from the account")
+    if not re.fullmatch(r"Copyright © 2019-.*\bReactiveUI and Contributors", text("copyright")):
+        fail(f"{name} must keep the ReactiveUI and Contributors copyright")
+    flavor = "System.Reactive" if reactive else "ReactiveUI.Primitives"
+    for field in ("title", "description"):
+        value = text(field)
+        if not value.lower().startswith((FORK_NAME.lower(), f"the {FORK_NAME.lower()}")) or flavor not in value:
+            fail(f"{name} <{field}> must start by naming the {FORK_NAME} and name {flavor}")
+
+
 def verify_package(path, package_id, source):
+    if package_id not in PACKAGE_IDS:
+        fail(f"{package_id} is not a branded release package ID")
     reactive = package_id.endswith(".Reactive")
     assembly = "ReactiveUI.Validation.Reactive" if reactive else "ReactiveUI.Validation"
     try:
@@ -257,10 +293,11 @@ def verify_package(path, package_id, source):
     metadata = root.find("n:metadata", NS)
     if metadata is None:
         fail(f"{path.name} has no nuspec metadata")
-    text = lambda name: metadata.findtext(f"n:{name}", namespaces=NS)
+    text = lambda name: (metadata.findtext(f"n:{name}", namespaces=NS) or "").strip()
     version = text("version")
-    if text("id") != package_id or text("authors") != "ReactiveUI and Contributors" or version is None or not re.fullmatch(r"9\.0\.\d+-runic\.\d+", version):
+    if text("id") != package_id or not re.fullmatch(VERSION_PATTERN, version):
         fail(f"{path.name} does not have the expected branded version identity")
+    verify_attribution(path.name, metadata, text, reactive)
     license_ = metadata.find("n:license", NS)
     repository = metadata.find("n:repository", NS)
     if (license_ is None or license_.get("type") != "expression" or license_.text != "MIT" or
@@ -284,10 +321,11 @@ def verify_package(path, package_id, source):
         if dependencies.get(name.casefold()) not in {version_pin, f"[{version_pin}]"}:
             fail(f"{path.name} does not pin {name} at {version_pin}")
     opposite_suffix = "" if reactive else ".Reactive"
-    # The legacy Runic.DynamicData IDs are GitHub-release-only and never part of a new release.
+    # The legacy Runic.* IDs are GitHub-release-only and never part of a new release.
     forbidden = {"DynamicData", "DynamicData.Reactive", "ReactiveUI.Validation", "ReactiveUI.Validation.Reactive",
-                 "Runic.DynamicData", "Runic.DynamicData.Reactive", f"RunicArtifex.DynamicData{opposite_suffix}",
-                 f"ReactiveUI{opposite_suffix}", f"Runic.ReactiveUI.Validation{opposite_suffix}"}
+                 "Runic.DynamicData", "Runic.DynamicData.Reactive", *LEGACY_PACKAGE_IDS,
+                 f"RunicArtifex.DynamicData{opposite_suffix}", f"ReactiveUI{opposite_suffix}",
+                 f"RunicArtifex.ReactiveUI.Validation{opposite_suffix}"}
     if not reactive:
         forbidden.add("System.Reactive")
     if set(dependencies) & {name.casefold() for name in forbidden}:
@@ -394,6 +432,37 @@ def verify(root, source_report, output):
     output.write_text(json.dumps({"source": source, "version": selected["Primitives"]["version"], "packages": selected}, indent=2) + "\n")
 
 
+def selected_pair(folder):
+    """Validate the package folder of this release: exactly the branded pair, one version."""
+    repository, source = github_environment()
+    pair = package_pair(folder)
+    packages = {}
+    for package_id in PACKAGE_IDS:
+        version, digest = verify_package(pair[package_id], package_id, source)
+        packages["Reactive" if package_id.endswith(".Reactive") else "Primitives"] = {
+            "id": package_id, "version": version, "sha256": digest, "path": str(pair[package_id])}
+    if packages["Primitives"]["version"] != packages["Reactive"]["version"]:
+        fail("Validation package flavors have different versions")
+    return repository, source, packages["Primitives"]["version"], packages
+
+
+def stage(verified, output):
+    """Copy the verified Ubuntu pair, and only it, into the release package folder."""
+    _, source = github_environment()
+    data = json_file(verified)
+    if data.get("source") != source:
+        fail("verified evidence is not for the current release source")
+    if output.exists() and any(output.iterdir()):
+        fail(f"{output} must be empty before staging the pair")
+    output.mkdir(parents=True, exist_ok=True)
+    for package in data["packages"].values():
+        path = Path(package["path"])
+        if sha256(path) != package["sha256"]:
+            fail("selected local package bytes changed after verification")
+        shutil.copyfile(path, output / path.name)
+    selected_pair(output)
+
+
 def absent(endpoint, label):
     gh = os.environ.get("GH_BIN", "gh")
     result = subprocess.run([gh, "api", "--silent", "--include", endpoint], text=True, capture_output=True)
@@ -403,39 +472,47 @@ def absent(endpoint, label):
         fail(f"could not determine whether {label} exists: {result.stderr.strip()}")
 
 
+def require_new_release(repository, tag):
+    absent(f"repos/{repository}/git/ref/tags/{tag}", f"tag {tag}")
+    releases = paged(f"repos/{repository}/releases?per_page=100")
+    if any(release.get("tag_name") == tag for page in releases for release in page):
+        fail(f"release {tag} already exists and is immutable")
+
+
 def require_draft(draft, tag, source):
     if (not isinstance(draft.get("id"), int) or draft.get("tag_name") != tag or draft.get("draft") is not True or
             draft.get("prerelease") is not True or draft.get("target_commitish") != source):
         fail("GitHub did not create the expected draft")
 
 
-def publish(verified):
-    repository, source = github_environment()
+def check(folder):
+    """Read-only: everything publish requires before it creates the draft."""
+    repository, source, version, _ = selected_pair(folder)
     require_clean_source(source)
-    data = json_file(verified)
-    if data.get("source") != source:
-        fail("verified evidence is not for the current release source")
-    version = data["version"]
+    require_new_release(repository, f"v{version}")
+    print(f"release-assets: GitHub prerelease v{version} can be created.")
+
+
+def publish(folder):
+    repository, source, version, packages = selected_pair(folder)
+    require_clean_source(source)
     tag = f"v{version}"
-    absent(f"repos/{repository}/git/ref/tags/{tag}", f"tag {tag}")
-    releases = paged(f"repos/{repository}/releases?per_page=100")
-    if any(release.get("tag_name") == tag for page in releases for release in page):
-        fail(f"release {tag} already exists and is immutable")
-    draft = json.loads(api(f"repos/{repository}/releases", "--method", "POST", "-f", f"tag_name={tag}", "-f", f"target_commitish={source}", "-f", f"name=Runic ReactiveUI.Validation {version}", "-F", "draft=true", "-F", "prerelease=true", "-F", "generate_release_notes=true"))
+    require_new_release(repository, tag)
+    draft = json.loads(api(f"repos/{repository}/releases", "--method", "POST", "-f", f"tag_name={tag}", "-f", f"target_commitish={source}", "-f", f"name=RunicArtifex.ReactiveUI.Validation {version}", "-F", "draft=true", "-F", "prerelease=true", "-F", "generate_release_notes=true"))
     require_draft(draft, tag, source)
     release_id = draft["id"]
     subprocess.run([os.environ.get("GH_BIN", "gh"), "release", "upload", tag, "--repo", repository,
-                    data["packages"]["Primitives"]["path"], data["packages"]["Reactive"]["path"]], check=True)
+                    packages["Primitives"]["path"], packages["Reactive"]["path"]], check=True)
     release = json.loads(api(f"repos/{repository}/releases/{release_id}"))
     try:
         require_draft(release, tag, source)
     except ValueError as error:
         fail(f"draft release metadata changed before publication: {error}")
     assets = {asset.get("name"): asset for asset in release.get("assets", [])}
-    expected_names = {Path(package["path"]).name for package in data["packages"].values()}
+    expected_names = {Path(package["path"]).name for package in packages.values()}
     if set(assets) != expected_names:
         fail("draft release does not contain exactly the selected package pair")
-    for package in data["packages"].values():
+    for package in packages.values():
         if sha256(Path(package["path"])) != package["sha256"]:
             fail("selected local package bytes changed after verification")
         asset = assets.get(Path(package["path"]).name)
@@ -453,8 +530,213 @@ def publish(verified):
     api(f"repos/{repository}/releases/{release_id}", "--method", "PATCH", "-F", "draft=false")
 
 
+# nuget.org publishing. Every lookup below is keyless and read-only; only
+# nuget_push sends the short-lived key from NuGet/login, to dotnet nuget push.
+NUGET_SERVICE_INDEX = "https://api.nuget.org/v3/index.json"
+NUGET_POLICY = Path(__file__).with_name("nuget-policy.json")
+# nuget.org adds its repository signature to every package it accepts.
+NUGET_SIGNATURE = ".signature.p7s"
+NUGET_ATTEMPTS = 6
+
+
+def test_override(name, default):
+    """Offline-test hooks; refused in GitHub Actions so a release always uses the real values."""
+    value = os.environ.get(name)
+    if not value:
+        return default
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        fail(f"{name} is only for the offline tests")
+    return value
+
+
+def nuget_fetch(url):
+    """GET url; returns the body, or None for 404. Retries 429, 5xx and network errors."""
+    last = "no response"
+    for attempt in range(NUGET_ATTEMPTS):
+        delay = min(30, 2 ** attempt)
+        try:
+            request = urllib.request.Request(url, headers={"User-Agent": "runic-validation-release"})
+            with urllib.request.urlopen(request, timeout=60) as response:
+                return response.read()
+        except urllib.error.HTTPError as error:
+            error.close()
+            if error.code == 404:
+                return None
+            if error.code != 429 and error.code < 500:
+                raise RuntimeError(f"nuget.org lookup failed: HTTP {error.code} {url}") from error
+            retry_after = error.headers.get("Retry-After", "")
+            if retry_after.isdigit():
+                delay = int(retry_after)
+            last = f"HTTP {error.code}"
+        except (urllib.error.URLError, TimeoutError) as error:
+            last = str(getattr(error, "reason", error))
+        if attempt < NUGET_ATTEMPTS - 1:
+            if delay > 120:
+                break
+            time.sleep(delay)
+    raise RuntimeError(f"nuget.org lookup failed after retries ({last}): {url}")
+
+
+def nuget_json(url):
+    body = nuget_fetch(url)
+    return None if body is None else json.loads(body)
+
+
+class NuGet:
+    def __init__(self):
+        index = nuget_json(test_override("NUGET_TEST_SERVICE_INDEX", NUGET_SERVICE_INDEX))
+        if not isinstance(index, dict):
+            fail("the nuget.org service index is unavailable")
+
+        def resource(prefix):
+            for item in index.get("resources", []):
+                if str(item.get("@type", "")).startswith(prefix) and isinstance(item.get("@id"), str):
+                    return item["@id"]
+            fail(f"the nuget.org service index has no {prefix}")
+
+        self.search = resource("SearchQueryService")
+        self.flat = resource("PackageBaseAddress/3.0.0").rstrip("/") + "/"
+
+    def versions(self, package_id):
+        """Versions the flat container (dotnet restore's source) lists, or None for an unknown ID."""
+        listing = nuget_json(f"{self.flat}{package_id.lower()}/index.json")
+        return None if listing is None else [str(version).lower() for version in listing.get("versions", [])]
+
+    def download(self, package_id, version):
+        lower_id, lower_version = package_id.lower(), version.lower()
+        return nuget_fetch(f"{self.flat}{lower_id}/{lower_version}/{lower_id}.{lower_version}.nupkg")
+
+    def owners(self, package_id):
+        """('new', None), ('exists', [owners]) or ('exists', None) when search lists no version."""
+        query = urllib.parse.urlencode({"q": f"packageid:{package_id}", "prerelease": "true",
+                                        "semVerLevel": "2.0.0", "take": "1"})
+        for entry in (nuget_json(f"{self.search}?{query}") or {}).get("data", []):
+            if str(entry.get("id", "")).lower() == package_id.lower():
+                owners = entry.get("owners") or []
+                return "exists", [owners] if isinstance(owners, str) else [str(owner) for owner in owners]
+        # Search omits an ID whose versions are all unlisted, or one pushed moments ago.
+        return ("new", None) if self.versions(package_id) is None else ("exists", None)
+
+
+def glob_matches(pattern, package_id):
+    """nuget.org package globs: '*' matches any run of characters, case-insensitively."""
+    expression = ".*".join(re.escape(part) for part in pattern.split("*"))
+    return re.fullmatch(expression, package_id, re.IGNORECASE) is not None
+
+
+def archive_entries(source, label):
+    """Every archive entry except the nuget.org repository signature, by name."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(source) if isinstance(source, bytes) else source) as archive:
+            names = [item.filename for item in archive.infolist()]
+            if len(names) != len(set(names)):
+                fail(f"{label} repeats an archive entry")
+            return {name: archive.read(name) for name in names if name != NUGET_SIGNATURE}
+    except zipfile.BadZipFile as error:
+        fail(f"{label} is not a valid package: {error}")
+
+
+def declared_dependencies(path, package_id):
+    with zipfile.ZipFile(path) as archive:
+        metadata = ET.fromstring(archive.read(f"{package_id}.nuspec")).find("n:metadata", NS)
+    for item in metadata.findall("n:dependencies/n:group/n:dependency", NS):
+        # A plain version is NuGet's minimum; [x] and [x, y) ranges start at x.
+        yield item.get("id"), (item.get("version") or "").strip("[( ").split(",")[0].strip()
+
+
+def nuget_plan(folder):
+    """Keyless checks of the pair against nuget.org; returns the packages still to push.
+
+    Refuses, before anything is pushed, every condition the trusted-publishing key
+    would fail on or that would break consumers: an ID outside the policy globs, a
+    changed published version, an ID runic-artifex does not own, and a dependency
+    nuget.org cannot restore.
+    """
+    _, _, version, packages = selected_pair(folder)
+    policy = json.loads(Path(test_override("NUGET_POLICY", str(NUGET_POLICY))).read_text(encoding="utf-8"))
+    owner, globs = policy["owner"], policy["packageGlobs"]
+    nuget = NuGet()
+    problems, pending = [], []
+    for package in packages.values():
+        package_id, path = package["id"], Path(package["path"])
+        if not any(glob_matches(glob, package_id) for glob in globs):
+            problems.append(f"{package_id} matches none of the trusted-publishing package globs ({', '.join(globs)}). "
+                            f"Add a matching glob to the policy of {owner} on nuget.org and to eng/release/nuget-policy.json.")
+        for dependency, minimum in declared_dependencies(path, package_id):
+            if minimum.lower() not in (nuget.versions(dependency) or []):
+                problems.append(f"{package_id} depends on {dependency} {minimum}, which nuget.org does not list; "
+                                "publish that dependency to nuget.org first.")
+        published = nuget.download(package_id, version)
+        if published is None:
+            pending.append(package)
+            continue
+        local, remote = archive_entries(path, path.name), archive_entries(published, f"nuget.org {package_id} {version}")
+        if local != remote:
+            changed = sorted(name for name in set(local) | set(remote) if local.get(name) != remote.get(name))
+            problems.append(f"nuget.org already has {package_id} {version} with different contents ({', '.join(changed[:5])}). "
+                            "Published versions are immutable; release a new version.")
+        else:
+            print(f"{package_id} {version} is already on nuget.org with identical contents; skipping it.")
+    for package in pending:
+        package_id = package["id"]
+        state, owners = nuget.owners(package_id)
+        if state == "new":
+            if policy.get("pushNewPackages"):
+                print(f"::notice::{package_id} is a new nuget.org package ID; the trusted-publishing policy of {owner} must cover it.")
+            else:
+                problems.append(f"{package_id} is a new nuget.org package ID, but the policy may push only existing packages. "
+                                f"Allow the policy of {owner} to push new packages.")
+        elif owners is None:
+            problems.append(f"nuget.org knows {package_id}, but its search lists no version, so its owners cannot be checked. "
+                            "If a version was pushed moments ago, wait until nuget.org search lists it and rerun; "
+                            f"otherwise relist a version and make sure {owner} owns the ID.")
+        elif not any(name.lower() == owner.lower() for name in owners):
+            problems.append(f"{package_id} is owned on nuget.org by {', '.join(owners) or 'nobody listed'}, not by {owner}, "
+                            f"so the trusted-publishing key cannot push it. Ask the owners to add {owner}, or choose another ID.")
+    if problems:
+        fail("\n".join(["nuget.org cannot accept this release as built; nothing was pushed.",
+                         *(f"- {problem}" for problem in problems), 'See eng/release/README.md, "nuget.org publishing".']))
+    names = ", ".join(f"{package['id']} {version}" for package in pending)
+    print(f"{len(pending)} of {len(packages)} packages need a push to nuget.org: {names or 'none'}.")
+    return pending
+
+
+def nuget_push(folder):
+    if os.environ.get("GITHUB_ACTIONS") != "true" and os.environ.get("RELEASE_ALLOW_LOCAL_PUBLISH") != "1":
+        fail("nuget-push may run only in GitHub Actions")
+    key = os.environ.get("NUGET_API_KEY")
+    if not key:
+        fail("NUGET_API_KEY from NuGet/login is required to push")
+    dotnet = os.environ.get("DOTNET_BIN", "dotnet")
+    for package in nuget_plan(folder):
+        name = Path(package["path"]).name
+        # The command line carries the key, so report only the package on failure.
+        result = subprocess.run([dotnet, "nuget", "push", package["path"], "--source", NUGET_SERVICE_INDEX, "--api-key", key])
+        if result.returncode:
+            raise RuntimeError(f"dotnet nuget push failed for {name}; see eng/release/README.md, \"Retries\", before rerunning.")
+        print(f"Pushed {name} to nuget.org.")
+
+
+def wait_indexed(version, timeout_seconds, interval_seconds):
+    if not re.fullmatch(VERSION_PATTERN, version):
+        fail(f"invalid package version: {version}")
+    nuget = NuGet()
+    missing = list(PACKAGE_IDS)
+    deadline = time.monotonic() + timeout_seconds
+    while True:
+        missing = [package_id for package_id in missing if version.lower() not in (nuget.versions(package_id) or [])]
+        if not missing:
+            print(f"nuget.org lists {', '.join(PACKAGE_IDS)} {version}.")
+            return
+        names = ", ".join(f"{package_id} {version}" for package_id in missing)
+        if time.monotonic() + interval_seconds > deadline:
+            fail(f"nuget.org still does not list {names} after {timeout_seconds:g} seconds; rerun this job later.")
+        print(f"Waiting for nuget.org to list {names}", flush=True)
+        time.sleep(interval_seconds)
+
+
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
     resolve_parser = commands.add_parser("resolve")
     resolve_parser.add_argument("--output", type=Path, required=True)
@@ -465,13 +747,25 @@ def main():
     verify_parser.add_argument("--input", type=Path, required=True)
     verify_parser.add_argument("--source-report", type=Path, required=True)
     verify_parser.add_argument("--output", type=Path, required=True)
-    publish_parser = commands.add_parser("publish")
-    publish_parser.add_argument("--verified", type=Path, required=True)
+    stage_parser = commands.add_parser("stage")
+    stage_parser.add_argument("--verified", type=Path, required=True)
+    stage_parser.add_argument("--output", type=Path, required=True)
+    for name in ("check", "publish", "nuget-check", "nuget-push"):
+        commands.add_parser(name).add_argument("--packages", type=Path, required=True)
+    wait_parser = commands.add_parser("wait-indexed")
+    wait_parser.add_argument("version")
+    wait_parser.add_argument("--timeout-seconds", type=float, default=float(os.environ.get("NUGET_WAIT_TIMEOUT_SECONDS", 3600)))
+    wait_parser.add_argument("--interval-seconds", type=float, default=float(os.environ.get("NUGET_WAIT_INTERVAL_SECONDS", 30)))
     args = parser.parse_args()
     if args.command == "resolve": resolve(args.output)
     elif args.command == "download": download(args.source_report, args.output)
     elif args.command == "verify": verify(args.input, args.source_report, args.output)
-    else: publish(args.verified)
+    elif args.command == "stage": stage(args.verified, args.output)
+    elif args.command == "check": check(args.packages)
+    elif args.command == "publish": publish(args.packages)
+    elif args.command == "nuget-check": nuget_plan(args.packages)
+    elif args.command == "nuget-push": nuget_push(args.packages)
+    else: wait_indexed(args.version, args.timeout_seconds, args.interval_seconds)
 
 
 if __name__ == "__main__":

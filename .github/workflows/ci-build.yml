@@ -71,10 +71,10 @@ jobs:
           if ($files.Count -ne 2) { throw 'Expected exactly two verified packages' }
           $versions = @()
           foreach ($file in $files) {
-            if ($file.Name -cnotmatch '^Runic\.ReactiveUI\.Validation(\.Reactive)?\.([0-9][0-9A-Za-z.+-]*)\.nupkg$') { throw "Unexpected package: $($file.Name)" }
+            if ($file.Name -cnotmatch '^RunicArtifex\.ReactiveUI\.Validation(\.Reactive)?\.([0-9][0-9A-Za-z.+-]*)\.nupkg$') { throw "Unexpected package: $($file.Name)" }
             $versions += $Matches[2]
           }
-          if (@($versions | Select-Object -Unique).Count -ne 1 -or @($files | Where-Object Name -Match '^Runic\.ReactiveUI\.Validation\.Reactive\.').Count -ne 1) { throw 'Expected matching versions of both flavors' }
+          if (@($versions | Select-Object -Unique).Count -ne 1 -or @($files | Where-Object Name -Match '^RunicArtifex\.ReactiveUI\.Validation\.Reactive\.').Count -ne 1) { throw 'Expected matching versions of both flavors' }
           $packages = @($files | ForEach-Object { [ordered]@{ filename = $_.Name; sha256 = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant(); size = $_.Length } })
           [ordered]@{ source = $env:GITHUB_SHA; packages = $packages } | ConvertTo-Json -Depth 4 | Set-Content artifacts/packages/package-manifest.json -Encoding utf8
       - name: Upload the exact verified package pair

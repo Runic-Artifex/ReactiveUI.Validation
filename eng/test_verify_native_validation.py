@@ -58,6 +58,13 @@ class NativeGateTests(unittest.TestCase):
         legacy_identity = f"Runic.DynamicData/{legacy['runic.dynamicdata']}"
         graph["libraries"][legacy_identity] = graph["libraries"].pop(current_identity)
         graph["targets"]["net10.0"][legacy_identity] = graph["targets"]["net10.0"].pop(current_identity)
+        # The released baseline is the legacy Runic.ReactiveUI.Validation ID.
+        current_validation = f"RunicArtifex.ReactiveUI.Validation/{CORE_TESTS.VERSION}"
+        legacy_validation = f"Runic.ReactiveUI.Validation/{CORE_TESTS.VERSION}"
+        with self.assertRaisesRegex(ValueError, "Forbidden dependencies.*runicartifex.reactiveui.validation"):
+            VERIFY.verify_native_graph(graph, False, legacy, CORE_TESTS.VERSION)
+        graph["libraries"][legacy_validation] = graph["libraries"].pop(current_validation)
+        graph["targets"]["net10.0"][legacy_validation] = graph["targets"]["net10.0"].pop(current_validation)
         VERIFY.verify_native_graph(graph, False, legacy, CORE_TESTS.VERSION)
         with self.assertRaisesRegex(ValueError, "Forbidden dependencies"):
             VERIFY.verify_native_graph(graph, False, current, CORE_TESTS.VERSION)
@@ -76,6 +83,7 @@ class NativeGateTests(unittest.TestCase):
                     self.assertEqual(sources.get("dynamicdata"), str(VERIFY.DEPENDENCIES.FEED) if legacy else None)
                     self.assertEqual(patterns["nuget.org"], ["*"])
                     self.assertEqual(patterns.get("dynamicdata"), ["Runic.DynamicData*"] if legacy else None)
+                    self.assertEqual(patterns["validation"], ["Runic.ReactiveUI.Validation*" if legacy else "RunicArtifex.ReactiveUI.Validation*"])
 
     def test_any_project_reference_is_rejected(self):
         graph = CORE_TESTS.consumer_graph()

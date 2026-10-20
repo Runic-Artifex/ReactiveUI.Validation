@@ -2,8 +2,9 @@
 
 These package-only consumers are opt-in and outside the shipping solution. Shared
 application models use real property notifications. The `ExpectedFailure` pair
-pins released Validation `8.1.0-runic.0.790.17` and the matching released
-`Runic.DynamicData` `10.0.0-runic.5`, which exists only as GitHub release assets.
+pins released `Runic.ReactiveUI.Validation` `8.1.0-runic.0.790.17` and the matching
+released `Runic.DynamicData` `10.0.0-runic.5`; both legacy `Runic.*` IDs exist only
+as GitHub release assets.
 No sibling project reference is used.
 
 | Case | Application contract | Released baseline |
@@ -20,7 +21,8 @@ has no static writes or metadata roots. Actual native publication/execution is
 owned by the serialized native gate; strict compile failures must not be reported
 as native runtime failures.
 
-The `Safe` pair defines `SAFE_API`, uses the current released
+The `Safe` pair defines `SAFE_API`, references the current
+`RunicArtifex.ReactiveUI.Validation` IDs and the released
 `RunicArtifex.DynamicData` 10.0.0-runic.118 pair from NuGet.org, and accepts a
 fresh candidate package version.
 Its implementation uses `AddObservableRule`, `BindObservableValidationState` and

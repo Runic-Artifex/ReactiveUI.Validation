@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Fetch the immutable released Validation pair, verifying hashes before use."""
+"""Fetch the immutable released Validation pair, verifying hashes before use.
+
+This is the legacy, GitHub-release-only Runic.ReactiveUI.Validation baseline;
+current packages ship to NuGet.org as RunicArtifex.ReactiveUI.Validation.
+"""
 import argparse
 import hashlib
 from pathlib import Path

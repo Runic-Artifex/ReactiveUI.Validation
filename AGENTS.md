@@ -17,7 +17,9 @@ artifact plus an `Upstream review YYYY-MM` issue; never commit inventory snapsho
 
 Preserve the .NET 10/SDK pin, both shared-source flavors, the matching released
 RunicArtifex.DynamicData pair from NuGet.org, scheduler/namespace contracts and
-branded package IDs. Update the DynamicData version, the NuGet.org SHA-256 pins in
+the branded `RunicArtifex.ReactiveUI.Validation*` package IDs; the legacy
+`Runic.ReactiveUI.Validation*` IDs are GitHub-release-only history kept by the
+released-baseline gates and frozen fixtures. Update the DynamicData version, the NuGet.org SHA-256 pins in
 `eng/restore-fork-dependencies.py` and the library lock files together; never
 switch to a sibling checkout or inherit workspace package versions. Keep Primitives consumers
 free of System.Reactive and all consumers free of upstream DynamicData. Published

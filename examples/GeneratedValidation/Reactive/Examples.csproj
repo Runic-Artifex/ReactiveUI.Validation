@@ -19,7 +19,7 @@
     <Compile Include="$(CapabilityFixtureRoot)/BindingCapabilityScenario.cs" Link="BindingCapabilityScenario.cs" />
     <Compile Include="$(CapabilityFixtureRoot)/BindingCapabilityScenario.Types.cs" Link="BindingCapabilityScenario.Types.cs" />
     <Analyzer Include="$(PeerGeneratedCallerAnalyzerPath)" />
-    <PackageReference Include="Runic.ReactiveUI.Validation.Reactive" Version="$(ValidationVersion)" />
+    <PackageReference Include="RunicArtifex.ReactiveUI.Validation.Reactive" Version="$(ValidationVersion)" />
     <PackageReference Include="ReactiveUI.Reactive" Version="26.0.1" />
     <PackageReference Include="RunicArtifex.DynamicData.Reactive" Version="10.0.0-runic.118" />
   </ItemGroup>
