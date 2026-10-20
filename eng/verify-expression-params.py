@@ -90,7 +90,7 @@ def write_project(path, assembly, package_id, version, reactive, peer=None):
         ET.SubElement(properties, "DefineConstants").text = "$(DefineConstants);REACTIVE_SHIM"
     items = ET.SubElement(project, "ItemGroup")
     for name, value in ((package_id, version), ("ReactiveUI" + (".Reactive" if reactive else ""), "26.0.1"),
-                        ("Runic.DynamicData" + (".Reactive" if reactive else ""), "10.0.0-runic.30")):
+                        ("RunicArtifex.DynamicData" + (".Reactive" if reactive else ""), "10.0.0-runic.118")):
         ET.SubElement(items, "PackageReference", Include=name, Version=value)
     if peer is not None:
         ET.SubElement(items, "Reference", Include=peer.stem, HintPath=str(peer))

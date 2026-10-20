@@ -142,16 +142,20 @@ def run(command, log, cwd, expected=False):
     return result.returncode, content
 
 
-def write_config(folder, validation_feed):
+def write_config(folder, validation_feed, legacy_dynamic_data=False):
+    """Isolated sources: RunicArtifex.DynamicData comes from NuGet.org; only the
+    released baseline adds the local feed holding the GitHub-released .5 pair."""
+    sources_list = [("validation", validation_feed, "Runic.ReactiveUI.Validation*")]
+    if legacy_dynamic_data:
+        sources_list.append(("dynamicdata", DEPENDENCIES.FEED, "Runic.DynamicData*"))
+    sources_list.append(("nuget.org", "https://api.nuget.org/v3/index.json", "*"))
     config = ET.Element("configuration")
     sources = ET.SubElement(config, "packageSources")
     ET.SubElement(sources, "clear")
-    for key, value in (("validation", validation_feed), ("dynamicdata", ROOT / "artifacts/dependencies"),
-                       ("nuget.org", "https://api.nuget.org/v3/index.json")):
+    for key, value, _ in sources_list:
         ET.SubElement(sources, "add", key=key, value=str(value))
     mapping = ET.SubElement(config, "packageSourceMapping")
-    for key, pattern in (("validation", "Runic.ReactiveUI.Validation*"),
-                         ("dynamicdata", "Runic.DynamicData*"), ("nuget.org", "*")):
+    for key, _, pattern in sources_list:
         ET.SubElement(ET.SubElement(mapping, "packageSource", key=key), "package", pattern=pattern)
     path = folder / "nuget.config"
     ET.ElementTree(config).write(path, encoding="utf-8", xml_declaration=True)
@@ -182,8 +186,9 @@ def packed_versions(feed, pins, source=None):
 
 
 def legacy_pins(pins):
-    """Keep the immutable Validation baseline on its released DynamicData pair."""
-    result = dict(pins)
+    """Keep the immutable Validation baseline on its released Runic.DynamicData pair."""
+    result = {name: version for name, version in pins.items()
+              if name not in {package.casefold() for package in DEPENDENCIES.DIGESTS}}
     for package in DEPENDENCIES.LEGACY_DIGESTS:
         result[package.casefold()] = DEPENDENCIES.LEGACY_VERSION
     return result
@@ -216,10 +221,7 @@ def main():
     fixture = ROOT / "examples/NativeValidation"
     guard_consumer_sources(fixture)
     pins = PACKAGES.dependency_pins(ROOT)
-    for package_id, expected_hash in DEPENDENCIES.DIGESTS.items():
-        package = ROOT / "artifacts/dependencies" / f"{package_id}.{pins[package_id.casefold()]}.nupkg"
-        if digest(package) != expected_hash:
-            raise ValueError(f"DynamicData release bytes differ from bootstrap SHA-256: {package}")
+    PACKAGES.verified_dynamic_data_inputs(pins)
     baseline_pins = legacy_pins(pins)
     DEPENDENCIES.restore_cohort(DEPENDENCIES.LEGACY_VERSION, DEPENDENCIES.LEGACY_DIGESTS)
     report.update({"source": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
@@ -258,7 +260,7 @@ def main():
                 flavor = "Reactive" if reactive else "Primitives"
                 folder = work / f"{kind}-{flavor}"
                 shutil.copytree(fixture, folder, ignore=shutil.ignore_patterns("bin", "obj", "artifacts", ".editorconfig"))
-                config = write_config(folder, validation_feed)
+                config = write_config(folder, validation_feed, legacy_dynamic_data=kind == "baseline")
                 project = folder / ("Safe" if kind == "candidate" else "ExpectedFailure") / flavor / "Examples.csproj"
                 cache = output / "packages"
                 # Retain this task's dependency cache across invocations. Remove only
@@ -288,7 +290,7 @@ def main():
                     assets = json.loads((project.parent / "obj/project.assets.json").read_text())
                     verify_native_graph(assets, reactive, cohort_pins, version, rid)
                     PACKAGES.verify_restored_bytes(assets, package_id, version, package_hash)
-                    dynamic_data = PACKAGES.flavor_ids(reactive)[1]
+                    dynamic_data = PACKAGES.flavor_ids(reactive, PACKAGES.dynamic_data_family(cohort_pins))[1]
                     PACKAGES.verify_restored_bytes(assets, dynamic_data, cohort_pins[dynamic_data.casefold()], cohort_digests[dynamic_data])
                     (output / f"{stem}.graph.json").write_text(json.dumps(assets, indent=2))
                     if kind == "baseline":
