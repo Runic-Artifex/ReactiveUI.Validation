@@ -1,16 +1,15 @@
 # Child collection validation
 
 The executable [.NET 10 recipe](../../examples/CollectionValidation/CollectionValidationRecipe.cs)
-uses ReactiveUI 26.0.1 and the matching **released** Runic.DynamicData
-10.0.0-runic.30 flavor. It covers the collection goals from the dated review of
+uses ReactiveUI 26.0.1 and the matching **released** RunicArtifex.DynamicData
+10.0.0-runic.118 flavor from NuGet.org. It covers the collection goals from the dated review of
 [#173](https://github.com/reactiveui/ReactiveUI.Validation/issues/173) and
 [#450](https://github.com/reactiveui/ReactiveUI.Validation/issues/450).
 Neither example participates in the core solution or normal package output.
 
-From the repository root, bootstrap the released packages and run either flavor:
+From the repository root, run either flavor:
 
 ```sh
-python3 eng/restore-fork-dependencies.py
 dotnet run --project examples/CollectionValidation/Primitives/CollectionValidation.Primitives.csproj -c Release
 dotnet run --project examples/CollectionValidation/Reactive/CollectionValidation.Reactive.csproj -c Release
 ```

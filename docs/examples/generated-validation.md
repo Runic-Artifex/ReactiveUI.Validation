@@ -6,13 +6,13 @@ the [capability reference](../generated-capabilities.md) for the full contract.
 
 ## Consume the matching core package
 
-Use `Runic.ReactiveUI.Validation` with ReactiveUI/Runic.DynamicData, or
+Use `Runic.ReactiveUI.Validation` with ReactiveUI/RunicArtifex.DynamicData, or
 `Runic.ReactiveUI.Validation.Reactive` with ReactiveUI.Reactive/
-Runic.DynamicData.Reactive. Keep exactly one matching flavor. Imports are
+RunicArtifex.DynamicData.Reactive. Keep exactly one matching flavor. Imports are
 `ReactiveUI.Validation.Extensions`, `.Contexts`, `.Helpers`, `.Abstractions`,
 `.States` and `.Capabilities`, or the same namespaces below
 `ReactiveUI.Validation.Reactive`. The dependency cohort is ReactiveUI 26.0.1 and
-Runic.DynamicData 10.0.0-runic.30.
+RunicArtifex.DynamicData 10.0.0-runic.118 from NuGet.org.
 
 Both core packages embed `ReactiveUI.Validation.SourceGenerators.dll` and
 flavor-named `buildTransitive` props allowlisting `ReactiveUI.Validation.Generated`.
@@ -297,8 +297,7 @@ The [GeneratedValidation corpus](../../examples/GeneratedValidation/README.md)
 compiles the same source for both flavors against the actual packed packages and
 covers every case named in the [capability reference](../generated-capabilities.md).
 `Negative.cs` holds the compile-negative configurations. Run it through the
-strict gate from the repository root, in the locked SDK environment, after
-`python3 eng/restore-fork-dependencies.py`:
+strict gate from the repository root, in the locked SDK environment:
 
 ```sh
 python3 eng/verify-generated-validation.py --rid linux-x64 --mode all

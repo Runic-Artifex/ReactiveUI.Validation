@@ -1,22 +1,23 @@
 # Runic ReactiveUI.Validation (.NET 10)
 
 This Runic-Artifex fork of upstream ReactiveUI.Validation uses ReactiveUI
-**26.0.1** with the released **10.0.0-runic.30** Runic.DynamicData packages.
+**26.0.1** with the released **10.0.0-runic.118** RunicArtifex.DynamicData packages
+from NuGet.org.
 It ships two core NuGet packages:
 
 | Package ID | Namespace root | Dependencies |
 | --- | --- | --- |
-| `Runic.ReactiveUI.Validation` | `ReactiveUI.Validation` | `ReactiveUI`, `Runic.DynamicData` |
-| `Runic.ReactiveUI.Validation.Reactive` | `ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive`, `Runic.DynamicData.Reactive` |
+| `Runic.ReactiveUI.Validation` | `ReactiveUI.Validation` | `ReactiveUI`, `RunicArtifex.DynamicData` |
+| `Runic.ReactiveUI.Validation.Reactive` | `ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive`, `RunicArtifex.DynamicData.Reactive` |
 
 Both target .NET 10. Use the flavor that matches your ReactiveUI package; the
 Reactive flavor's validation collection uses `DynamicData.Reactive` types. Keep
 one flavor per application and replace upstream Validation and DynamicData
-references with the matching `Runic.*` IDs. The original MIT license and
+references with the matching `Runic.*` / `RunicArtifex.*` IDs. The original MIT license and
 authorship remain.
 
 Packages are attached to [GitHub releases](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases);
-download them and the matching DynamicData packages into a local NuGet feed.
+put them in a local NuGet feed; the DynamicData dependencies restore from NuGet.org.
 See [CONTRIBUTING](CONTRIBUTING.md) to build and test,
 [NativeAOT and generators](docs/aot-and-generators.md) for trimming/AOT, the
 [maintenance policy](docs/maintenance.md) and

@@ -2,8 +2,8 @@
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md), the [maintenance policy](docs/maintenance.md)
 and the [fork difference register](docs/fork-differences.md) before implementation,
-and verify claims against the current branch. Run the dependency bootstrap first,
-reuse the Runic SDK's locked shell on NixOS, and build/test from `src`. CI
+and verify claims against the current branch. Reuse the Runic SDK's locked shell
+on NixOS and build/test from `src`; NuGet.org supplies the DynamicData pair. CI
 requires only the core .NET 10 solution; platform projects are retained
 separately. The upstream guidance below applies within this fork's scope.
 
@@ -16,9 +16,10 @@ replacement. Nothing is sent upstream. The monthly upstream review is a workflow
 artifact plus an `Upstream review YYYY-MM` issue; never commit inventory snapshots.
 
 Preserve the .NET 10/SDK pin, both shared-source flavors, the matching released
-Runic.DynamicData pair, scheduler/namespace contracts and branded package IDs.
-Update dependency versions and bootstrap hashes together; never switch to a
-sibling checkout or inherit workspace package versions. Keep Primitives consumers
+RunicArtifex.DynamicData pair from NuGet.org, scheduler/namespace contracts and
+branded package IDs. Update the DynamicData version, the NuGet.org SHA-256 pins in
+`eng/restore-fork-dependencies.py` and the library lock files together; never
+switch to a sibling checkout or inherit workspace package versions. Keep Primitives consumers
 free of System.Reactive and all consumers free of upstream DynamicData. Published
 tags, versions and assets are immutable.
 

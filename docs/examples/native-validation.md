@@ -133,7 +133,7 @@ Equivalent generated-observer tests remain deferred with the future generator.
 
 Primitives uses `ReactiveUI.Validation.*` with `DynamicData`; Reactive uses
 `ReactiveUI.Validation.Reactive.*`, `DynamicData.Reactive` and System.Reactive.
-Use the matching released Runic.DynamicData package. The Primitives consumer
+Use the matching released RunicArtifex.DynamicData package from NuGet.org. The Primitives consumer
 graph stays free of System.Reactive and both graphs stay free of upstream
 DynamicData packages.
 
