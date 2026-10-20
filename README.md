@@ -7,8 +7,8 @@ It ships two core NuGet packages:
 
 | Package ID | Namespace root | Dependencies |
 | --- | --- | --- |
-| `Runic.ReactiveUI.Validation` | `ReactiveUI.Validation` | `ReactiveUI`, `RunicArtifex.DynamicData` |
-| `Runic.ReactiveUI.Validation.Reactive` | `ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive`, `RunicArtifex.DynamicData.Reactive` |
+| `RunicArtifex.ReactiveUI.Validation` | `ReactiveUI.Validation` | `ReactiveUI`, `RunicArtifex.DynamicData` |
+| `RunicArtifex.ReactiveUI.Validation.Reactive` | `ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive`, `RunicArtifex.DynamicData.Reactive` |
 
 Both target .NET 10. Use the flavor that matches your ReactiveUI package; the
 Reactive flavor's validation collection uses `DynamicData.Reactive` types. Keep

@@ -148,6 +148,16 @@ class ReleaseEvidenceTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, message):
                         RELEASE.verify_package(path, package_id, SOURCE)
 
+    def test_legacy_runic_ids_are_not_a_release(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            for package_id in RELEASE.LEGACY_PACKAGE_IDS:
+                package(folder, package_id, b"legacy")
+            with self.assertRaisesRegex(ValueError, "exactly the branded Validation package pair"):
+                RELEASE.package_pair(folder)
+            with self.assertRaisesRegex(ValueError, "not a branded release package ID"):
+                RELEASE.verify_package(next(folder.glob("Runic.ReactiveUI.Validation.9*.nupkg")), RELEASE.LEGACY_PACKAGE_IDS[0], SOURCE)
+
     def test_latest_eligible_run_must_succeed(self):
         base = {"head_sha": SOURCE, "head_repository": {"full_name": "Runic-Artifex/ReactiveUI.Validation"},
                 "head_branch": "main", "event": "push", "path": RELEASE.BUILD_WORKFLOW}
@@ -177,7 +187,7 @@ class ReleaseEvidenceTests(unittest.TestCase):
     def test_manifest_corruption_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)
-            package = folder / "Runic.ReactiveUI.Validation.9.0.0-runic.1.nupkg"
+            package = folder / f"{RELEASE.PACKAGE_IDS[0]}.9.0.0-runic.1.nupkg"
             package.write_bytes(b"wrong")
             (folder / "package-manifest.json").write_text(json.dumps({"source": SOURCE, "packages": [{"filename": package.name, "sha256": "0" * 64, "size": 5}]}))
             with self.assertRaises(ValueError):
@@ -204,7 +214,7 @@ class ReleaseEvidenceTests(unittest.TestCase):
     def test_mocked_publication_downloads_exact_draft_bytes_before_tag_and_publish(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)
-            first, second = folder / "Runic.ReactiveUI.Validation.9.0.0-runic.1.nupkg", folder / "Runic.ReactiveUI.Validation.Reactive.9.0.0-runic.1.nupkg"
+            first, second = (folder / f"{package_id}.9.0.0-runic.1.nupkg" for package_id in RELEASE.PACKAGE_IDS)
             first.write_bytes(b"first")
             second.write_bytes(b"second")
             packages = {"Primitives": {"path": str(first), "sha256": RELEASE.sha256(first)},

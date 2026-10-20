@@ -144,8 +144,11 @@ def run(command, log, cwd, expected=False):
 
 def write_config(folder, validation_feed, legacy_dynamic_data=False):
     """Isolated sources: RunicArtifex.DynamicData comes from NuGet.org; only the
-    released baseline adds the local feed holding the GitHub-released .5 pair."""
-    sources_list = [("validation", validation_feed, "Runic.ReactiveUI.Validation*")]
+    released baseline adds the local feed holding the GitHub-released .5 pair.
+    The local Validation feed serves only the family under test: the candidate's
+    RunicArtifex IDs, or the released baseline's legacy Runic IDs."""
+    family = PACKAGES.DYNAMIC_DATA_FAMILIES[1 if legacy_dynamic_data else 0]
+    sources_list = [("validation", validation_feed, f"{PACKAGES.VALIDATION_FAMILIES[family]}*")]
     if legacy_dynamic_data:
         sources_list.append(("dynamicdata", DEPENDENCIES.FEED, "Runic.DynamicData*"))
     sources_list.append(("nuget.org", "https://api.nuget.org/v3/index.json", "*"))
@@ -165,7 +168,7 @@ def write_config(folder, validation_feed, legacy_dynamic_data=False):
 def packed_versions(feed, pins, source=None):
     selected = []
     for reactive in (False, True):
-        package_id = PACKAGES.flavor_ids(reactive)[0]
+        package_id = PACKAGES.flavor_ids(reactive, PACKAGES.dynamic_data_family(pins))[0]
         paths = [path for path in feed.glob(f"{package_id}.*.nupkg")
                  if not path.name.startswith(f"{package_id}.Reactive.")]
         if len(paths) != 1:

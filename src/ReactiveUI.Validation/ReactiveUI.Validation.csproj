@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>$(LibraryTargetFrameworks)</TargetFrameworks>
     <IsAotCompatible Condition="'$(TargetFramework)' == 'net10.0'">true</IsAotCompatible>
-    <PackageId>Runic.ReactiveUI.Validation</PackageId>
+    <PackageId>RunicArtifex.ReactiveUI.Validation</PackageId>
     <ValidationNamespaceRoot>ReactiveUI.Validation</ValidationNamespaceRoot>
   </PropertyGroup>
 

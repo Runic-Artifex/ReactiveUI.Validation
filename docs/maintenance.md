@@ -221,7 +221,7 @@ exact Linux package pair from the latest successful trusted Build of the current
 source, cohort and hashes. `verify_only: true` performs read-only verification;
 the default publishes. Nothing is pushed to NuGet.org.
 
-Keep the `Runic.ReactiveUI.Validation` and `Runic.ReactiveUI.Validation.Reactive`
+Keep the `RunicArtifex.ReactiveUI.Validation` and `RunicArtifex.ReactiveUI.Validation.Reactive`
 IDs, namespaces, licensing and attribution. Release notes record the source SHA,
 dependency cohort, verification and known limitations. Published versions, tags
 and assets are immutable: never retag or replace assets; corrections get a new

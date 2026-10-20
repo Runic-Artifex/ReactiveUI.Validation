@@ -24,7 +24,7 @@ def consumer_graph(reactive=False):
     """A minimal resolved net10.0 cohort, including the shared ReactiveUI core."""
     suffix = ".Reactive" if reactive else ""
     identities = [
-        f"Runic.ReactiveUI.Validation{suffix}/{VERSION}",
+        f"RunicArtifex.ReactiveUI.Validation{suffix}/{VERSION}",
         f"RunicArtifex.DynamicData{suffix}/{PINS[f'runicartifex.dynamicdata{suffix}'.casefold()]}",
         f"ReactiveUI{suffix}/{PINS[f'reactiveui{suffix}'.casefold()]}",
         f"ReactiveUI.Core/{PINS[f'reactiveui{suffix}'.casefold()]}",
@@ -39,7 +39,7 @@ def package_metadata(reactive=False):
     """A valid shipped nuspec; unrelated allowed dependencies remain permitted."""
     suffix = ".Reactive" if reactive else ""
     return ET.fromstring(f'''<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
-      <metadata><id>Runic.ReactiveUI.Validation{suffix}</id><version>{VERSION}</version>
+      <metadata><id>RunicArtifex.ReactiveUI.Validation{suffix}</id><version>{VERSION}</version>
         <dependencies><group targetFramework="net10.0">
           <dependency id="RunicArtifex.DynamicData{suffix}" version="{PINS[f'runicartifex.dynamicdata{suffix}'.casefold()]}" />
           <dependency id="ReactiveUI{suffix}" version="{PINS[f'reactiveui{suffix}'.casefold()]}" />
@@ -59,12 +59,14 @@ class PackageCohortTests(unittest.TestCase):
             False: ["dynamicdata/9.4.1", "DynamicData.Reactive/9.4.1",
                     f"RunicArtifex.DynamicData.Reactive/{PINS['runicartifex.dynamicdata.reactive']}",
                     "Runic.DynamicData/10.0.0-runic.5", "RUNIC.DYNAMICDATA.REACTIVE/10.0.0-runic.30",
-                    f"Runic.ReactiveUI.Validation.Reactive/{VERSION}",
+                    f"RunicArtifex.ReactiveUI.Validation.Reactive/{VERSION}",
+                    f"Runic.ReactiveUI.Validation/{VERSION}", "runic.reactiveui.validation.reactive/8.1.0-runic.0.790.17",
                     f"ReactiveUI.Reactive/{PINS['reactiveui.reactive']}", "System.Reactive/7.0.0"],
             True: ["DynamicData/9.4.1", "DYNAMICDATA.REACTIVE/9.4.1",
                    f"RunicArtifex.DynamicData/{PINS['runicartifex.dynamicdata']}",
                    "Runic.DynamicData.Reactive/10.0.0-runic.30", "runic.dynamicdata/10.0.0-runic.5",
-                   f"Runic.ReactiveUI.Validation/{VERSION}", f"ReactiveUI/{PINS['reactiveui']}"],
+                   f"RunicArtifex.ReactiveUI.Validation/{VERSION}", f"ReactiveUI/{PINS['reactiveui']}",
+                   f"Runic.ReactiveUI.Validation.Reactive/{VERSION}", "RUNIC.REACTIVEUI.VALIDATION/8.1.0-runic.0.790.17"],
         }
         for reactive, identities in cases.items():
             for identity in identities:
@@ -75,7 +77,7 @@ class PackageCohortTests(unittest.TestCase):
                         VERIFY.verify_graph(graph, reactive, PINS, VERSION)
 
     def test_binary_generation_mismatch_is_rejected(self):
-        for package in ("RunicArtifex.DynamicData", "ReactiveUI", "ReactiveUI.Core", "Runic.ReactiveUI.Validation"):
+        for package in ("RunicArtifex.DynamicData", "ReactiveUI", "ReactiveUI.Core", "RunicArtifex.ReactiveUI.Validation"):
             with self.subTest(package=package):
                 graph = consumer_graph()
                 identity = next(name for name in graph["libraries"] if name.split("/")[0] == package)
@@ -114,6 +116,17 @@ class PackageCohortTests(unittest.TestCase):
         metadata.find("n:metadata/n:dependencies/n:group/n:dependency", VERIFY.NS).set("version", "9.0.0")
         with self.assertRaisesRegex(ValueError, "central pin"):
             VERIFY.verify_metadata(metadata, False, PINS)
+
+    def test_validation_and_dynamic_data_families_are_paired(self):
+        self.assertEqual(VERIFY.flavor_ids(False), ("RunicArtifex.ReactiveUI.Validation", "RunicArtifex.DynamicData", "ReactiveUI"))
+        self.assertEqual(VERIFY.flavor_ids(True, "Runic.DynamicData"),
+                         ("Runic.ReactiveUI.Validation.Reactive", "Runic.DynamicData.Reactive", "ReactiveUI.Reactive"))
+        self.assertIn("runic.reactiveui.validation", VERIFY.forbidden_ids(False))
+        self.assertIn("runicartifex.reactiveui.validation.reactive", VERIFY.forbidden_ids(True, "Runic.DynamicData"))
+        legacy = package_metadata()
+        legacy.find("n:metadata/n:id", VERIFY.NS).text = "Runic.ReactiveUI.Validation"
+        with self.assertRaisesRegex(ValueError, "Expected package ID RunicArtifex.ReactiveUI.Validation"):
+            VERIFY.verify_metadata(legacy, False, PINS)
 
     def test_unexpected_shipped_target_or_package_id_is_rejected(self):
         metadata = package_metadata()

@@ -6,8 +6,8 @@ the [capability reference](../generated-capabilities.md) for the full contract.
 
 ## Consume the matching core package
 
-Use `Runic.ReactiveUI.Validation` with ReactiveUI/RunicArtifex.DynamicData, or
-`Runic.ReactiveUI.Validation.Reactive` with ReactiveUI.Reactive/
+Use `RunicArtifex.ReactiveUI.Validation` with ReactiveUI/RunicArtifex.DynamicData, or
+`RunicArtifex.ReactiveUI.Validation.Reactive` with ReactiveUI.Reactive/
 RunicArtifex.DynamicData.Reactive. Keep exactly one matching flavor. Imports are
 `ReactiveUI.Validation.Extensions`, `.Contexts`, `.Helpers`, `.Abstractions`,
 `.States` and `.Capabilities`, or the same namespaces below

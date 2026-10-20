@@ -13,7 +13,9 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-PACKAGE_IDS = ("Runic.ReactiveUI.Validation", "Runic.ReactiveUI.Validation.Reactive")
+PACKAGE_IDS = ("RunicArtifex.ReactiveUI.Validation", "RunicArtifex.ReactiveUI.Validation.Reactive")
+# Earlier releases were GitHub-release assets under these IDs; a new release never uses them.
+LEGACY_PACKAGE_IDS = ("Runic.ReactiveUI.Validation", "Runic.ReactiveUI.Validation.Reactive")
 BUILD_WORKFLOW = ".github/workflows/ci-build.yml"
 EXPECTED_JOBS = {
     "build (ubuntu-latest)", "build (windows-latest)",
@@ -236,6 +238,8 @@ def verify_manifest(folder, pair, source):
 
 
 def verify_package(path, package_id, source):
+    if package_id not in PACKAGE_IDS:
+        fail(f"{package_id} is not a branded release package ID")
     reactive = package_id.endswith(".Reactive")
     assembly = "ReactiveUI.Validation.Reactive" if reactive else "ReactiveUI.Validation"
     try:
@@ -284,10 +288,11 @@ def verify_package(path, package_id, source):
         if dependencies.get(name.casefold()) not in {version_pin, f"[{version_pin}]"}:
             fail(f"{path.name} does not pin {name} at {version_pin}")
     opposite_suffix = "" if reactive else ".Reactive"
-    # The legacy Runic.DynamicData IDs are GitHub-release-only and never part of a new release.
+    # The legacy Runic.* IDs are GitHub-release-only and never part of a new release.
     forbidden = {"DynamicData", "DynamicData.Reactive", "ReactiveUI.Validation", "ReactiveUI.Validation.Reactive",
-                 "Runic.DynamicData", "Runic.DynamicData.Reactive", f"RunicArtifex.DynamicData{opposite_suffix}",
-                 f"ReactiveUI{opposite_suffix}", f"Runic.ReactiveUI.Validation{opposite_suffix}"}
+                 "Runic.DynamicData", "Runic.DynamicData.Reactive", *LEGACY_PACKAGE_IDS,
+                 f"RunicArtifex.DynamicData{opposite_suffix}", f"ReactiveUI{opposite_suffix}",
+                 f"RunicArtifex.ReactiveUI.Validation{opposite_suffix}"}
     if not reactive:
         forbidden.add("System.Reactive")
     if set(dependencies) & {name.casefold() for name in forbidden}:

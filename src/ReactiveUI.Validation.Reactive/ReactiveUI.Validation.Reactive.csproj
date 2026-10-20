@@ -7,7 +7,7 @@
     <TargetFrameworks>$(LibraryTargetFrameworks)</TargetFrameworks>
     <IsAotCompatible Condition="'$(TargetFramework)' == 'net10.0'">true</IsAotCompatible>
     <DefineConstants>$(DefineConstants);REACTIVE_SHIM</DefineConstants>
-    <PackageId>Runic.ReactiveUI.Validation.Reactive</PackageId>
+    <PackageId>RunicArtifex.ReactiveUI.Validation.Reactive</PackageId>
     <ValidationNamespaceRoot>ReactiveUI.Validation.Reactive</ValidationNamespaceRoot>
     <Description>Validations library for ReactiveUI.Reactive, the System.Reactive flavour of ReactiveUI.</Description>
     <PackageTags>$(PackageTags);system.reactive</PackageTags>

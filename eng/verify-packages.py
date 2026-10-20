@@ -19,6 +19,11 @@ NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
 # Current NuGet.org pair first, then the immutable GitHub-released .5 pair that
 # only the released Validation baseline and the historical peer fixture use.
 DYNAMIC_DATA_FAMILIES = ("RunicArtifex.DynamicData", "Runic.DynamicData")
+# The Validation family each DynamicData family belongs to: current packages ship
+# as RunicArtifex.ReactiveUI.Validation on NuGet.org; the released baseline and
+# historical fixtures are the GitHub-release-only Runic.ReactiveUI.Validation IDs.
+VALIDATION_FAMILIES = dict(zip(DYNAMIC_DATA_FAMILIES,
+                               ("RunicArtifex.ReactiveUI.Validation", "Runic.ReactiveUI.Validation")))
 SIGNATURE_ENTRY = ".signature.p7s"
 
 
@@ -57,7 +62,7 @@ def flavor_ids(reactive, family=DYNAMIC_DATA_FAMILIES[0]):
     """Return the validation, DynamicData and ReactiveUI package identities."""
     suffix = ".Reactive" if reactive else ""
     return tuple(f"{name}{suffix}" for name in (
-        "Runic.ReactiveUI.Validation", family, "ReactiveUI"))
+        VALIDATION_FAMILIES[family], family, "ReactiveUI"))
 
 
 def forbidden_ids(reactive, family=DYNAMIC_DATA_FAMILIES[0]):
@@ -66,7 +71,8 @@ def forbidden_ids(reactive, family=DYNAMIC_DATA_FAMILIES[0]):
                  "ReactiveUI.Validation.Reactive", *flavor_ids(not reactive, family)}
     for other in DYNAMIC_DATA_FAMILIES:
         if other != family:
-            forbidden |= {other, f"{other}.Reactive"}
+            forbidden |= {other, f"{other}.Reactive",
+                          VALIDATION_FAMILIES[other], f"{VALIDATION_FAMILIES[other]}.Reactive"}
     if not reactive:
         forbidden.add("System.Reactive")
     return {name.casefold() for name in forbidden}
@@ -291,7 +297,7 @@ def main():
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
   <packageSourceMapping>
-    <packageSource key="runic-validation"><package pattern="Runic.ReactiveUI.Validation*" /></packageSource>
+    <packageSource key="runic-validation"><package pattern="{VALIDATION_FAMILIES[DYNAMIC_DATA_FAMILIES[0]]}*" /></packageSource>
     <packageSource key="nuget.org"><package pattern="*" /></packageSource>
   </packageSourceMapping>
 </configuration>

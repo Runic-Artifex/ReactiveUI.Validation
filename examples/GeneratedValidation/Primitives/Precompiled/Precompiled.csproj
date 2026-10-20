@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../PrecompiledCaller.cs" Link="PrecompiledCaller.cs" />
-    <PackageReference Include="Runic.ReactiveUI.Validation" Version="$(ValidationVersion)" />
+    <PackageReference Include="RunicArtifex.ReactiveUI.Validation" Version="$(ValidationVersion)" />
     <PackageReference Include="ReactiveUI" Version="26.0.1" />
     <PackageReference Include="RunicArtifex.DynamicData" Version="10.0.0-runic.118" />
   </ItemGroup>

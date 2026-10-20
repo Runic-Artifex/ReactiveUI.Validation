@@ -44,8 +44,8 @@ The core solution builds the generator, both .NET 10 libraries and their tests:
 
 | Validation package | ReactiveUI package | DynamicData package |
 | --- | --- | --- |
-| `Runic.ReactiveUI.Validation` | `ReactiveUI` 26.0.1 | `RunicArtifex.DynamicData` |
-| `Runic.ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive` 26.0.1 | `RunicArtifex.DynamicData.Reactive` |
+| `RunicArtifex.ReactiveUI.Validation` | `ReactiveUI` 26.0.1 | `RunicArtifex.DynamicData` |
+| `RunicArtifex.ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive` 26.0.1 | `RunicArtifex.DynamicData.Reactive` |
 
 Keep both shared-source flavors working. The Reactive flavor exposes
 `DynamicData.Reactive.IObservableList`; Primitives exposes
