@@ -4,6 +4,8 @@
     <TargetFrameworks>$(LibraryTargetFrameworks)</TargetFrameworks>
     <IsAotCompatible Condition="'$(TargetFramework)' == 'net10.0'">true</IsAotCompatible>
     <PackageId>RunicArtifex.ReactiveUI.Validation</PackageId>
+    <Title>Runic Artifex fork of ReactiveUI.Validation for ReactiveUI.Primitives</Title>
+    <Description>The Runic Artifex fork of ReactiveUI.Validation for .NET 10 and ReactiveUI.Primitives (the ReactiveUI package): validation rules and bindings for ReactiveUI view models, with generated call sites that stay trimming- and NativeAOT-safe.</Description>
     <ValidationNamespaceRoot>ReactiveUI.Validation</ValidationNamespaceRoot>
   </PropertyGroup>
 

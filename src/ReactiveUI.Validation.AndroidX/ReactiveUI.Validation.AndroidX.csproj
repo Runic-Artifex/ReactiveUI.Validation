@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>$(MauiAndroidTargets)</TargetFrameworks>
-    <PackageDescription>Provides ReactiveUI.Validation extensions for the AndroidX Library</PackageDescription>
+    <Title>Runic Artifex fork of ReactiveUI.Validation for AndroidX</Title>
+    <Description>The Runic Artifex fork of ReactiveUI.Validation for AndroidX: validation extensions for the AndroidX library, for apps that use ReactiveUI.AndroidX.</Description>
     <PackageId>RunicArtifex.ReactiveUI.Validation.AndroidX</PackageId>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <Nullable>enable</Nullable>

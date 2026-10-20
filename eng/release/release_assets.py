@@ -29,6 +29,8 @@ EXPECTED_ARTIFACTS = {
     "generated-validation-linux-x64", "generated-validation-win-x64",
 }
 NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
+AUTHORS = "ReactiveUI and Contributors, Runic Artifex"
+FORK_NAME = "Runic Artifex fork of ReactiveUI.Validation"
 
 
 def fail(message):
@@ -237,6 +239,21 @@ def verify_manifest(folder, pair, source):
         fail(f"package manifest does not describe the exact package pair in {folder}")
 
 
+def verify_attribution(name, metadata, text, reactive):
+    """Upstream authorship and copyright stay; the fork is named and owns nothing upstream."""
+    if text("authors") != AUTHORS:
+        fail(f'{name} authors must be "{AUTHORS}"')
+    if metadata.find("n:owners", NS) is not None:
+        fail(f"{name} must not declare <owners>; nuget.org takes owners from the account")
+    if not re.fullmatch(r"Copyright © 2019-.*\bReactiveUI and Contributors", text("copyright")):
+        fail(f"{name} must keep the ReactiveUI and Contributors copyright")
+    flavor = "System.Reactive" if reactive else "ReactiveUI.Primitives"
+    for field in ("title", "description"):
+        value = text(field)
+        if not value.lower().startswith((FORK_NAME.lower(), f"the {FORK_NAME.lower()}")) or flavor not in value:
+            fail(f"{name} <{field}> must start by naming the {FORK_NAME} and name {flavor}")
+
+
 def verify_package(path, package_id, source):
     if package_id not in PACKAGE_IDS:
         fail(f"{package_id} is not a branded release package ID")
@@ -261,10 +278,11 @@ def verify_package(path, package_id, source):
     metadata = root.find("n:metadata", NS)
     if metadata is None:
         fail(f"{path.name} has no nuspec metadata")
-    text = lambda name: metadata.findtext(f"n:{name}", namespaces=NS)
+    text = lambda name: (metadata.findtext(f"n:{name}", namespaces=NS) or "").strip()
     version = text("version")
-    if text("id") != package_id or text("authors") != "ReactiveUI and Contributors" or version is None or not re.fullmatch(r"9\.0\.\d+-runic\.\d+", version):
+    if text("id") != package_id or not re.fullmatch(r"9\.0\.\d+-runic\.\d+", version):
         fail(f"{path.name} does not have the expected branded version identity")
+    verify_attribution(path.name, metadata, text, reactive)
     license_ = metadata.find("n:license", NS)
     repository = metadata.find("n:repository", NS)
     if (license_ is None or license_.get("type") != "expression" or license_.text != "MIT" or

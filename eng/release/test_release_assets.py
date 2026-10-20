@@ -25,15 +25,24 @@ def manifest(folder):
     (folder / "package-manifest.json").write_text(json.dumps({"source": SOURCE, "packages": packages}))
 
 
-def package(folder, package_id, marker, dynamic_data=None, dynamic_data_version="10.0.0-runic.118"):
+def metadata_fields(reactive):
+    flavor = "System.Reactive" if reactive else "ReactiveUI.Primitives"
+    return {"authors": "ReactiveUI and Contributors, Runic Artifex",
+            "title": f"Runic Artifex fork of ReactiveUI.Validation for {flavor}",
+            "description": f"The Runic Artifex fork of ReactiveUI.Validation for .NET 10 and {flavor}.",
+            "copyright": "Copyright © 2019- 2026 ReactiveUI and Contributors"}
+
+
+def package(folder, package_id, marker, dynamic_data=None, dynamic_data_version="10.0.0-runic.118", version="9.0.0-runic.1", fields=None):
     reactive = package_id.endswith(".Reactive")
     assembly = "ReactiveUI.Validation.Reactive" if reactive else "ReactiveUI.Validation"
-    version = "9.0.0-runic.1"
     path = folder / f"{package_id}.{version}.nupkg"
+    fields = {**metadata_fields(reactive), **(fields or {})}
+    extra = "".join(f"<{name}>{value}</{name}>" for name, value in fields.items() if value is not None)
     reactive_ui = "ReactiveUI.Reactive" if reactive else "ReactiveUI"
     dynamic_data = dynamic_data or ("RunicArtifex.DynamicData.Reactive" if reactive else "RunicArtifex.DynamicData")
     nuspec = f'''<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"><metadata>
-<id>{package_id}</id><version>{version}</version><authors>ReactiveUI and Contributors</authors>
+<id>{package_id}</id><version>{version}</version>{extra}
 <license type="expression">MIT</license><repository type="git" url="https://github.com/Runic-Artifex/ReactiveUI.Validation" commit="{SOURCE}" />
 <dependencies><group targetFramework="net10.0"><dependency id="{reactive_ui}" version="26.0.1" /><dependency id="{dynamic_data}" version="{dynamic_data_version}" /></group></dependencies>
 </metadata></package>'''
@@ -145,6 +154,23 @@ class ReleaseEvidenceTests(unittest.TestCase):
                 package_id = reactive_id if dynamic_data.endswith(".Reactive") else RELEASE.PACKAGE_IDS[0]
                 with self.subTest(dynamic_data=dynamic_data, version=version), tempfile.TemporaryDirectory() as other:
                     path = package(Path(other), package_id, b"stale", dynamic_data, version)
+                    with self.assertRaisesRegex(ValueError, message):
+                        RELEASE.verify_package(path, package_id, SOURCE)
+
+    def test_package_names_the_fork_and_keeps_upstream_attribution(self):
+        upstream = {"authors": "ReactiveUI and Contributors", "owners": "xanaisbettsx;ghuntley",
+                    "title": None, "description": "Validations library for ReactiveUI."}
+        for reactive, package_id in zip((False, True), RELEASE.PACKAGE_IDS):
+            opposite = "ReactiveUI.Primitives" if reactive else "System.Reactive"
+            for fields, message in (({"authors": upstream["authors"]}, "authors must be"),
+                                    ({"owners": upstream["owners"]}, "must not declare <owners>"),
+                                    ({"copyright": "Copyright (c) Runic Artifex"}, "copyright"),
+                                    ({"title": None}, "<title> must start"),
+                                    ({"title": "ReactiveUI.Validation"}, "<title> must start"),
+                                    ({"description": upstream["description"]}, "<description> must start"),
+                                    ({"description": f"The Runic Artifex fork of ReactiveUI.Validation for {opposite}."}, "<description> must start")):
+                with self.subTest(package_id=package_id, fields=fields), tempfile.TemporaryDirectory() as temporary:
+                    path = package(Path(temporary), package_id, b"metadata", fields=fields)
                     with self.assertRaisesRegex(ValueError, message):
                         RELEASE.verify_package(path, package_id, SOURCE)
 
