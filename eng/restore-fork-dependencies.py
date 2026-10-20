@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # Copyright (c) 2026 Runic Artifex. Licensed under the MIT license.
-"""Download the pinned Runic DynamicData release into the local NuGet feed."""
+"""Pin the Runic DynamicData cohorts and restore the legacy release pair.
+
+The current RunicArtifex.DynamicData pair restores from NuGet.org like any other
+package; DIGESTS pins the SHA-256 of the NuGet.org (repository-signed) archives,
+which the package gates compare with the restored bytes. Without arguments this
+checks that the central versions match those pins.
+
+The immutable legacy Runic.DynamicData 10.0.0-runic.5 pair, which the released
+Validation baseline depends on, is published only as GitHub release assets;
+--legacy downloads and verifies it into the local feed artifacts/dependencies.
+"""
 
 import argparse
 import hashlib
@@ -10,10 +20,10 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parent.parent
 FEED = ROOT / "artifacts" / "dependencies"
-CURRENT_VERSION = "10.0.0-runic.30"
+CURRENT_VERSION = "10.0.0-runic.118"
 DIGESTS = {
-    "Runic.DynamicData": "cf0d369f43774c2ba1535db8c468c0214d9a82c7f3d1a3d6fa1bf74918f8cbbc",
-    "Runic.DynamicData.Reactive": "23cc3f33c029157585a2521cc1c04afbaba21efc6dc6659a855ecafc67217fc5",
+    "RunicArtifex.DynamicData": "8cbb24bad17666d45ea429465314b535e0b459b1910cb4f5fa2a23bd531014ac",
+    "RunicArtifex.DynamicData.Reactive": "2fc449f7f33888f19d377f08ad99880cd89714b7305719a1f15758f2b906e9e3",
 }
 LEGACY_VERSION = "10.0.0-runic.5"
 LEGACY_DIGESTS = {
@@ -23,7 +33,7 @@ LEGACY_DIGESTS = {
 
 
 def restore_cohort(version, digests):
-    """Reuse or download one immutable DynamicData pair into the local feed."""
+    """Reuse or download one immutable GitHub-released DynamicData pair into the local feed."""
     FEED.mkdir(parents=True, exist_ok=True)
     for package, digest in digests.items():
         destination = FEED / f"{package}.{version}.nupkg"
@@ -39,21 +49,28 @@ def restore_cohort(version, digests):
         print(f"Downloaded and verified {destination.name}")
 
 
+def verify_central_pins(root=ROOT):
+    """Require the central DynamicData versions to be the pinned NuGet.org pair."""
+    versions = {
+        node.attrib["Include"]: node.attrib["Version"]
+        for node in ET.parse(root / "src" / "Directory.Packages.props").iter("PackageVersion")
+    }
+    if any(package in versions for package in LEGACY_DIGESTS):
+        raise ValueError("The source build must not pin the legacy Runic.DynamicData IDs")
+    if {versions.get(package) for package in DIGESTS} != {CURRENT_VERSION}:
+        raise ValueError("Update the DynamicData version and NuGet.org checksums together when changing the cohort")
+
+
 def main():
-    """Restore the current central pair or the explicit immutable legacy baseline."""
-    parser = argparse.ArgumentParser(description=__doc__)
+    """Check the current central pair or restore the explicit immutable legacy baseline."""
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--legacy", action="store_true", help="Restore the immutable .5 pair used by the native gate's released Validation baseline")
     args = parser.parse_args()
     if args.legacy:
         restore_cohort(LEGACY_VERSION, LEGACY_DIGESTS)
         return
-    versions = {
-        node.attrib["Include"]: node.attrib["Version"]
-        for node in ET.parse(ROOT / "src" / "Directory.Packages.props").iter("PackageVersion")
-    }
-    if {versions[package] for package in DIGESTS} != {CURRENT_VERSION}:
-        raise ValueError("Update the release version and checksums together when changing the DynamicData cohort")
-    restore_cohort(CURRENT_VERSION, DIGESTS)
+    verify_central_pins()
+    print(f"Central RunicArtifex.DynamicData pins match {CURRENT_VERSION}; the pair restores from NuGet.org")
 
 
 if __name__ == "__main__":

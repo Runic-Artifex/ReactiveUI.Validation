@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="ReactiveUI.Reactive" />
-    <PackageReference Include="Runic.DynamicData.Reactive" />
+    <PackageReference Include="RunicArtifex.DynamicData.Reactive" />
   </ItemGroup>
 
   <ItemGroup>

@@ -57,7 +57,6 @@ require precise `IL2026` and reject invented `IL3050`. Every configuration gets 
 From the repository root, with the pinned SDK/native toolchain loaded:
 
 ```sh
-python3 eng/restore-fork-dependencies.py
 python3 eng/verify-generated-validation.py --rid linux-x64 --mode all --package-feed artifacts/packages
 ```
 

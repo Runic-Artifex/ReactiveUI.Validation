@@ -861,10 +861,7 @@ def main():
     report["sharedFixtureSources"] = [{"file": str(path.relative_to(ROOT)), "sha256": NATIVE.digest(path)} for path in shared_fixture_paths]
     write_report(output, report)
     pins = PACKAGES.dependency_pins(ROOT)
-    for package_id, expected in DEPENDENCIES.DIGESTS.items():
-        package = ROOT / "artifacts/dependencies" / f"{package_id}.{pins[package_id.casefold()]}.nupkg"
-        if NATIVE.digest(package) != expected:
-            raise ValueError("DynamicData feed must match the SHA-verified immutable release")
+    PACKAGES.verified_dynamic_data_inputs(pins)
     with tempfile.TemporaryDirectory(prefix="work-", dir=output) as temporary:
         work = Path(temporary)
         feed = args.package_feed.resolve() if args.package_feed else work / "candidate-feed"

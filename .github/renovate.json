@@ -26,6 +26,16 @@
             ]
         },
         {
+            "description": "Propose the RunicArtifex.DynamicData flavors as one cohort; the pins in eng/restore-fork-dependencies.py and the lock files must be updated with them.",
+            "matchManagers": [
+                "nuget"
+            ],
+            "groupName": "RunicArtifex.DynamicData",
+            "matchPackageNames": [
+                "/^RunicArtifex\\.DynamicData(\\.Reactive)?$/"
+            ]
+        },
+        {
             "description": "Include MessageBox.Avalonia in the Avalonia group.",
             "matchManagers": [
                 "nuget"

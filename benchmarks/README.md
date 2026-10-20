@@ -4,7 +4,7 @@ This separate .NET 10 solution measures the two core validation flavors for the
 work proposed in upstream [#117](https://github.com/reactiveui/ReactiveUI.Validation/issues/117).
 Both executables compile the same source files, reference their matching core
 project, and restore that project's existing ReactiveUI 26.0.1 / released
-Runic.DynamicData 10.0.0-runic.30 dependency cohort. No benchmark dependency is
+RunicArtifex.DynamicData 10.0.0-runic.118 dependency cohort from NuGet.org. No benchmark dependency is
 added to the normal core solution, tests, package graph, or release workflow.
 The benchmark executables set `IsPackable=false` and `IsTestProject=false`.
 
@@ -15,10 +15,9 @@ It supports .NET 10; this solution uses the repository's SDK **10.0.401** pin.
 The tooling pin belongs to `benchmarks/Directory.Build.props`, leaving the core
 central dependency pins unchanged.
 
-From the repository root, bootstrap released dependencies and build explicitly:
+From the repository root, build explicitly:
 
 ```sh
-python3 eng/restore-fork-dependencies.py
 dotnet build benchmarks/ReactiveUI.Validation.Benchmarks.slnx -c Release -warnaserror
 ```
 

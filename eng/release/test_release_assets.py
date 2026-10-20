@@ -25,17 +25,17 @@ def manifest(folder):
     (folder / "package-manifest.json").write_text(json.dumps({"source": SOURCE, "packages": packages}))
 
 
-def package(folder, package_id, marker):
+def package(folder, package_id, marker, dynamic_data=None, dynamic_data_version="10.0.0-runic.118"):
     reactive = package_id.endswith(".Reactive")
     assembly = "ReactiveUI.Validation.Reactive" if reactive else "ReactiveUI.Validation"
     version = "9.0.0-runic.1"
     path = folder / f"{package_id}.{version}.nupkg"
     reactive_ui = "ReactiveUI.Reactive" if reactive else "ReactiveUI"
-    dynamic_data = "Runic.DynamicData.Reactive" if reactive else "Runic.DynamicData"
+    dynamic_data = dynamic_data or ("RunicArtifex.DynamicData.Reactive" if reactive else "RunicArtifex.DynamicData")
     nuspec = f'''<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"><metadata>
 <id>{package_id}</id><version>{version}</version><authors>ReactiveUI and Contributors</authors>
 <license type="expression">MIT</license><repository type="git" url="https://github.com/Runic-Artifex/ReactiveUI.Validation" commit="{SOURCE}" />
-<dependencies><group targetFramework="net10.0"><dependency id="{reactive_ui}" version="26.0.1" /><dependency id="{dynamic_data}" version="10.0.0-runic.30" /></group></dependencies>
+<dependencies><group targetFramework="net10.0"><dependency id="{reactive_ui}" version="26.0.1" /><dependency id="{dynamic_data}" version="{dynamic_data_version}" /></group></dependencies>
 </metadata></package>'''
     with RELEASE.zipfile.ZipFile(path, "w") as archive:
         archive.writestr(f"{package_id}.nuspec", nuspec)
@@ -131,6 +131,22 @@ class ReleaseEvidenceTests(unittest.TestCase):
                 with mock.patch.dict(os.environ, {"GITHUB_SHA": SOURCE}):
                     with self.assertRaisesRegex(ValueError, "generated validation report is incomplete for linux-x64"):
                         RELEASE.verify(target, source_report, target / "verified.json")
+
+    def test_package_must_depend_on_the_current_nuget_org_dynamic_data_pair(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            for package_id in RELEASE.PACKAGE_IDS:
+                RELEASE.verify_package(package(folder, package_id, b"current"), package_id, SOURCE)
+            reactive_id = RELEASE.PACKAGE_IDS[1]
+            for dynamic_data, version, message in (
+                    ("Runic.DynamicData", "10.0.0-runic.118", "does not pin RunicArtifex.DynamicData"),
+                    ("RunicArtifex.DynamicData", "10.0.0-runic.30", "does not pin RunicArtifex.DynamicData"),
+                    ("Runic.DynamicData.Reactive", "10.0.0-runic.30", "does not pin RunicArtifex.DynamicData.Reactive")):
+                package_id = reactive_id if dynamic_data.endswith(".Reactive") else RELEASE.PACKAGE_IDS[0]
+                with self.subTest(dynamic_data=dynamic_data, version=version), tempfile.TemporaryDirectory() as other:
+                    path = package(Path(other), package_id, b"stale", dynamic_data, version)
+                    with self.assertRaisesRegex(ValueError, message):
+                        RELEASE.verify_package(path, package_id, SOURCE)
 
     def test_latest_eligible_run_must_succeed(self):
         base = {"head_sha": SOURCE, "head_repository": {"full_name": "Runic-Artifex/ReactiveUI.Validation"},

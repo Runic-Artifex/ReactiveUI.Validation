@@ -76,22 +76,30 @@ not a full sync.
 ## Coupled dependency updates
 
 Validation consumes **released packages**, not a DynamicData checkout. The cohort
-is ReactiveUI/ReactiveUI.Reactive 26.0.1 with Runic.DynamicData/Runic.DynamicData.Reactive
-[10.0.0-runic.30](https://github.com/Runic-Artifex/DynamicData/releases/tag/v10.0.0-runic.30)
-on .NET 10, pinned in [src/Directory.Packages.props](../src/Directory.Packages.props).
+is ReactiveUI/ReactiveUI.Reactive 26.0.1 with RunicArtifex.DynamicData/RunicArtifex.DynamicData.Reactive
+[10.0.0-runic.118](https://www.nuget.org/packages/RunicArtifex.DynamicData/10.0.0-runic.118)
+(DynamicData fork commit `373946771c763bdbedb84a089723abcdd0e4c046`, also the
+[GitHub prerelease](https://github.com/Runic-Artifex/DynamicData/releases/tag/v10.0.0-runic.118))
+on .NET 10, pinned in [src/Directory.Packages.props](../src/Directory.Packages.props)
+and restored from NuGet.org.
 
-When DynamicData changes, publish its tested pair first, then update both
-Validation pins and the versions/checksums in
-[eng/restore-fork-dependencies.py](../eng/restore-fork-dependencies.py) together
-and verify packaged consumers. Never replace hashes just to silence a checksum
-failure. The native gate separately restores the immutable `.5` pair for its
-released Validation baseline.
+When DynamicData changes, publish its tested pair to NuGet.org first, then update
+both Validation pins together with the SHA-256 pins in
+[eng/restore-fork-dependencies.py](../eng/restore-fork-dependencies.py), computed
+from the downloaded NuGet.org packages, and refresh the shipping libraries'
+`packages.lock.json` with `dotnet restore ReactiveUI.Validation.slnx --force-evaluate`.
+Review the lock diff and verify packaged consumers. NuGet.org adds a repository
+signature, so its archives hash differently from the GitHub release assets; the
+lock files hold NuGet's content hash, which excludes that signature. Never replace
+hashes just to silence a checksum failure. The native gate separately restores the
+immutable, GitHub-only `Runic.DynamicData` `.5` pair for its released Validation
+baseline.
 
 Keep ReactiveUI flavors on a compatible generation with their DynamicData
 namespaces and schedulers. No upstream `DynamicData` package may enter either
 consumer graph, and Primitives consumers must stay free of System.Reactive.
 Renovate proposals are inputs only: NuGet automation does not update the
-release-feed bootstrap or prove cohort compatibility. SDK, runtime, platform and
+SHA-256 pins or prove cohort compatibility. SDK, runtime, platform and
 major ReactiveUI upgrades (including ReactiveUI 25 or .NET 11 support) are
 support-policy decisions, not side effects of a merge.
 
@@ -120,7 +128,6 @@ On the Runic NixOS desktop, read `../runic-sdk/.envrc` and `flake.nix`, check
 `direnv status`, and reuse the locked shell. From the repository root:
 
 ```sh
-direnv exec ../runic-sdk python3 eng/restore-fork-dependencies.py
 cd src
 direnv exec ../../runic-sdk dotnet build ReactiveUI.Validation.slnx -c Release -warnaserror
 direnv exec ../../runic-sdk dotnet test --solution ReactiveUI.Validation.slnx -c Release -- --maximum-parallel-tests 4 --report-trx

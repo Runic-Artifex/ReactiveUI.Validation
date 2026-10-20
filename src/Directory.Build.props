@@ -51,10 +51,15 @@
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'ReactiveUI.Validation' or '$(MSBuildProjectName)' == 'ReactiveUI.Validation.Reactive'">
     <EnableAotAnalyzer>true</EnableAotAnalyzer>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <!-- Bind the shipped graph, including the NuGet.org RunicArtifex.DynamicData
+         pair, to the content hashes in packages.lock.json. Refresh the lock files
+         deliberately with dotnet restore's force-evaluate option (CONTRIBUTING.md). -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode>true</RestoreLockedMode>
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Match Runic.DynamicData's .NET 10-only support policy. -->
+    <!-- Match RunicArtifex.DynamicData's .NET 10-only support policy. -->
     <LibraryTargetFrameworks>net10.0</LibraryTargetFrameworks>
     <TestTargetFrameworks>net10.0</TestTargetFrameworks>
     <MauiAndroidTargets>net10.0-android36.0</MauiAndroidTargets>

@@ -24,7 +24,6 @@ adds imports for the matching command and SDK scheduler provider. Run it from th
 repository root, passing an SDK source checkout explicitly:
 
 ```sh
-python3 eng/restore-fork-dependencies.py
 dotnet run --project examples/ValidationOrdering/Primitives/ValidationOrdering.Primitives.csproj -c Release -p:RunicSdkRoot=/absolute/path/to/runic-sdk
 dotnet run --project examples/ValidationOrdering/Reactive/ValidationOrdering.Reactive.csproj -c Release -p:RunicSdkRoot=/absolute/path/to/runic-sdk
 ```

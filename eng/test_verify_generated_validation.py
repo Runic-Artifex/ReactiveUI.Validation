@@ -456,7 +456,7 @@ class GeneratedGateTests(unittest.TestCase):
             peer["originalILReportSha256"] = VERIFY.NATIVE.digest(il)
             path.write_text(json.dumps(provenance))
             self.assertEqual(VERIFY.verify_legacy_peer(folder, "Primitives", evidence)[0], assembly)
-            for key, value in (("source", "current"), ("validationVersion", "current"), ("dynamicDataVersion", "10.0.0-runic.30"),
+            for key, value in (("source", "current"), ("validationVersion", "current"), ("dynamicDataVersion", "10.0.0-runic.118"),
                                ("compiledBeforeFreshCapabilityPackage", False), ("sdk", "different"), ("language", "different")):
                 path.write_text(json.dumps(dict(provenance, **{key: value})))
                 with self.subTest(key=key), self.assertRaises(ValueError):

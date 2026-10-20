@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 
 
 def load(name, filename):
@@ -38,7 +39,7 @@ class NativeGateTests(unittest.TestCase):
         graph = CORE_TESTS.consumer_graph()
         graph["targets"]["net10.0/linux-x64"] = deepcopy(graph["targets"]["net10.0"])
         VERIFY.verify_native_graph(graph, False, CORE_TESTS.PINS, CORE_TESTS.VERSION, "linux-x64")
-        del graph["targets"]["net10.0/linux-x64"][f"Runic.DynamicData/{CORE_TESTS.PINS['runic.dynamicdata']}"]
+        del graph["targets"]["net10.0/linux-x64"][f"RunicArtifex.DynamicData/{CORE_TESTS.PINS['runicartifex.dynamicdata']}"]
         with self.assertRaisesRegex(ValueError, "Missing"):
             VERIFY.verify_native_graph(graph, False, CORE_TESTS.PINS, CORE_TESTS.VERSION, "linux-x64")
         graph = CORE_TESTS.consumer_graph()
@@ -50,14 +51,31 @@ class NativeGateTests(unittest.TestCase):
         legacy = VERIFY.legacy_pins(current)
         self.assertEqual(legacy["runic.dynamicdata"], VERIFY.DEPENDENCIES.LEGACY_VERSION)
         self.assertEqual(legacy["runic.dynamicdata.reactive"], VERIFY.DEPENDENCIES.LEGACY_VERSION)
+        self.assertNotIn("runicartifex.dynamicdata", legacy)
+        self.assertNotIn("runicartifex.dynamicdata.reactive", legacy)
         graph = CORE_TESTS.consumer_graph()
-        current_identity = f"Runic.DynamicData/{current['runic.dynamicdata']}"
+        current_identity = f"RunicArtifex.DynamicData/{current['runicartifex.dynamicdata']}"
         legacy_identity = f"Runic.DynamicData/{legacy['runic.dynamicdata']}"
         graph["libraries"][legacy_identity] = graph["libraries"].pop(current_identity)
         graph["targets"]["net10.0"][legacy_identity] = graph["targets"]["net10.0"].pop(current_identity)
         VERIFY.verify_native_graph(graph, False, legacy, CORE_TESTS.VERSION)
-        with self.assertRaisesRegex(ValueError, "must resolve package"):
+        with self.assertRaisesRegex(ValueError, "Forbidden dependencies"):
             VERIFY.verify_native_graph(graph, False, current, CORE_TESTS.VERSION)
+        graph["libraries"][current_identity] = {"type": "package"}
+        graph["targets"]["net10.0"][current_identity] = {}
+        with self.assertRaisesRegex(ValueError, "Forbidden dependencies"):
+            VERIFY.verify_native_graph(graph, False, legacy, CORE_TESTS.VERSION)
+
+    def test_only_the_released_baseline_uses_the_legacy_local_feed(self):
+        with tempfile.TemporaryDirectory() as temp:
+            for legacy in (False, True):
+                config = ET.parse(VERIFY.write_config(Path(temp), Path(temp) / "validation", legacy)).getroot()
+                sources = {node.get("key"): node.get("value") for node in config.iter("add")}
+                patterns = {node.get("key"): [item.get("pattern") for item in node] for node in config.iter("packageSource")}
+                with self.subTest(legacy=legacy):
+                    self.assertEqual(sources.get("dynamicdata"), str(VERIFY.DEPENDENCIES.FEED) if legacy else None)
+                    self.assertEqual(patterns["nuget.org"], ["*"])
+                    self.assertEqual(patterns.get("dynamicdata"), ["Runic.DynamicData*"] if legacy else None)
 
     def test_any_project_reference_is_rejected(self):
         graph = CORE_TESTS.consumer_graph()

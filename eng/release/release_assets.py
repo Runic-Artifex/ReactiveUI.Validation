@@ -279,14 +279,15 @@ def verify_package(path, package_id, source):
         if not folded or folded in dependencies:
             fail(f"{path.name} has duplicate or malformed dependencies")
         dependencies[folded] = item.get("version")
-    expected = (("ReactiveUI.Reactive", "26.0.1"), ("Runic.DynamicData.Reactive", "10.0.0-runic.30")) if reactive else (("ReactiveUI", "26.0.1"), ("Runic.DynamicData", "10.0.0-runic.30"))
+    expected = (("ReactiveUI.Reactive", "26.0.1"), ("RunicArtifex.DynamicData.Reactive", "10.0.0-runic.118")) if reactive else (("ReactiveUI", "26.0.1"), ("RunicArtifex.DynamicData", "10.0.0-runic.118"))
     for name, version_pin in expected:
         if dependencies.get(name.casefold()) not in {version_pin, f"[{version_pin}]"}:
             fail(f"{path.name} does not pin {name} at {version_pin}")
     opposite_suffix = "" if reactive else ".Reactive"
+    # The legacy Runic.DynamicData IDs are GitHub-release-only and never part of a new release.
     forbidden = {"DynamicData", "DynamicData.Reactive", "ReactiveUI.Validation", "ReactiveUI.Validation.Reactive",
-                 f"Runic.DynamicData{opposite_suffix}", f"ReactiveUI{opposite_suffix}",
-                 f"Runic.ReactiveUI.Validation{opposite_suffix}"}
+                 "Runic.DynamicData", "Runic.DynamicData.Reactive", f"RunicArtifex.DynamicData{opposite_suffix}",
+                 f"ReactiveUI{opposite_suffix}", f"Runic.ReactiveUI.Validation{opposite_suffix}"}
     if not reactive:
         forbidden.add("System.Reactive")
     if set(dependencies) & {name.casefold() for name in forbidden}:

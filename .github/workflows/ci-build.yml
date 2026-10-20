@@ -42,8 +42,6 @@ jobs:
           node eng/upstream/test-collect-inventory.mjs
           node eng/upstream/test-prepare-review.mjs
           node eng/upstream/test-review-issue.mjs
-      - name: Restore pinned Runic DynamicData packages
-        run: python eng/restore-fork-dependencies.py
       - name: Build .NET 10
         working-directory: src
         run: dotnet build ReactiveUI.Validation.slnx -c Release -warnaserror

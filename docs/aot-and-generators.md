@@ -63,7 +63,7 @@ Validation workaround.
 
 ## Dependency boundaries
 
-The Runic.DynamicData pair enables AOT/trim analysis on its own targets.
+The RunicArtifex.DynamicData pair enables AOT/trim analysis on its own targets.
 Validation's context uses `SourceList.Connect`, `AsObservableList`,
 `AutoRefreshOnObservable` with a delegate and `QueryWhenChanged`; it does not use
 DynamicData's property-expression refresh or grouping APIs. Binding provider
@@ -97,8 +97,7 @@ flavor/version graphs and source identity, and run the emitted programs
   compiler/configuration controls, the precompiled-caller fixtures and the
   `Expression` construction control.
 
-From the repository root, in the locked SDK/native environment, after
-`python3 eng/restore-fork-dependencies.py`:
+From the repository root, in the locked SDK/native environment:
 
 ```sh
 python3 eng/verify-native-validation.py --rid linux-x64 --mode all

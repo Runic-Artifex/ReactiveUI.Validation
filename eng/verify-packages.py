@@ -9,12 +9,17 @@ import json
 from pathlib import Path
 import subprocess
 import shutil
+import struct
 import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT = Path(__file__).resolve().parent.parent
 NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
+# Current NuGet.org pair first, then the immutable GitHub-released .5 pair that
+# only the released Validation baseline and the historical peer fixture use.
+DYNAMIC_DATA_FAMILIES = ("RunicArtifex.DynamicData", "Runic.DynamicData")
+SIGNATURE_ENTRY = ".signature.p7s"
 
 
 def module(name, path):
@@ -39,17 +44,29 @@ def dependency_pins(root):
     }
 
 
-def flavor_ids(reactive):
+def dynamic_data_family(pins):
+    """Return the one DynamicData package family whose flavor pair a cohort pins."""
+    families = [family for family in DYNAMIC_DATA_FAMILIES
+                if family.casefold() in pins and f"{family}.Reactive".casefold() in pins]
+    if len(families) != 1:
+        raise ValueError("A dependency cohort must pin exactly one DynamicData package family")
+    return families[0]
+
+
+def flavor_ids(reactive, family=DYNAMIC_DATA_FAMILIES[0]):
     """Return the validation, DynamicData and ReactiveUI package identities."""
     suffix = ".Reactive" if reactive else ""
     return tuple(f"{name}{suffix}" for name in (
-        "Runic.ReactiveUI.Validation", "Runic.DynamicData", "ReactiveUI"))
+        "Runic.ReactiveUI.Validation", family, "ReactiveUI"))
 
 
-def forbidden_ids(reactive):
-    """Exclude upstream and opposite-flavor dependencies, regardless of casing."""
+def forbidden_ids(reactive, family=DYNAMIC_DATA_FAMILIES[0]):
+    """Exclude upstream, opposite-flavor and other-family dependencies, regardless of casing."""
     forbidden = {"DynamicData", "DynamicData.Reactive", "ReactiveUI.Validation",
-                 "ReactiveUI.Validation.Reactive", *flavor_ids(not reactive)}
+                 "ReactiveUI.Validation.Reactive", *flavor_ids(not reactive, family)}
+    for other in DYNAMIC_DATA_FAMILIES:
+        if other != family:
+            forbidden |= {other, f"{other}.Reactive"}
     if not reactive:
         forbidden.add("System.Reactive")
     return {name.casefold() for name in forbidden}
@@ -57,7 +74,8 @@ def forbidden_ids(reactive):
 
 def verify_metadata(metadata, reactive, pins):
     """Check the shipped identity, target and declared dependency cohort."""
-    package_id, dynamic_data, reactive_ui = flavor_ids(reactive)
+    family = dynamic_data_family(pins)
+    package_id, dynamic_data, reactive_ui = flavor_ids(reactive, family)
     actual_id = metadata.findtext("n:metadata/n:id", namespaces=NS)
     if actual_id != package_id:
         raise ValueError(f"Expected package ID {package_id}, got {actual_id}")
@@ -77,7 +95,7 @@ def verify_metadata(metadata, reactive, pins):
         if name in declared:
             raise ValueError(f"Duplicate dependency {name} in {package_id}")
         declared[name] = dependency.get("version")
-    unexpected = set(declared) & forbidden_ids(reactive)
+    unexpected = set(declared) & forbidden_ids(reactive, family)
     if unexpected:
         raise ValueError(f"Forbidden dependencies in {package_id}: {sorted(unexpected)}")
     for name in (dynamic_data, reactive_ui):
@@ -94,6 +112,41 @@ def verify_repository_source(metadata, package, source):
         raise ValueError(f"Packed package must record source SHA {source}: {package}")
 
 
+def nuget_content_hash(path):
+    """Return NuGet's content hash: SHA-512 of the archive without a repository signature.
+
+    NuGet.org appends .signature.p7s as the last entry. NuGet hashes the archive as
+    it was before signing, so restore graphs and lock files record that hash.
+    """
+    data = path.read_bytes()
+    with zipfile.ZipFile(path) as archive:
+        entries = archive.infolist()
+    signed = [entry for entry in entries if entry.filename == SIGNATURE_ENTRY]
+    if not signed:
+        content = data
+    else:
+        signature = signed[0]
+        end = data.rfind(b"PK\x05\x06")
+        fields = struct.unpack("<IHHHHIIH", data[end:end + 22]) if end >= 0 else ()
+        if (len(signed) != 1 or entries[-1] is not signature or len(fields) != 8 or fields[1] or fields[2]
+                or fields[3] != fields[4] or fields[4] != len(entries) or 0xFFFFFFFF in fields[5:7]
+                or any(entry.header_offset >= signature.header_offset for entry in entries[:-1])
+                or not signature.header_offset < fields[6] <= end):
+            raise ValueError(f"Unsupported NuGet package signature layout: {path}")
+        central = data[fields[6]:fields[6] + fields[5]]
+        record, starts = 0, []
+        while record < len(central):
+            starts.append(record)
+            name, extra, comment = struct.unpack("<HHH", central[record + 28:record + 34])
+            record += 46 + name + extra + comment
+        if len(starts) != len(entries) or record != len(central):
+            raise ValueError(f"Malformed NuGet package central directory: {path}")
+        content = (data[:signature.header_offset] + central[:starts[-1]]
+                   + struct.pack("<IHHHHIIH", fields[0], 0, 0, fields[3] - 1, fields[4] - 1,
+                                 starts[-1], signature.header_offset, fields[7]) + data[end + 22:])
+    return base64.b64encode(hashlib.sha512(content).digest()).decode()
+
+
 def verify_restored_bytes(assets, package_id, version, expected):
     """Bind restored archives and extracted DLLs to the exact verified input bytes."""
     library = assets["libraries"][f"{package_id}/{version}"]
@@ -103,8 +156,7 @@ def verify_restored_bytes(assets, package_id, version, expected):
     present = [path for path in candidates if path.is_file()]
     if len(present) != 1 or digest(present[0]) != expected:
         raise ValueError(f"Restored {package_id} bytes do not match the verified input package")
-    restored_sha512 = base64.b64encode(hashlib.sha512(present[0].read_bytes()).digest()).decode()
-    if library.get("sha512") != restored_sha512:
+    if library.get("sha512") != nuget_content_hash(present[0]):
         raise ValueError(f"Restored {package_id} asset SHA-512 does not bind its package bytes")
     with zipfile.ZipFile(present[0]) as archive:
         dlls = sorted(name for name in archive.namelist() if name.casefold().endswith(".dll"))
@@ -118,17 +170,12 @@ def verify_restored_bytes(assets, package_id, version, expected):
 
 
 def verified_dynamic_data_inputs(pins):
-    """Return the current immutable DynamicData pair after checking its bootstrap hashes."""
-    inputs = {}
-    for package_id, expected_hash in DEPENDENCIES.DIGESTS.items():
-        version = pins[package_id.casefold()]
-        if version != DEPENDENCIES.CURRENT_VERSION:
+    """Return the NuGet.org SHA-256 pins of the current DynamicData pair; restore checks the bytes."""
+    DEPENDENCIES.verify_central_pins(ROOT)
+    for package_id in DEPENDENCIES.DIGESTS:
+        if pins.get(package_id.casefold()) != DEPENDENCIES.CURRENT_VERSION:
             raise ValueError(f"{package_id} must use the current immutable DynamicData version")
-        package = ROOT / "artifacts" / "dependencies" / f"{package_id}.{version}.nupkg"
-        if not package.is_file() or digest(package) != expected_hash:
-            raise ValueError(f"DynamicData feed must match the SHA-verified immutable release: {package}")
-        inputs[package_id] = expected_hash
-    return inputs
+    return dict(DEPENDENCIES.DIGESTS)
 
 
 def write_report(output, report):
@@ -154,7 +201,8 @@ def run(command, log, cwd):
 
 def verify_graph(assets, reactive, pins, validation_version):
     """Reject restored graphs that mix package flavors or dependency generations."""
-    package_id, dynamic_data, reactive_ui = flavor_ids(reactive)
+    family = dynamic_data_family(pins)
+    package_id, dynamic_data, reactive_ui = flavor_ids(reactive, family)
     libraries = {}
     for identity, library in assets["libraries"].items():
         name, version = identity.rsplit("/", 1)
@@ -162,7 +210,7 @@ def verify_graph(assets, reactive, pins, validation_version):
         if name in libraries:
             raise ValueError(f"Multiple resolved versions of {name} in {package_id}")
         libraries[name] = (version, library.get("type"))
-    unexpected = set(libraries) & forbidden_ids(reactive)
+    unexpected = set(libraries) & forbidden_ids(reactive, family)
     if unexpected:
         raise ValueError(f"Forbidden dependencies in {package_id}: {sorted(unexpected)}")
     expected_packages = {
@@ -239,13 +287,11 @@ def main():
             (folder / "nuget.config").write_text(f'''<configuration>
   <packageSources>
     <clear />
-    <add key="runic-forks" value="{ROOT / 'artifacts' / 'dependencies'}" />
     <add key="runic-validation" value="{ROOT / 'artifacts' / 'packages'}" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
   <packageSourceMapping>
     <packageSource key="runic-validation"><package pattern="Runic.ReactiveUI.Validation*" /></packageSource>
-    <packageSource key="runic-forks"><package pattern="Runic.DynamicData*" /></packageSource>
     <packageSource key="nuget.org"><package pattern="*" /></packageSource>
   </packageSourceMapping>
 </configuration>

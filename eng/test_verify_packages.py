@@ -25,7 +25,7 @@ def consumer_graph(reactive=False):
     suffix = ".Reactive" if reactive else ""
     identities = [
         f"Runic.ReactiveUI.Validation{suffix}/{VERSION}",
-        f"Runic.DynamicData{suffix}/{PINS[f'runic.dynamicdata{suffix}'.casefold()]}",
+        f"RunicArtifex.DynamicData{suffix}/{PINS[f'runicartifex.dynamicdata{suffix}'.casefold()]}",
         f"ReactiveUI{suffix}/{PINS[f'reactiveui{suffix}'.casefold()]}",
         f"ReactiveUI.Core/{PINS[f'reactiveui{suffix}'.casefold()]}",
     ]
@@ -41,7 +41,7 @@ def package_metadata(reactive=False):
     return ET.fromstring(f'''<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
       <metadata><id>Runic.ReactiveUI.Validation{suffix}</id><version>{VERSION}</version>
         <dependencies><group targetFramework="net10.0">
-          <dependency id="Runic.DynamicData{suffix}" version="{PINS[f'runic.dynamicdata{suffix}'.casefold()]}" />
+          <dependency id="RunicArtifex.DynamicData{suffix}" version="{PINS[f'runicartifex.dynamicdata{suffix}'.casefold()]}" />
           <dependency id="ReactiveUI{suffix}" version="{PINS[f'reactiveui{suffix}'.casefold()]}" />
           <dependency id="Splat" version="21.0.0" />
         </group></dependencies>
@@ -57,11 +57,13 @@ class PackageCohortTests(unittest.TestCase):
     def test_transitive_upstream_and_opposite_flavors_are_rejected(self):
         cases = {
             False: ["dynamicdata/9.4.1", "DynamicData.Reactive/9.4.1",
-                    f"Runic.DynamicData.Reactive/{PINS['runic.dynamicdata.reactive']}",
+                    f"RunicArtifex.DynamicData.Reactive/{PINS['runicartifex.dynamicdata.reactive']}",
+                    "Runic.DynamicData/10.0.0-runic.5", "RUNIC.DYNAMICDATA.REACTIVE/10.0.0-runic.30",
                     f"Runic.ReactiveUI.Validation.Reactive/{VERSION}",
                     f"ReactiveUI.Reactive/{PINS['reactiveui.reactive']}", "System.Reactive/7.0.0"],
             True: ["DynamicData/9.4.1", "DYNAMICDATA.REACTIVE/9.4.1",
-                   f"Runic.DynamicData/{PINS['runic.dynamicdata']}",
+                   f"RunicArtifex.DynamicData/{PINS['runicartifex.dynamicdata']}",
+                   "Runic.DynamicData.Reactive/10.0.0-runic.30", "runic.dynamicdata/10.0.0-runic.5",
                    f"Runic.ReactiveUI.Validation/{VERSION}", f"ReactiveUI/{PINS['reactiveui']}"],
         }
         for reactive, identities in cases.items():
@@ -73,7 +75,7 @@ class PackageCohortTests(unittest.TestCase):
                         VERIFY.verify_graph(graph, reactive, PINS, VERSION)
 
     def test_binary_generation_mismatch_is_rejected(self):
-        for package in ("Runic.DynamicData", "ReactiveUI", "ReactiveUI.Core", "Runic.ReactiveUI.Validation"):
+        for package in ("RunicArtifex.DynamicData", "ReactiveUI", "ReactiveUI.Core", "Runic.ReactiveUI.Validation"):
             with self.subTest(package=package):
                 graph = consumer_graph()
                 identity = next(name for name in graph["libraries"] if name.split("/")[0] == package)
@@ -84,14 +86,14 @@ class PackageCohortTests(unittest.TestCase):
 
     def test_source_project_cannot_replace_released_dependency(self):
         graph = consumer_graph()
-        identity = f"Runic.DynamicData/{PINS['runic.dynamicdata']}"
+        identity = f"RunicArtifex.DynamicData/{PINS['runicartifex.dynamicdata']}"
         graph["libraries"][identity]["type"] = "project"
         with self.assertRaisesRegex(ValueError, "must resolve package"):
             VERIFY.verify_graph(graph, False, PINS, VERSION)
 
     def test_library_catalog_does_not_replace_target_resolution(self):
         graph = consumer_graph()
-        del graph["targets"]["net10.0"][f"Runic.DynamicData/{PINS['runic.dynamicdata']}"]
+        del graph["targets"]["net10.0"][f"RunicArtifex.DynamicData/{PINS['runicartifex.dynamicdata']}"]
         with self.assertRaisesRegex(ValueError, "Missing"):
             VERIFY.verify_graph(graph, False, PINS, VERSION)
 
@@ -102,7 +104,7 @@ class PackageCohortTests(unittest.TestCase):
             VERIFY.verify_graph(graph, False, PINS, VERSION)
 
     def test_package_declaration_must_match_flavor_and_pin(self):
-        for replacement in ("DynamicData", "Runic.DynamicData.Reactive", "ReactiveUI.Reactive"):
+        for replacement in ("DynamicData", "RunicArtifex.DynamicData.Reactive", "Runic.DynamicData", "ReactiveUI.Reactive"):
             metadata = package_metadata()
             dependency = metadata.find("n:metadata/n:dependencies/n:group/n:dependency", VERIFY.NS)
             dependency.set("id", replacement)
@@ -120,6 +122,29 @@ class PackageCohortTests(unittest.TestCase):
             VERIFY.verify_metadata(metadata, False, PINS)
         with self.assertRaisesRegex(ValueError, "Expected package ID"):
             VERIFY.verify_metadata(package_metadata(True), False, PINS)
+
+    def test_cohort_pins_exactly_one_dynamic_data_family(self):
+        self.assertEqual(VERIFY.dynamic_data_family(PINS), "RunicArtifex.DynamicData")
+        self.assertNotIn("runic.dynamicdata", PINS)
+        self.assertEqual(PINS["runicartifex.dynamicdata"], VERIFY.DEPENDENCIES.CURRENT_VERSION)
+        self.assertEqual(PINS["runicartifex.dynamicdata.reactive"], VERIFY.DEPENDENCIES.CURRENT_VERSION)
+        for pins in ({**PINS, "runic.dynamicdata": "10.0.0-runic.5", "runic.dynamicdata.reactive": "10.0.0-runic.5"},
+                     {key: value for key, value in PINS.items() if key != "runicartifex.dynamicdata.reactive"}):
+            with self.subTest(pins=sorted(pins)), self.assertRaisesRegex(ValueError, "exactly one DynamicData"):
+                VERIFY.dynamic_data_family(pins)
+
+    def test_central_versions_must_match_the_nuget_org_pins(self):
+        VERIFY.DEPENDENCIES.verify_central_pins(Path(__file__).resolve().parent.parent)
+        self.assertEqual(VERIFY.verified_dynamic_data_inputs(PINS), VERIFY.DEPENDENCIES.DIGESTS)
+        for props in ('<PackageVersion Include="RunicArtifex.DynamicData" Version="10.0.0-runic.30" />'
+                      '<PackageVersion Include="RunicArtifex.DynamicData.Reactive" Version="10.0.0-runic.118" />',
+                      '<PackageVersion Include="Runic.DynamicData" Version="10.0.0-runic.118" />'
+                      '<PackageVersion Include="Runic.DynamicData.Reactive" Version="10.0.0-runic.118" />'):
+            with self.subTest(props=props), tempfile.TemporaryDirectory() as temp:
+                (Path(temp) / "src").mkdir()
+                (Path(temp) / "src/Directory.Packages.props").write_text(f"<Project><ItemGroup>{props}</ItemGroup></Project>")
+                with self.assertRaises(ValueError):
+                    VERIFY.DEPENDENCIES.verify_central_pins(Path(temp))
 
     def test_package_must_record_the_clean_checkout_source(self):
         metadata = package_metadata()
@@ -148,6 +173,36 @@ class PackageCohortTests(unittest.TestCase):
             assets["libraries"]["Package/1.0"]["sha512"] = "sha512-stale"
             with self.assertRaisesRegex(ValueError, "SHA-512"):
                 VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
+
+    def test_repository_signed_package_binds_nuget_content_hash(self):
+        # NuGet.org appends .signature.p7s; NuGet records the hash of the archive without it.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            package = root / "package/1.0/package.1.0.nupkg"
+            package.parent.mkdir(parents=True)
+            with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as archive:
+                archive.writestr("Package.nuspec", "<package />")
+                archive.writestr("lib/net10.0/Package.dll", b"verified DLL")
+            unsigned = package.read_bytes()
+            unsigned_sha512 = base64.b64encode(hashlib.sha512(unsigned).digest()).decode()
+            self.assertEqual(VERIFY.nuget_content_hash(package), unsigned_sha512)
+            with zipfile.ZipFile(package, "a", zipfile.ZIP_STORED) as archive:
+                archive.writestr(VERIFY.SIGNATURE_ENTRY, b"repository signature")
+            self.assertNotEqual(package.read_bytes(), unsigned)
+            self.assertEqual(VERIFY.nuget_content_hash(package), unsigned_sha512)
+            extracted = package.parent / "lib/net10.0/Package.dll"
+            extracted.parent.mkdir(parents=True)
+            extracted.write_bytes(b"verified DLL")
+            assets = {"libraries": {"Package/1.0": {"path": "package/1.0", "sha512": unsigned_sha512}},
+                      "packageFolders": {str(root): {}}}
+            VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
+            assets["libraries"]["Package/1.0"]["sha512"] = base64.b64encode(hashlib.sha512(package.read_bytes()).digest()).decode()
+            with self.assertRaisesRegex(ValueError, "SHA-512"):
+                VERIFY.verify_restored_bytes(assets, "Package", "1.0", VERIFY.digest(package))
+            with zipfile.ZipFile(package, "a") as archive:
+                archive.writestr("late.txt", b"entry after the signature")
+            with self.assertRaisesRegex(ValueError, "signature layout"):
+                VERIFY.nuget_content_hash(package)
 
     def test_verified_archive_cannot_hide_a_corrupt_or_missing_extracted_dll(self):
         # This cache is task-owned and isolated: never mutate a shared released package.

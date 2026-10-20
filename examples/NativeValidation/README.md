@@ -3,7 +3,8 @@
 These package-only consumers are opt-in and outside the shipping solution. Shared
 application models use real property notifications. The `ExpectedFailure` pair
 pins released Validation `8.1.0-runic.0.790.17` and the matching released
-DynamicData `10.0.0-runic.5`. No sibling project reference is used.
+`Runic.DynamicData` `10.0.0-runic.5`, which exists only as GitHub release assets.
+No sibling project reference is used.
 
 | Case | Application contract | Released baseline |
 | --- | --- | --- |
@@ -19,8 +20,9 @@ has no static writes or metadata roots. Actual native publication/execution is
 owned by the serialized native gate; strict compile failures must not be reported
 as native runtime failures.
 
-The `Safe` pair defines `SAFE_API`, uses the current released DynamicData
-10.0.0-runic.30 pair, and accepts a fresh candidate package version.
+The `Safe` pair defines `SAFE_API`, uses the current released
+`RunicArtifex.DynamicData` 10.0.0-runic.118 pair from NuGet.org, and accepts a
+fresh candidate package version.
 Its implementation uses `AddObservableRule`, `BindObservableValidationState` and
 `BindObservablePropertyValidationState`. Application INPC streams provide initial
 values and explicit replacements. Nested null emits an actual null value, which
@@ -50,12 +52,11 @@ From the repository root, inside the locked SDK shell:
 
 ```sh
 python3 eng/restore-validation-feed.py examples/NativeValidation/artifacts/baseline-feed
-python3 eng/restore-fork-dependencies.py
 python3 eng/restore-fork-dependencies.py --legacy
 python3 examples/NativeValidation/run.py baseline-managed examples/NativeValidation/artifacts/baseline-feed artifacts/dependencies
 python3 examples/NativeValidation/run.py baseline-strict examples/NativeValidation/artifacts/baseline-feed artifacts/dependencies
-python3 examples/NativeValidation/run.py candidate-managed /absolute/candidate/feed artifacts/dependencies --version FRESH_VERSION
-python3 examples/NativeValidation/run.py candidate-strict /absolute/candidate/feed artifacts/dependencies --version FRESH_VERSION
+python3 examples/NativeValidation/run.py candidate-managed /absolute/candidate/feed --version FRESH_VERSION
+python3 examples/NativeValidation/run.py candidate-strict /absolute/candidate/feed --version FRESH_VERSION
 ```
 
 The runner validates immutable baseline hashes, exact package identities and

@@ -14,7 +14,6 @@ desktop, reuse the locked shell with `direnv exec ../runic-sdk <command>` from
 the repository root (or `direnv exec ../../runic-sdk <command>` from `src`).
 
 ```sh
-python3 eng/restore-fork-dependencies.py
 cd src
 dotnet build ReactiveUI.Validation.slnx -c Release -warnaserror
 dotnet test --solution ReactiveUI.Validation.slnx -c Release -- --maximum-parallel-tests 4 --report-trx
@@ -28,18 +27,25 @@ node eng/upstream/test-prepare-review.mjs
 node eng/upstream/test-review-issue.mjs
 ```
 
-The bootstrap downloads both `Runic.DynamicData` 10.0.0-runic.30 flavors from
-their GitHub release, verifies SHA-256 hashes and reuses valid downloads in
-`artifacts/dependencies`, the local feed configured in `nuget.config`. Update the
-central package versions and bootstrap checksums together. Restore never uses a
-sibling checkout.
+Both `RunicArtifex.DynamicData` 10.0.0-runic.118 flavors restore from NuGet.org
+through the package source mapping in `nuget.config`. The two shipping libraries
+restore in locked mode from their `packages.lock.json`, which pins every package's
+NuGet content hash; the package gates also compare the restored NuGet.org archives
+with the SHA-256 pins in `eng/restore-fork-dependencies.py`. To change the cohort,
+update `src/Directory.Packages.props`, compute those pins from the downloaded
+NuGet.org packages, and refresh the lock files deliberately with
+`dotnet restore ReactiveUI.Validation.slnx --force-evaluate` (from `src`), then
+review their diff. Restore never uses a sibling checkout. Only the native gate's
+released baseline still uses the GitHub-released `Runic.DynamicData`
+10.0.0-runic.5 pair; the gate restores it into `artifacts/dependencies` itself
+(`python3 eng/restore-fork-dependencies.py --legacy`).
 
 The core solution builds the generator, both .NET 10 libraries and their tests:
 
 | Validation package | ReactiveUI package | DynamicData package |
 | --- | --- | --- |
-| `Runic.ReactiveUI.Validation` | `ReactiveUI` 26.0.1 | `Runic.DynamicData` |
-| `Runic.ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive` 26.0.1 | `Runic.DynamicData.Reactive` |
+| `Runic.ReactiveUI.Validation` | `ReactiveUI` 26.0.1 | `RunicArtifex.DynamicData` |
+| `Runic.ReactiveUI.Validation.Reactive` | `ReactiveUI.Reactive` 26.0.1 | `RunicArtifex.DynamicData.Reactive` |
 
 Keep both shared-source flavors working. The Reactive flavor exposes
 `DynamicData.Reactive.IObservableList`; Primitives exposes
@@ -65,7 +71,7 @@ never a pass.
 
 CI runs the steps above on Linux and Windows, plus the strict native and
 generated package gates on Linux x64 and Windows x64 against the same Linux
-package artifact. Locally, after the bootstrap and on a matching host:
+package artifact. Locally, on a matching host:
 
 ```sh
 python3 eng/verify-native-validation.py --rid linux-x64 --mode all
