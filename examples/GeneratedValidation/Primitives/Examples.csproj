@@ -21,6 +21,6 @@
     <Analyzer Include="$(PeerGeneratedCallerAnalyzerPath)" />
     <PackageReference Include="RunicArtifex.ReactiveUI.Validation" Version="$(ValidationVersion)" />
     <PackageReference Include="ReactiveUI" Version="26.0.1" />
-    <PackageReference Include="RunicArtifex.DynamicData" Version="10.0.0-runic.118" />
+    <PackageReference Include="RunicArtifex.DynamicData" Version="10.0.0" />
   </ItemGroup>
 </Project>

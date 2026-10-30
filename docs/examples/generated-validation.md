@@ -12,7 +12,7 @@ RunicArtifex.DynamicData.Reactive. Keep exactly one matching flavor. Imports are
 `ReactiveUI.Validation.Extensions`, `.Contexts`, `.Helpers`, `.Abstractions`,
 `.States` and `.Capabilities`, or the same namespaces below
 `ReactiveUI.Validation.Reactive`. The dependency cohort is ReactiveUI 26.0.1 and
-RunicArtifex.DynamicData 10.0.0-runic.118 from NuGet.org.
+RunicArtifex.DynamicData 10.0.0 from NuGet.org.
 
 Both core packages embed `ReactiveUI.Validation.SourceGenerators.dll` and
 flavor-named `buildTransitive` props allowlisting `ReactiveUI.Validation.Generated`.

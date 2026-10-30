@@ -23,7 +23,7 @@ as native runtime failures.
 
 The `Safe` pair defines `SAFE_API`, references the current
 `RunicArtifex.ReactiveUI.Validation` IDs and the released
-`RunicArtifex.DynamicData` 10.0.0-runic.118 pair from NuGet.org, and accepts a
+`RunicArtifex.DynamicData` 10.0.0 pair from NuGet.org, and accepts a
 fresh candidate package version.
 Its implementation uses `AddObservableRule`, `BindObservableValidationState` and
 `BindObservablePropertyValidationState`. Application INPC streams provide initial

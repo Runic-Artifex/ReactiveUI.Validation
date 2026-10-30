@@ -19,7 +19,7 @@ BASELINE_VALIDATION_HASHES = {
 # local feed; the candidate's RunicArtifex.DynamicData pair restores from NuGet.org
 # and its restored (repository-signed) archives are checked after the build.
 BASELINE_DYNAMICDATA = ("Runic.DynamicData", "10.0.0-runic.5")
-CURRENT_DYNAMICDATA = ("RunicArtifex.DynamicData", "10.0.0-runic.118")
+CURRENT_DYNAMICDATA = ("RunicArtifex.DynamicData", "10.0.0")
 BASELINE_DYNAMICDATA_HASHES = {
     f"Runic.DynamicData.{BASELINE_DYNAMICDATA[1]}.nupkg": "ebd6e4329af148f8a1b3caa00e1391726e2379872b027a693cce787718055366",
     f"Runic.DynamicData.Reactive.{BASELINE_DYNAMICDATA[1]}.nupkg": "49f3e11fdd62b357b376ee26b45deca94cbfc1a52a918bc228aff09c92fc5268",

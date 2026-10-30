@@ -38,7 +38,7 @@ def metadata_fields(reactive):
             "copyright": "Copyright © 2019- 2026 ReactiveUI and Contributors"}
 
 
-def package(folder, package_id, marker, dynamic_data=None, dynamic_data_version="10.0.0-runic.118", version="9.0.0-runic.1", fields=None):
+def package(folder, package_id, marker, dynamic_data=None, dynamic_data_version=RELEASE.DYNAMIC_DATA_VERSION, version="9.0.0-runic.1", fields=None):
     reactive = package_id.endswith(".Reactive")
     assembly = "ReactiveUI.Validation.Reactive" if reactive else "ReactiveUI.Validation"
     path = folder / f"{package_id}.{version}.nupkg"
@@ -155,12 +155,27 @@ class ReleaseEvidenceTests(unittest.TestCase):
             for dynamic_data, version, message in (
                     ("Runic.DynamicData", "10.0.0-runic.118", "does not pin RunicArtifex.DynamicData"),
                     ("RunicArtifex.DynamicData", "10.0.0-runic.30", "does not pin RunicArtifex.DynamicData"),
+                    ("RunicArtifex.DynamicData", "10.0.0-runic.118", "does not pin RunicArtifex.DynamicData at 10.0.0"),
+                    ("RunicArtifex.DynamicData.Reactive", "10.0.0-runic.118", "does not pin RunicArtifex.DynamicData.Reactive at 10.0.0"),
                     ("Runic.DynamicData.Reactive", "10.0.0-runic.30", "does not pin RunicArtifex.DynamicData.Reactive")):
                 package_id = reactive_id if dynamic_data.endswith(".Reactive") else RELEASE.PACKAGE_IDS[0]
                 with self.subTest(dynamic_data=dynamic_data, version=version), tempfile.TemporaryDirectory() as other:
                     path = package(Path(other), package_id, b"stale", dynamic_data, version)
                     with self.assertRaisesRegex(ValueError, message):
                         RELEASE.verify_package(path, package_id, SOURCE)
+
+    def test_package_version_is_stable_or_a_runic_prerelease_of_major_9(self):
+        for version in ("9.0.0", "9.0.0-runic.9", "9.1.0-runic.1", "9.0.1"):
+            with self.subTest(version=version), tempfile.TemporaryDirectory() as temporary:
+                package_id = RELEASE.PACKAGE_IDS[0]
+                self.assertEqual(RELEASE.verify_package(package(Path(temporary), package_id, b"v", version=version), package_id, SOURCE)[0], version)
+        for version in ("10.0.0", "8.1.0", "9.0.0-beta.1", "9.0.0-runic.1.gabc", "9.0", "9.0.0+build"):
+            with self.subTest(version=version), tempfile.TemporaryDirectory() as temporary:
+                package_id = RELEASE.PACKAGE_IDS[0]
+                with self.assertRaisesRegex(ValueError, "expected branded version identity"):
+                    RELEASE.verify_package(package(Path(temporary), package_id, b"v", version=version), package_id, SOURCE)
+        self.assertTrue(RELEASE.is_prerelease("9.1.0-runic.1"))
+        self.assertFalse(RELEASE.is_prerelease("9.0.0"))
 
     def test_package_names_the_fork_and_keeps_upstream_attribution(self):
         upstream = {"authors": "ReactiveUI and Contributors", "owners": "xanaisbettsx;ghuntley",
@@ -242,19 +257,34 @@ class ReleaseEvidenceTests(unittest.TestCase):
             RELEASE.require_draft({"id": 7, "tag_name": "vwrong", "draft": True, "prerelease": True,
                                    "target_commitish": SOURCE}, "v9.0.0-runic.1", SOURCE)
 
+    def test_draft_prerelease_flag_must_match_the_version(self):
+        for tag, prerelease in (("v9.0.0-runic.1", True), ("v9.0.0", False)):
+            draft = {"id": 7, "tag_name": tag, "draft": True, "target_commitish": SOURCE}
+            RELEASE.require_draft({**draft, "prerelease": prerelease}, tag, SOURCE)
+            with self.subTest(tag=tag), self.assertRaisesRegex(ValueError, "expected draft"):
+                RELEASE.require_draft({**draft, "prerelease": not prerelease}, tag, SOURCE)
+
     def test_mocked_publication_downloads_exact_draft_bytes_before_tag_and_publish(self):
+        for version, prerelease in (("9.0.0-runic.1", True), ("9.0.0", False)):
+            with self.subTest(version=version):
+                self.mocked_publication(version, prerelease)
+
+    def mocked_publication(self, version, prerelease):
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)
-            first, second = (package(folder, package_id, b"published") for package_id in RELEASE.PACKAGE_IDS)
-            tag = "v9.0.0-runic.1"
+            first, second = (package(folder, package_id, b"published", version=version) for package_id in RELEASE.PACKAGE_IDS)
+            tag = f"v{version}"
             calls = []
+            created = []
             assets = [{"id": 1, "name": first.name, "state": "uploaded", "size": first.stat().st_size, "digest": "sha256:" + RELEASE.sha256(first)},
                       {"id": 2, "name": second.name, "state": "uploaded", "size": second.stat().st_size, "digest": "sha256:" + RELEASE.sha256(second)}]
-            draft = {"id": 9, "tag_name": tag, "draft": True, "prerelease": True, "target_commitish": SOURCE}
+            draft = {"id": 9, "tag_name": tag, "draft": True, "prerelease": prerelease, "target_commitish": SOURCE}
             def fake_api(endpoint, *args):
                 calls.append(endpoint)
                 if endpoint.endswith("/releases?per_page=100"): return "[[]]"
-                if endpoint.endswith("/releases"): return json.dumps(draft)
+                if endpoint.endswith("/releases"):
+                    created.append(args)
+                    return json.dumps(draft)
                 if endpoint.endswith("/releases/9"): return json.dumps({**draft, "assets": assets})
                 if endpoint.endswith("/git/ref/tags/" + tag): return json.dumps({"object": {"type": "commit", "sha": SOURCE}})
                 return "{}"
@@ -269,6 +299,7 @@ class ReleaseEvidenceTests(unittest.TestCase):
                 RELEASE.publish(folder)
             self.assertLess(calls.index("repos/Runic-Artifex/ReactiveUI.Validation/git/refs"),
                             max(index for index, call in enumerate(calls) if call.endswith("/releases/9")))
+            self.assertIn(f"prerelease={str(prerelease).lower()}", created[0])
             calls.clear()
             with mock.patch.object(RELEASE, "github_environment", return_value=("Runic-Artifex/ReactiveUI.Validation", SOURCE)), \
                  mock.patch.object(RELEASE, "require_clean_source"), mock.patch.object(RELEASE, "api", side_effect=fake_api), \
@@ -331,7 +362,7 @@ class ReleaseEvidenceTests(unittest.TestCase):
 
 # Dependencies the fixture packages declare; the mock lists them so restore would succeed.
 DEPENDENCIES = {"reactiveui": ["26.0.1"], "reactiveui.reactive": ["26.0.1"],
-                "runicartifex.dynamicdata": ["10.0.0-runic.118"], "runicartifex.dynamicdata.reactive": ["10.0.0-runic.118"]}
+                "runicartifex.dynamicdata": ["10.0.0"], "runicartifex.dynamicdata.reactive": ["10.0.0"]}
 CREDENTIAL_HEADERS = ("authorization", "x-nuget-apikey")
 MOCK_DOTNET = r"""
 import os, sys, xml.etree.ElementTree as ET, zipfile
@@ -506,8 +537,8 @@ class NuGetPublishingTests(unittest.TestCase):
         self.assertFalse(RELEASE.glob_matches("RunicArtifex.*", "Runic.ReactiveUI.Validation"))
 
     def test_a_dependency_missing_from_nuget_org_fails(self):
-        with mock.patch.dict(DEPENDENCIES, {"runicartifex.dynamicdata": ["10.0.0-runic.30"]}):
-            with self.assertRaisesRegex(ValueError, "depends on RunicArtifex.DynamicData 10.0.0-runic.118, which nuget.org does not list"):
+        with mock.patch.dict(DEPENDENCIES, {"runicartifex.dynamicdata": ["10.0.0-runic.118"]}):
+            with self.assertRaisesRegex(ValueError, "depends on RunicArtifex.DynamicData 10.0.0, which nuget.org does not list"):
                 RELEASE.nuget_plan(self.packages)
 
     def test_a_partial_push_is_completed_by_a_retry(self):

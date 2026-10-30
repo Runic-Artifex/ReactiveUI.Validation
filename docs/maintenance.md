@@ -77,9 +77,9 @@ not a full sync.
 
 Validation consumes **released packages**, not a DynamicData checkout. The cohort
 is ReactiveUI/ReactiveUI.Reactive 26.0.1 with RunicArtifex.DynamicData/RunicArtifex.DynamicData.Reactive
-[10.0.0-runic.118](https://www.nuget.org/packages/RunicArtifex.DynamicData/10.0.0-runic.118)
-(DynamicData fork commit `373946771c763bdbedb84a089723abcdd0e4c046`, also the
-[GitHub prerelease](https://github.com/Runic-Artifex/DynamicData/releases/tag/v10.0.0-runic.118))
+[10.0.0](https://www.nuget.org/packages/RunicArtifex.DynamicData/10.0.0)
+(DynamicData fork commit `b407196c31a626627bb86452d09460cb4cc4bc7f`, also the
+[GitHub release](https://github.com/Runic-Artifex/DynamicData/releases/tag/v10.0.0))
 on .NET 10, pinned in [src/Directory.Packages.props](../src/Directory.Packages.props)
 and restored from NuGet.org.
 
@@ -211,17 +211,20 @@ reproducing a fixed compiler. This boundary does not authorize dependency update
 ## Releases and retirement
 
 Release a tested source commit under a unique version and tag. Nerdbank.GitVersioning
-reads [version.json](../version.json) (`9.0-runic.{height}`), so `main` produces
-`9.0.0-runic.1`, `9.0.0-runic.2`, ... and other branches add a commit suffix. This
-matches the DynamicData fork. Change the major/minor in `version.json` for a new
-line; the height then restarts. Releases are tagged `v<version>`; the older
+reads [version.json](../version.json). A prerelease line such as
+`9.0-runic.{height}` makes `main` produce `9.0.0-runic.1`, `9.0.0-runic.2`, ... and
+other branches add a commit suffix. This matches the DynamicData fork. Change the
+major/minor in `version.json` for a new line; the height then restarts. A stable
+release sets the exact version (`9.0.0`) for the one release commit, and the next
+commit moves `main` to the next prerelease line (`9.1-runic.{height}` after
+`9.0.0`), so later pushes never produce the released version again. Releases are tagged `v<version>`; the older
 `runic-v8.1.0-runic.0.*` releases are historical.
 
 The [release workflow](../.github/workflows/release.yml) promotes the exact Linux
 `RunicArtifex.ReactiveUI.Validation` and `RunicArtifex.ReactiveUI.Validation.Reactive`
 pair from the latest successful trusted Build of the current `main` SHA, after
 checking its completed core, native and generated reports, source, cohort,
-attribution and hashes. It creates a prerelease GitHub release with those assets
+attribution and hashes. It creates a GitHub release (a prerelease for `-runic.N` versions) with those assets
 and the release notes, then pushes the pair to nuget.org with trusted publishing
 from the protected `nuget` environment, and finally waits up to an hour until
 nuget.org lists both versions. Earlier releases were GitHub release assets only,

@@ -3,7 +3,8 @@
 
 resolve, download, verify  bind the release to the accepted Build evidence.
 stage                      copies the verified Ubuntu pair into a package folder.
-check, publish             check (read-only) or create the GitHub prerelease.
+check, publish             check (read-only) or create the GitHub release (a prerelease
+                           for -runic.N versions).
 nuget-check, nuget-push    check nuget.org with keyless lookups, then push what it lacks.
 wait-indexed               waits until the nuget.org flat container lists the pair.
 
@@ -43,7 +44,10 @@ EXPECTED_ARTIFACTS = {
     "generated-validation-linux-x64", "generated-validation-win-x64",
 }
 NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
-VERSION_PATTERN = r"9\.0\.\d+-runic\.\d+"
+# Major 9: a stable version (9.0.0) or a -runic.N prerelease of a main line (9.1.0-runic.3).
+VERSION_PATTERN = r"9\.\d+\.\d+(?:-runic\.\d+)?"
+REACTIVE_UI_VERSION = "26.0.1"
+DYNAMIC_DATA_VERSION = "10.0.0"
 AUTHORS = "ReactiveUI and Contributors, Runic Artifex"
 FORK_NAME = "Runic Artifex fork of ReactiveUI.Validation"
 
@@ -316,7 +320,8 @@ def verify_package(path, package_id, source):
         if not folded or folded in dependencies:
             fail(f"{path.name} has duplicate or malformed dependencies")
         dependencies[folded] = item.get("version")
-    expected = (("ReactiveUI.Reactive", "26.0.1"), ("RunicArtifex.DynamicData.Reactive", "10.0.0-runic.118")) if reactive else (("ReactiveUI", "26.0.1"), ("RunicArtifex.DynamicData", "10.0.0-runic.118"))
+    expected = ((("ReactiveUI.Reactive", REACTIVE_UI_VERSION), ("RunicArtifex.DynamicData.Reactive", DYNAMIC_DATA_VERSION)) if reactive
+                else (("ReactiveUI", REACTIVE_UI_VERSION), ("RunicArtifex.DynamicData", DYNAMIC_DATA_VERSION)))
     for name, version_pin in expected:
         if dependencies.get(name.casefold()) not in {version_pin, f"[{version_pin}]"}:
             fail(f"{path.name} does not pin {name} at {version_pin}")
@@ -479,9 +484,14 @@ def require_new_release(repository, tag):
         fail(f"release {tag} already exists and is immutable")
 
 
+def is_prerelease(version):
+    """A SemVer prerelease (9.1.0-runic.3) becomes a GitHub prerelease; a stable version (9.0.0) does not."""
+    return "-" in version.split("+", 1)[0]
+
+
 def require_draft(draft, tag, source):
     if (not isinstance(draft.get("id"), int) or draft.get("tag_name") != tag or draft.get("draft") is not True or
-            draft.get("prerelease") is not True or draft.get("target_commitish") != source):
+            draft.get("prerelease") is not is_prerelease(tag.removeprefix("v")) or draft.get("target_commitish") != source):
         fail("GitHub did not create the expected draft")
 
 
@@ -490,7 +500,8 @@ def check(folder):
     repository, source, version, _ = selected_pair(folder)
     require_clean_source(source)
     require_new_release(repository, f"v{version}")
-    print(f"release-assets: GitHub prerelease v{version} can be created.")
+    kind = "prerelease" if is_prerelease(version) else "release"
+    print(f"release-assets: GitHub {kind} v{version} can be created.")
 
 
 def publish(folder):
@@ -498,7 +509,7 @@ def publish(folder):
     require_clean_source(source)
     tag = f"v{version}"
     require_new_release(repository, tag)
-    draft = json.loads(api(f"repos/{repository}/releases", "--method", "POST", "-f", f"tag_name={tag}", "-f", f"target_commitish={source}", "-f", f"name=RunicArtifex.ReactiveUI.Validation {version}", "-F", "draft=true", "-F", "prerelease=true", "-F", "generate_release_notes=true"))
+    draft = json.loads(api(f"repos/{repository}/releases", "--method", "POST", "-f", f"tag_name={tag}", "-f", f"target_commitish={source}", "-f", f"name=RunicArtifex.ReactiveUI.Validation {version}", "-F", "draft=true", "-F", f"prerelease={str(is_prerelease(version)).lower()}", "-F", "generate_release_notes=true"))
     require_draft(draft, tag, source)
     release_id = draft["id"]
     subprocess.run([os.environ.get("GH_BIN", "gh"), "release", "upload", tag, "--repo", repository,
