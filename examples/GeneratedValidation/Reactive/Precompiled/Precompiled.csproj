@@ -8,6 +8,6 @@
     <Compile Include="../../PrecompiledCaller.cs" Link="PrecompiledCaller.cs" />
     <PackageReference Include="RunicArtifex.ReactiveUI.Validation.Reactive" Version="$(ValidationVersion)" />
     <PackageReference Include="ReactiveUI.Reactive" Version="26.0.1" />
-    <PackageReference Include="RunicArtifex.DynamicData.Reactive" Version="10.0.0-runic.118" />
+    <PackageReference Include="RunicArtifex.DynamicData.Reactive" Version="10.0.0" />
   </ItemGroup>
 </Project>

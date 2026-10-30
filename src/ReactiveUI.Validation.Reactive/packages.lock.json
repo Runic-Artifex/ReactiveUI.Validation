@@ -56,9 +56,9 @@
       },
       "RunicArtifex.DynamicData.Reactive": {
         "type": "Direct",
-        "requested": "[10.0.0-runic.118, )",
-        "resolved": "10.0.0-runic.118",
-        "contentHash": "zptgrG51DFSRxZd54rJhDLo+BiUTjG7eQdsVlzS4Rp8nYGdXc+m7exSs975ylMTeFIIvasBvmsnXCKSgX7XZDA==",
+        "requested": "[10.0.0, )",
+        "resolved": "10.0.0",
+        "contentHash": "sjgfoW6FTfPTM8jpD8/OQaq2cLuxIFgeohLJNqTOtiN6famAo5tREcLTsUAFUXrjs23VEKvFeq2jik6dAL/4ZA==",
         "dependencies": {
           "ReactiveUI.Primitives.Reactive": "9.0.0"
         }

@@ -6,6 +6,7 @@ import base64
 import hashlib
 import importlib.util
 import json
+import re
 from pathlib import Path
 import subprocess
 import shutil
@@ -86,8 +87,9 @@ def verify_metadata(metadata, reactive, pins):
     if actual_id != package_id:
         raise ValueError(f"Expected package ID {package_id}, got {actual_id}")
     version = metadata.findtext("n:metadata/n:version", namespaces=NS)
-    if not version or "-runic." not in version:
-        raise ValueError(f"Expected a Runic prerelease version, got {version}")
+    # NBGV: a stable version on main (9.0.0), -runic.N on a prerelease line, a commit suffix elsewhere.
+    if not version or not re.fullmatch(r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?", version):
+        raise ValueError(f"Expected a Runic SemVer version, got {version}")
     groups = metadata.findall("n:metadata/n:dependencies/n:group", NS)
     if len(groups) != 1 or groups[0].get("targetFramework") != "net10.0":
         raise ValueError(f"{package_id} must declare exactly one net10.0 dependency group")

@@ -27,7 +27,7 @@ node eng/upstream/test-prepare-review.mjs
 node eng/upstream/test-review-issue.mjs
 ```
 
-Both `RunicArtifex.DynamicData` 10.0.0-runic.118 flavors restore from NuGet.org
+Both `RunicArtifex.DynamicData` 10.0.0 flavors restore from NuGet.org
 through the package source mapping in `nuget.config`. The two shipping libraries
 restore in locked mode from their `packages.lock.json`, which pins every package's
 NuGet content hash; the package gates also compare the restored NuGet.org archives
@@ -111,10 +111,11 @@ UWP sample and non-.NET-10 API baselines are retained as upstream history.
 The manual release workflow publishes the two core packages to nuget.org, as
 [RunicArtifex.ReactiveUI.Validation](https://www.nuget.org/packages/RunicArtifex.ReactiveUI.Validation)
 and [RunicArtifex.ReactiveUI.Validation.Reactive](https://www.nuget.org/packages/RunicArtifex.ReactiveUI.Validation.Reactive),
-and records release notes in a [GitHub prerelease](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases);
+and records release notes in a [GitHub release](https://github.com/Runic-Artifex/ReactiveUI.Validation/releases);
 it does not publish under upstream package names (see the
 [release guide](eng/release/README.md)). Consume the fork from nuget.org, for
-example `dotnet add package RunicArtifex.ReactiveUI.Validation --prerelease`.
+example `dotnet add package RunicArtifex.ReactiveUI.Validation` (add `--prerelease`
+for a `-runic.N` build of `main`).
 Earlier releases were only GitHub release assets, under the IDs
 `Runic.ReactiveUI.Validation` and `Runic.ReactiveUI.Validation.Reactive`.
 Preserve upstream MIT licensing and authorship. This fork is maintained for Runic

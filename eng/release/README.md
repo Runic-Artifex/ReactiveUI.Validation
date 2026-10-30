@@ -6,10 +6,10 @@ package pair of the latest eligible completed Build for the exact maintained-mai
 SHA; it does not rebuild. The pair is exactly:
 
 - `RunicArtifex.ReactiveUI.Validation.<version>.nupkg`, depending on `ReactiveUI`
-  26.0.1 and `RunicArtifex.DynamicData` 10.0.0-runic.118;
+  26.0.1 and `RunicArtifex.DynamicData` 10.0.0;
 - `RunicArtifex.ReactiveUI.Validation.Reactive.<version>.nupkg`, depending on
   `ReactiveUI.Reactive` 26.0.1 and `RunicArtifex.DynamicData.Reactive`
-  10.0.0-runic.118.
+  10.0.0.
 
 The AndroidX packages are not part of a release (see
 [CONTRIBUTING](../../CONTRIBUTING.md#scope)). Earlier releases were published only
@@ -30,7 +30,8 @@ copies exactly that verified pair into `artifacts/packages`.
 ## Package checks
 
 Every command that takes `--packages` first validates the folder: exactly the two
-`RunicArtifex.*` packages at one `9.0.0-runic.N` version, a single `net10.0`
+`RunicArtifex.*` packages at one major-9 version (stable, such as `9.0.0`, or
+`9.M.P-runic.N`), a single `net10.0`
 dependency group with the pinned ReactiveUI and RunicArtifex.DynamicData cohort and
 no upstream, legacy or opposite-flavor dependency, the MIT license, the bundled
 generator and flavor-named `buildTransitive` props, and repository URL and commit
@@ -42,6 +43,10 @@ description that start by naming the Runic Artifex fork of ReactiveUI.Validation
 and name the flavor (`ReactiveUI.Primitives` or `System.Reactive`).
 
 ## GitHub release
+
+A `-runic.N` version becomes a GitHub prerelease; a stable version (such as
+`9.0.0`) becomes a regular release. The draft's prerelease flag is checked when
+it is created and again before it is published.
 
 `publish` refuses every existing tag or release, creates a draft targeted at the
 SHA, uploads the exact two assets, downloads them for byte comparison, creates and

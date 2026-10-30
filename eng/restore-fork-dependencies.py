@@ -20,10 +20,10 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parent.parent
 FEED = ROOT / "artifacts" / "dependencies"
-CURRENT_VERSION = "10.0.0-runic.118"
+CURRENT_VERSION = "10.0.0"
 DIGESTS = {
-    "RunicArtifex.DynamicData": "8cbb24bad17666d45ea429465314b535e0b459b1910cb4f5fa2a23bd531014ac",
-    "RunicArtifex.DynamicData.Reactive": "2fc449f7f33888f19d377f08ad99880cd89714b7305719a1f15758f2b906e9e3",
+    "RunicArtifex.DynamicData": "7cbf33435ca72c38a7408616ab75cf26cfe3eb78c7de1e50ced98d7aabfc417d",
+    "RunicArtifex.DynamicData.Reactive": "683453a39ed1dcf0c0eab4872af2fb9fac6add66e7e34e18dd09ddcd6b41d43e",
 }
 LEGACY_VERSION = "10.0.0-runic.5"
 LEGACY_DIGESTS = {
