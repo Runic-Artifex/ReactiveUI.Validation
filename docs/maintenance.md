@@ -217,7 +217,8 @@ other branches add a commit suffix. This matches the DynamicData fork. Change th
 major/minor in `version.json` for a new line; the height then restarts. A stable
 release sets the exact version (`9.0.0`) for the one release commit, and the next
 commit moves `main` to the next prerelease line (`9.1-runic.{height}` after
-`9.0.0`), so later pushes never produce the released version again. Releases are tagged `v<version>`; the older
+`9.0.0`), so later pushes never produce the released version again. `9.0.0` was
+the first stable release; `main` now produces `9.1.0-runic.N`. Releases are tagged `v<version>`; the older
 `runic-v8.1.0-runic.0.*` releases are historical.
 
 The [release workflow](../.github/workflows/release.yml) promotes the exact Linux
