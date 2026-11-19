@@ -204,14 +204,15 @@ class GeneratedGateTests(unittest.TestCase):
             root = Path(temporary)
             project = root / "App.csproj"
             cache = root / "cache"
-            package_root = cache / "microsoft.net.illink.tasks/10.0.12"
+            version = VERIFY.ILLINK_VERSION
+            package_root = cache / f"microsoft.net.illink.tasks/{version}"
             target = package_root / "build/Microsoft.NET.ILLink.targets"
             target.parent.mkdir(parents=True)
             target.write_bytes(b"exact pinned SDK default target")
             dll = package_root / "tools/ILLink.dll"
             dll.parent.mkdir()
             dll.write_bytes(b"exact tool bytes")
-            archive = package_root / "microsoft.net.illink.tasks.10.0.12.nupkg"
+            archive = package_root / f"microsoft.net.illink.tasks.{version}.nupkg"
             with zipfile.ZipFile(archive, "w") as output:
                 output.write(target, "build/Microsoft.NET.ILLink.targets")
                 output.write(dll, "tools/ILLink.dll")
@@ -220,8 +221,8 @@ class GeneratedGateTests(unittest.TestCase):
             signed_hash = base64.b64encode(hashlib.sha512(b"unsigned content fixture").digest()).decode()
             archive.with_suffix(".nupkg.sha512").write_text(raw_hash)
             (package_root / ".nupkg.metadata").write_text(json.dumps({"contentHash": signed_hash}))
-            assets = {"packageFolders": {str(cache): {}}, "libraries": {"Microsoft.NET.ILLink.Tasks/10.0.12": {
-                "path": "microsoft.net.illink.tasks/10.0.12", "type": "package",
+            assets = {"packageFolders": {str(cache): {}}, "libraries": {f"Microsoft.NET.ILLink.Tasks/{version}": {
+                "path": f"microsoft.net.illink.tasks/{version}", "type": "package",
                 "sha512": signed_hash}}}
             graph = root / "obj/project.assets.json"
             graph.parent.mkdir()
@@ -236,11 +237,11 @@ class GeneratedGateTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     VERIFY.verify_sdk_warning_origin(project, str(target))
                 archive.write_bytes(original_archive)
-                assets["libraries"]["Microsoft.NET.ILLink.Tasks/10.0.12"]["sha512"] = raw_hash
+                assets["libraries"][f"Microsoft.NET.ILLink.Tasks/{version}"]["sha512"] = raw_hash
                 graph.write_text(json.dumps(assets))
                 with self.assertRaises(ValueError):
                     VERIFY.verify_sdk_warning_origin(project, str(target))
-                assets["libraries"]["Microsoft.NET.ILLink.Tasks/10.0.12"]["sha512"] = signed_hash
+                assets["libraries"][f"Microsoft.NET.ILLink.Tasks/{version}"]["sha512"] = signed_hash
                 graph.write_text(json.dumps(assets))
                 metadata_file = package_root / ".nupkg.metadata"
                 metadata_file.write_text(json.dumps({"contentHash": "tampered"}))

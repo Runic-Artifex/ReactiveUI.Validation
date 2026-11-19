@@ -11,7 +11,7 @@ The benchmark executables set `IsPackable=false` and `IsTestProject=false`.
 BenchmarkDotNet is pinned separately at **0.15.8**, the latest stable package
 verified on 2026-10-05 from [NuGet](https://www.nuget.org/packages/BenchmarkDotNet/0.15.8)
 and the [official changelog](https://benchmarkdotnet.org/changelog/v0.15.8.html).
-It supports .NET 10; this solution uses the repository's SDK **10.0.401** pin.
+It supports .NET 10; this solution uses the repository's SDK **10.0.403** pin.
 The tooling pin belongs to `benchmarks/Directory.Build.props`, leaving the core
 central dependency pins unchanged.
 

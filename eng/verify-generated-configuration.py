@@ -48,7 +48,7 @@ def verify_diagnostics(code, output, required, allowed, provenance):
             raise ValueError(f"Unrelated configuration diagnostic: {line}")
         if provenance not in line:
             raise ValueError(f"Configuration diagnostic has the wrong provenance: {line}")
-        messages = {"RUVG003": ("buildTransitive", "10.0.401", "C# 14"),
+        messages = {"RUVG003": ("buildTransitive", "10.0.403", "C# 14"),
                     "RUVG004": ("matching validation runtime", "bundled analyzer"),
                     "RUVG005": ("bundled analyzer", "Unsafe")}
         if any(token not in match[4] for token in messages.get(match[3], ())):
@@ -500,7 +500,7 @@ def run_packed_cases(*, root, work, output, source, reactive, package_id, versio
             else:
                 verify_success(runtime_code, runtime_text)
                 if case == "excluded-analyzer":
-                    result["boundary"] = "Locked SDK10.0.401 preserves NuGet analyzer-exclusion flags but still selects the exact generator; generated typed rule executes. Actual absence is separately proved by removed-analyzer."
+                    result["boundary"] = "Locked SDK10.0.403 preserves NuGet analyzer-exclusion flags but still selects the exact generator; generated typed rule executes. Actual absence is separately proved by removed-analyzer."
                 else:
                     result["boundary"] = "Generated typed rule executes; diagnostic-analyzer disable does not disable generators" if case == "analyzers-disabled" else "Generated typed rule executes"
         result["passed"] = True

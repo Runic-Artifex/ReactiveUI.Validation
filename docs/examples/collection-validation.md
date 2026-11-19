@@ -16,7 +16,7 @@ dotnet run --project examples/CollectionValidation/Reactive/CollectionValidation
 
 On the Runic NixOS desktop, prefix each command with
 `direnv exec /absolute/path/to/runic-sdk`. The root `global.json` selects SDK
-10.0.401; the example project references the matching Validation flavor, which
+10.0.403; the example project references the matching Validation flavor, which
 supplies the existing pinned dependency cohort. No sibling DynamicData build is
 used.
 

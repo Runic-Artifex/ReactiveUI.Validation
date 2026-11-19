@@ -9,7 +9,7 @@ does not complete that pair's final gate.
 | Control | Required boundary |
 | --- | --- |
 | generated | Clean compilation and actual generated typed-rule execution. |
-| excluded-analyzer | On locked SDK 10.0.401, restore metadata excludes analyzers but actual compiler inputs still contain the exact bundled generator; generated execution succeeds. |
+| excluded-analyzer | On locked SDK 10.0.403, restore metadata excludes analyzers but actual compiler inputs still contain the exact bundled generator; generated execution succeeds. |
 | removed-analyzer | The exact bundled `Analyzer` item is absent; compilation succeeds and the actual normal runtime call fails with its actionable missing-capability message and supported alternatives. |
 | analyzers-disabled | `RunAnalyzers=false` disables diagnostic analysis while source generation and typed execution remain present. |
 | excluded-build | Packaged transitive props and the generated namespace allowlist are absent; the selected normal call reports actionable `RUVG003`. |
@@ -22,7 +22,7 @@ does not complete that pair's final gate.
 
 `ExcludeAssets=analyzers` is not proof of actual analyzer absence on this locked
 SDK. The measured compiler inputs determine that boundary. The official
-[SDK 10.0.401 resolver](https://github.com/dotnet/sdk/blob/v10.0.401/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs)
+[SDK 10.0.403 resolver](https://github.com/dotnet/sdk/blob/v10.0.403/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs)
 reads package analyzer files. The official
 [NuGet analyzer-assets notes](https://github.com/dotnet/core/blob/main/release-notes/11.0/preview/preview7/nuget.md)
 also distinguish restored exclusion metadata from SDK enforcement. These controls

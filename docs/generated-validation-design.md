@@ -38,7 +38,7 @@ Both branded core packages embed the analyzer at
 `analyzers/dotnet/roslyn5.9/cs/ReactiveUI.Validation.SourceGenerators.dll` and
 flavor-named `buildTransitive` props that add `ReactiveUI.Validation.Generated`
 to `InterceptorsNamespaces` and expose producer-version properties. Consumers
-must keep both assets and compile with SDK 10.0.401 / C# 14 (Roslyn 5.9); no
+must keep both assets and compile with SDK 10.0.403 / C# 14 (Roslyn 5.9); no
 separate generator package is needed. Primitives uses
 `ReactiveUI.Validation.Capabilities`; Reactive uses
 `ReactiveUI.Validation.Reactive.Capabilities`.

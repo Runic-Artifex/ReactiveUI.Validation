@@ -16,7 +16,7 @@ RunicArtifex.DynamicData 10.0.0 from NuGet.org.
 
 Both core packages embed `ReactiveUI.Validation.SourceGenerators.dll` and
 flavor-named `buildTransitive` props allowlisting `ReactiveUI.Validation.Generated`.
-Keep both analyzer and build assets and compile with SDK 10.0.401 / C# 14. No
+Keep both analyzer and build assets and compile with SDK 10.0.403 / C# 14. No
 additional generator package is needed. If generation is missing, inspect the
 real compiler analyzer inputs and imported props.
 
