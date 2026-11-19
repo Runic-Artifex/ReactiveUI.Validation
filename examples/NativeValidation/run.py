@@ -103,7 +103,7 @@ def main():
         parser.error("candidate restores RunicArtifex.DynamicData from NuGet.org; omit the DynamicData feed")
     if candidate and args.version == BASELINE:
         parser.error("candidate requires a fresh version and candidate feed")
-    assert subprocess.check_output(["dotnet", "--version"], text=True).strip() == "10.0.401"
+    assert subprocess.check_output(["dotnet", "--version"], text=True).strip() == json.loads((ROOT.parents[1] / "global.json").read_text())["sdk"]["version"]
     args.validation_feed = args.validation_feed.resolve()
     validation = CURRENT_VALIDATION if candidate else BASELINE_VALIDATION
     source_list = [("validation", str(args.validation_feed), f"{validation}*")]

@@ -9,7 +9,7 @@ retiring an adaptation. The generated validation surface is described in the
 [migration guide](docs/examples/generated-validation.md); trimming and NativeAOT
 in [NativeAOT and generators](docs/aot-and-generators.md).
 
-Use .NET SDK 10.0.401 (pinned in `global.json`) and Python 3. On the Runic
+Use .NET SDK 10.0.403 (pinned in `global.json`) and Python 3. On the Runic
 desktop, reuse the locked shell with `direnv exec ../runic-sdk <command>` from
 the repository root (or `direnv exec ../../runic-sdk <command>` from `src`).
 
@@ -88,7 +88,7 @@ trimmed and NativeAOT consumers. Gate tooling lives in `eng/` (including
 The core packages embed `ReactiveUI.Validation.SourceGenerators.dll` under
 `analyzers/dotnet/roslyn5.9/cs` and `buildTransitive` props that add
 `ReactiveUI.Validation.Generated` to `InterceptorsNamespaces`. Consumers must keep
-those assets and compile with SDK 10.0.401 / C# 14; inspect a consumer's
+those assets and compile with SDK 10.0.403 / C# 14; inspect a consumer's
 analyzer inputs and imported props when generation is missing. Normal calls that
 are neither intercepted nor matched by a registered typed plan fail at build or
 run time; `*Unsafe` methods keep reflection and its warnings.

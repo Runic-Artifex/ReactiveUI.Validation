@@ -46,7 +46,7 @@ public sealed class ValidationGenerator : IIncrementalGenerator
         "RUVG003",
         "Validation call cannot be intercepted",
         "The compiler must provide encoded interception locations and allow ReactiveUI.Validation.Generated. Retain the packaged buildTransitive props "
-        + "and use the supported .NET 10.0.401 SDK and C# 14 compiler.",
+        + "and use the supported .NET 10.0.403 SDK and C# 14 compiler.",
         Category,
         DiagnosticSeverity.Error,
         true);
