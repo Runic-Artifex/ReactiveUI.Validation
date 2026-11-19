@@ -19,7 +19,7 @@ namespace ReactiveUI.Validation.Extensions;
 [SuppressMessage(
     "Design",
     "SST1703:Use extension block",
-    Justification = "SDK 10.0.401 C# 14 static bridges impose incorrect notnull constraints; traditional extensions preserve nullable generic values.")]
+    Justification = "SDK 10.0.403 C# 14 static bridges impose incorrect notnull constraints; traditional extensions preserve nullable generic values.")]
 public static class ObservableValidationBindingExtensions
 {
     /// <summary>Projects unchanged states from the latest selected source.</summary>
