@@ -1,6 +1,6 @@
 # Upstream pull request catalog
 
-Snapshot: 2026-10-05. Every accessible upstream pull request is listed, including closed records. Total: **936**.
+Snapshot: 2026-10-05, extended with the items of each [monthly upstream review](README.md#monthly-reviews). Every accessible upstream pull request is listed, including closed records. Total: **944**.
 
 Read the [Runic assessment](README.md) for prioritized implementation notes.
 
@@ -168,9 +168,17 @@ The summary describes the upstream item; the final column is our assessment. A m
 
 | Item | State | Summary | Runic assessment |
 | --- | --- | --- | --- |
+| [#1000](https://github.com/reactiveui/ReactiveUI.Validation/pull/1000) chore(deps): update dependency dynamicdata to 9.5.0 - autoclosed | CLOSED | Updates dependency DynamicData from 9.4.33 to 9.5.0 - autoclosed. | Not applicable: the fork builds on RunicArtifex.DynamicData 10.x |
+| [#999](https://github.com/reactiveui/ReactiveUI.Validation/pull/999) chore(deps): update dotnet monorepo - autoclosed | CLOSED | Updates System.Collections.Immutable to 10.0.15 and the .NET 11 cohort to 11.0.0 - autoclosed. | Maintenance; .NET 11 outside support policy |
+| [#998](https://github.com/reactiveui/ReactiveUI.Validation/pull/998) chore(deps): update dependency microsoft.sourcelink.github to 10.0.404 - autoclosed | CLOSED | Updates dependency microsoft.sourcelink.github to 10.0.404 - autoclosed. | Maintenance |
+| [#997](https://github.com/reactiveui/ReactiveUI.Validation/pull/997) chore(deps): update dependency microsoft.net.test.sdk to 18.11.1 - autoclosed | CLOSED | Updates dependency microsoft.net.test.sdk to 18.11.1 - autoclosed. | Maintenance |
+| [#996](https://github.com/reactiveui/ReactiveUI.Validation/pull/996) chore(deps): update avalonia - autoclosed | CLOSED | Updates the Avalonia sample packages to 12.1.6 - autoclosed. | Maintenance (samples) |
+| [#995](https://github.com/reactiveui/ReactiveUI.Validation/pull/995) chore(deps): update dependency tunit to 1.83.0 - autoclosed | CLOSED | Updates dependency TUnit to 1.83.0 - autoclosed. | Maintenance |
+| [#994](https://github.com/reactiveui/ReactiveUI.Validation/pull/994) chore(deps): update github actions | MERGED | Updates the actions/download-artifact and actions/setup-dotnet digests in the release workflow. | Maintenance; the fork pins its own workflow actions |
+| [#993](https://github.com/reactiveui/ReactiveUI.Validation/pull/993) chore(deps): update reactiveui (major) | MERGED | Updates ReactiveUI to 26 and ReactiveUI.Validation to 8 in the UWP sample. | Maintenance (samples); the fork already uses ReactiveUI 26.0.1 |
 | [#991](https://github.com/reactiveui/ReactiveUI.Validation/pull/991) build(deps): update NuGet packages | MERGED | Updates NuGet packages. | Maintenance |
 | [#989](https://github.com/reactiveui/ReactiveUI.Validation/pull/989) chore(deps): update dependency reactiveui to v25 | MERGED | Updates dependency reactiveui to v25. | Maintenance |
-| [#988](https://github.com/reactiveui/ReactiveUI.Validation/pull/988) chore(deps): update dependency polyfill to 11.4.1 - autoclosed | CLOSED | Updates dependency polyfill to 11.4.1 - autoclosed. | Maintenance |
+| [#988](https://github.com/reactiveui/ReactiveUI.Validation/pull/988) chore(deps): update dependency polyfill to 11.4.5 - autoclosed | CLOSED | Updates dependency polyfill to 11.4.5 (retitled from 11.4.1) - autoclosed. | Maintenance |
 | [#987](https://github.com/reactiveui/ReactiveUI.Validation/pull/987) chore(deps): update dependency reactiveui.sourcegenerators to v4 | MERGED | Updates dependency reactiveui.sourcegenerators to v4. | Maintenance |
 | [#986](https://github.com/reactiveui/ReactiveUI.Validation/pull/986) chore(deps): update reactiveui to 24.3.0 | MERGED | Updates reactiveui to 24.3.0. | Maintenance |
 | [#985](https://github.com/reactiveui/ReactiveUI.Validation/pull/985) chore(deps): update avalonia to 12.1.3 | MERGED | Updates avalonia to 12.1.3. | Maintenance |

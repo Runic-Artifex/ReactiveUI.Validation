@@ -17,6 +17,14 @@ pull requests were open.
 | [Issue catalog](issues.md) | All 53 issues, with links, summaries and a Runic disposition. |
 | [Pull request catalog](pull-requests.md) | All 936 PRs, grouped by topic, with links, state, summaries and a disposition. |
 
+## Monthly reviews
+
+Outcome of each `Upstream review YYYY-MM` issue. Its items are added to the catalogs.
+
+| Review | Upstream main | Outcome |
+| --- | --- | --- |
+| [2026-11](https://github.com/Runic-Artifex/ReactiveUI.Validation/issues/11) | [`cde3062`](https://github.com/reactiveui/ReactiveUI.Validation/commit/cde3062937752abeb4216a92c15f5b3b37be9a34) | No sync: the fork already contains upstream `main`. The 19 items are Renovate dependency updates (#993–#1000 added to the catalog), #634 (Dependency Dashboard) and #992 (.NET 11, outside the support policy). #1000 (DynamicData 9.5.0) does not apply, because the fork builds on RunicArtifex.DynamicData 10.x. Nothing to adopt and no fork issues. The upstream commits after `cde3062` (from 2026-11-10: ReactiveUI 26, net11.0 and .NET Framework targets, CI layout) are left to the next review. |
+
 ## Recommended work
 
 Priorities here are our recommendations, not upstream labels. P1 means useful next work; P2 means a follow-up after correctness and a consumer scenario; P3 means defer. Effort describes scope, not a delivery estimate.
